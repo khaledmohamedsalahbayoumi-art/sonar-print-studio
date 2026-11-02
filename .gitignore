@@ -1,0 +1,30 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Production build artifacts
+dist/
+dist-ssr/
+*.local
+
+# Packaged Desktop App (Binaries > 100MB rejected by GitHub)
+SonarStudio-App/
+*.exe
+*.dll
+*.pak
+*.bin
+*.asar
+*.asar.bak
+
+# Logs and temp files
+run_output.txt
+*.log
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
