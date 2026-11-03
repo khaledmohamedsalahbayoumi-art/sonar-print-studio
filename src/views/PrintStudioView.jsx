@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { PrintSheet } from '../components/PrintSheet';
+import { PrinterSelectModal } from '../components/PrinterSelectModal';
 import { useDoctor } from '../context/DoctorContext';
+import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import {
   Printer,
   FileDown,
@@ -12,6 +15,7 @@ import {
   RefreshCw,
   Eye,
   ArrowRight,
+  ArrowLeft,
   Sparkles,
   Check,
   RotateCw,
@@ -30,6 +34,8 @@ export function PrintStudioView({
   onBackToHome
 }) {
   const { doctorInfo, updateDoctorInfo } = useDoctor();
+  const { t, isRTL } = useLanguage();
+  const { theme } = useTheme();
 
   // Selected images to display
   const selectedImages = images.filter((img) => selectedImageIds.includes(img.id));
@@ -55,6 +61,10 @@ export function PrintStudioView({
   // Slot custom transformations: { [slotIndex]: { scale: 1, x: 0, y: 0 } }
   const [slotTransforms, setSlotTransforms] = useState({});
   const [globalScale, setGlobalScale] = useState(100);
+
+  // Printer Selection Modal & Active Device
+  const [isPrinterModalOpen, setIsPrinterModalOpen] = useState(false);
+  const [selectedPrinterName, setSelectedPrinterName] = useState('');
 
   // Ultrasound Image Adjustments
   const [imageFit, setImageFit] = useState('contain'); // contain or cover
@@ -124,19 +134,31 @@ export function PrintStudioView({
     setSlotTransforms(newTransforms);
   };
 
-  // Handle direct printing
-  const handleDirectPrint = async () => {
+  // Handle direct printing with chosen printer and options
+  const handleExecutePrint = async (options = {}) => {
     setActiveSlotIndex(null); // Clear active slot before print so selection border doesn't print
     setIsPrinting(true);
+
+    if (options.deviceName) {
+      setSelectedPrinterName(options.deviceName);
+    }
 
     if (window.electronAPI && typeof window.electronAPI.directPrint === 'function') {
       try {
         await window.electronAPI.directPrint({
           pageSize: paperSize,
           landscape: orientation === 'landscape',
-          color: !isGrayscale
+          color: options.color !== false,
+          deviceName: options.deviceName,
+          copies: options.copies || 1,
+          silent: options.silent
         });
         setIsPrinting(false);
+        if (options.deviceName) {
+          setToastMsg(`تم إرسال أمر الطباعة بنجاح إلى: ${options.deviceName}`);
+        } else {
+          setToastMsg('تم إرسال أمر الطباعة بنجاح');
+        }
         return;
       } catch (err) {
         console.warn('Native direct print error:', err);
@@ -215,19 +237,23 @@ export function PrintStudioView({
     });
   };
 
+  const BackIcon = isRTL ? ArrowRight : ArrowLeft;
+
   return (
     <div className="print-studio-container" style={{
       display: 'flex',
       height: 'calc(100vh - 72px)',
       overflow: 'hidden',
-      backgroundColor: '#090d16'
+      backgroundColor: 'var(--bg-primary)',
+      direction: isRTL ? 'rtl' : 'ltr'
     }}>
 
-      {/* RIGHT SIDEBAR: Print Controls & Layout Tuning */}
+      {/* SIDEBAR: Print Controls & Layout Tuning */}
       <div className="no-print" style={{
         width: '380px',
-        backgroundColor: '#0f172a',
-        borderLeft: '1px solid #1e293b',
+        backgroundColor: 'var(--bg-secondary)',
+        borderInlineStart: isRTL ? 'none' : '1px solid var(--border-subtle)',
+        borderInlineEnd: isRTL ? '1px solid var(--border-subtle)' : 'none',
         display: 'flex',
         flexDirection: 'column',
         zIndex: 20,
@@ -237,7 +263,7 @@ export function PrintStudioView({
         {/* Studio Top Action Bar */}
         <div style={{
           padding: '16px 20px',
-          borderBottom: '1px solid #1e293b',
+          borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between'
@@ -247,12 +273,12 @@ export function PrintStudioView({
             className="btn btn-secondary"
             style={{ padding: '6px 12px', fontSize: '0.85rem' }}
           >
-            <ArrowRight size={16} />
-            <span>الرجوع لاختيار الصور</span>
+            <BackIcon size={16} />
+            <span>{t('backToImages')}</span>
           </button>
 
           <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#38bdf8' }}>
-            تجهيز الطباعة
+            {t('printPreparation')}
           </span>
         </div>
 
@@ -261,19 +287,19 @@ export function PrintStudioView({
 
           {/* 1. LAYOUT PRESETS */}
           <div style={{ marginBottom: '22px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 800, color: '#f8fafc', marginBottom: '10px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '10px' }}>
               <LayoutGrid size={18} color="#0ea5e9" />
-              <span>تقسيم وترتيب الصور في الصفحة</span>
+              <span>{t('imageLayoutGrid')}</span>
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
               {[
-                { id: '1', label: '1 صورة', desc: 'مكبرة' },
-                { id: '2-h', label: '2 أفقي', desc: '1×2' },
-                { id: '2-v', label: '2 رأسي', desc: '2×1' },
-                { id: '4', label: '4 صور', desc: '2×2 قياسي' },
-                { id: '6', label: '6 صور', desc: '3×2' },
-                { id: '8', label: '8 صور', desc: '4×2' },
-                { id: '9', label: '9 صور', desc: '3×3' }
+                { id: '1', label: t('layout1'), desc: t('layout1desc') },
+                { id: '2-h', label: t('layout2h'), desc: t('layout2hdesc') },
+                { id: '2-v', label: t('layout2v'), desc: t('layout2vdesc') },
+                { id: '4', label: t('layout4'), desc: t('layout4desc') },
+                { id: '6', label: t('layout6'), desc: t('layout6desc') },
+                { id: '8', label: t('layout8'), desc: t('layout8desc') },
+                { id: '9', label: t('layout9'), desc: t('layout9desc') }
               ].map((layout) => (
                 <button
                   key={layout.id}
@@ -281,16 +307,16 @@ export function PrintStudioView({
                   style={{
                     padding: '10px 6px',
                     borderRadius: '10px',
-                    border: gridPreset === layout.id ? '2px solid #0284c7' : '1px solid #334155',
-                    background: gridPreset === layout.id ? 'rgba(2, 132, 199, 0.2)' : '#141f36',
-                    color: gridPreset === layout.id ? '#38bdf8' : '#e2e8f0',
+                    border: gridPreset === layout.id ? '2px solid #0284c7' : '1px solid var(--border-subtle)',
+                    background: gridPreset === layout.id ? 'rgba(2, 132, 199, 0.2)' : 'var(--bg-card)',
+                    color: gridPreset === layout.id ? '#38bdf8' : 'var(--text-main)',
                     cursor: 'pointer',
                     textAlign: 'center',
                     transition: 'all 0.15s'
                   }}
                 >
                   <div style={{ fontSize: '0.88rem', fontWeight: 800 }}>{layout.label}</div>
-                  <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>{layout.desc}</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{layout.desc}</div>
                 </button>
               ))}
             </div>
@@ -298,9 +324,9 @@ export function PrintStudioView({
 
           {/* 2. PAPER FORMAT & ORIENTATION */}
           <div style={{ marginBottom: '22px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 800, color: '#f8fafc', marginBottom: '10px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '10px' }}>
               <Sliders size={18} color="#0ea5e9" />
-              <span>إعدادات ورق الطباعة</span>
+              <span>{t('paperSettings')}</span>
             </label>
 
             {/* Paper Size */}
@@ -310,15 +336,15 @@ export function PrintStudioView({
                 style={{
                   padding: '8px',
                   borderRadius: '8px',
-                  border: paperSize === 'A4' ? '2px solid #0284c7' : '1px solid #334155',
-                  background: paperSize === 'A4' ? '#0284c7' : '#141f36',
-                  color: '#ffffff',
+                  border: paperSize === 'A4' ? '2px solid #0284c7' : '1px solid var(--border-subtle)',
+                  background: paperSize === 'A4' ? '#0284c7' : 'var(--bg-card)',
+                  color: paperSize === 'A4' ? '#ffffff' : 'var(--text-main)',
                   fontWeight: 700,
                   fontSize: '0.85rem',
                   cursor: 'pointer'
                 }}
               >
-                ورق A4 (قياسي)
+                {t('paperA4')}
               </button>
 
               <button
@@ -326,15 +352,15 @@ export function PrintStudioView({
                 style={{
                   padding: '8px',
                   borderRadius: '8px',
-                  border: paperSize === 'A5' ? '2px solid #0284c7' : '1px solid #334155',
-                  background: paperSize === 'A5' ? '#0284c7' : '#141f36',
-                  color: '#ffffff',
+                  border: paperSize === 'A5' ? '2px solid #0284c7' : '1px solid var(--border-subtle)',
+                  background: paperSize === 'A5' ? '#0284c7' : 'var(--bg-card)',
+                  color: paperSize === 'A5' ? '#ffffff' : 'var(--text-main)',
                   fontWeight: 700,
                   fontSize: '0.85rem',
                   cursor: 'pointer'
                 }}
               >
-                ورق A5 (نصف صفحة)
+                {t('paperA5')}
               </button>
             </div>
 
@@ -345,15 +371,15 @@ export function PrintStudioView({
                 style={{
                   padding: '8px',
                   borderRadius: '8px',
-                  border: orientation === 'portrait' ? '2px solid #0ea5e9' : '1px solid #334155',
-                  background: orientation === 'portrait' ? 'rgba(14, 165, 233, 0.25)' : '#141f36',
-                  color: orientation === 'portrait' ? '#38bdf8' : '#cbd5e1',
+                  border: orientation === 'portrait' ? '2px solid #0ea5e9' : '1px solid var(--border-subtle)',
+                  background: orientation === 'portrait' ? 'rgba(14, 165, 233, 0.25)' : 'var(--bg-card)',
+                  color: orientation === 'portrait' ? '#38bdf8' : 'var(--text-main)',
                   fontWeight: 700,
                   fontSize: '0.85rem',
                   cursor: 'pointer'
                 }}
               >
-                طولي (Portrait)
+                {t('orientationPortrait')}
               </button>
 
               <button
@@ -361,37 +387,41 @@ export function PrintStudioView({
                 style={{
                   padding: '8px',
                   borderRadius: '8px',
-                  border: orientation === 'landscape' ? '2px solid #0ea5e9' : '1px solid #334155',
-                  background: orientation === 'landscape' ? 'rgba(14, 165, 233, 0.25)' : '#141f36',
-                  color: orientation === 'landscape' ? '#38bdf8' : '#cbd5e1',
+                  border: orientation === 'landscape' ? '2px solid #0ea5e9' : '1px solid var(--border-subtle)',
+                  background: orientation === 'landscape' ? 'rgba(14, 165, 233, 0.25)' : 'var(--bg-card)',
+                  color: orientation === 'landscape' ? '#38bdf8' : 'var(--text-main)',
                   fontWeight: 700,
                   fontSize: '0.85rem',
                   cursor: 'pointer'
                 }}
               >
-                عرضي (Landscape)
+                {t('orientationLandscape')}
               </button>
             </div>
 
             {/* Margins */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#141f36', padding: '8px 12px', borderRadius: '8px', border: '1px solid #334155' }}>
-              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>هوامش الورقة:</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('pageMargins')}</span>
               <div style={{ display: 'flex', gap: '6px' }}>
-                {['tight', 'normal', 'wide'].map((m) => (
+                {[
+                  { id: 'tight', label: t('marginTight') },
+                  { id: 'normal', label: t('marginNormal') },
+                  { id: 'wide', label: t('marginWide') }
+                ].map((m) => (
                   <button
-                    key={m}
-                    onClick={() => setMargins(m)}
+                    key={m.id}
+                    onClick={() => setMargins(m.id)}
                     style={{
                       padding: '4px 8px',
                       borderRadius: '6px',
                       fontSize: '0.75rem',
                       border: 'none',
                       cursor: 'pointer',
-                      background: margins === m ? '#0284c7' : '#1e293b',
-                      color: '#ffffff'
+                      background: margins === m.id ? '#0284c7' : 'var(--bg-secondary)',
+                      color: margins === m.id ? '#ffffff' : 'var(--text-main)'
                     }}
                   >
-                    {m === 'tight' ? 'ضيق' : m === 'normal' ? 'عادي' : 'عريض'}
+                    {m.label}
                   </button>
                 ))}
               </div>
@@ -400,9 +430,9 @@ export function PrintStudioView({
 
           {/* 3. ULTRASOUND IMAGE ENHANCEMENT */}
           <div style={{ marginBottom: '22px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 800, color: '#f8fafc', marginBottom: '10px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '10px' }}>
               <SunMedium size={18} color="#f59e0b" />
-              <span>معالجة ووضوح صور السونار</span>
+              <span>{t('imageEnhancement')}</span>
             </label>
 
             {/* Fit mode */}
@@ -412,16 +442,15 @@ export function PrintStudioView({
                 style={{
                   padding: '8px',
                   borderRadius: '8px',
-                  border: imageFit === 'contain' ? '2px solid #0284c7' : '1px solid #334155',
-                  background: imageFit === 'contain' ? 'rgba(2, 132, 199, 0.25)' : '#141f36',
-                  color: imageFit === 'contain' ? '#38bdf8' : '#cbd5e1',
+                  border: imageFit === 'contain' ? '2px solid #0284c7' : '1px solid var(--border-subtle)',
+                  background: imageFit === 'contain' ? 'rgba(2, 132, 199, 0.25)' : 'var(--bg-card)',
+                  color: imageFit === 'contain' ? '#38bdf8' : 'var(--text-main)',
                   fontWeight: 700,
                   fontSize: '0.82rem',
                   cursor: 'pointer'
                 }}
-                title="يمنع قص القياسات والبيانات الهامشية للسونار"
               >
-                احتواء كامل (Fit)
+                {t('fitContain')}
               </button>
 
               <button
@@ -429,23 +458,22 @@ export function PrintStudioView({
                 style={{
                   padding: '8px',
                   borderRadius: '8px',
-                  border: imageFit === 'cover' ? '2px solid #0284c7' : '1px solid #334155',
-                  background: imageFit === 'cover' ? 'rgba(2, 132, 199, 0.25)' : '#141f36',
-                  color: imageFit === 'cover' ? '#38bdf8' : '#cbd5e1',
+                  border: imageFit === 'cover' ? '2px solid #0284c7' : '1px solid var(--border-subtle)',
+                  background: imageFit === 'cover' ? 'rgba(2, 132, 199, 0.25)' : 'var(--bg-card)',
+                  color: imageFit === 'cover' ? '#38bdf8' : 'var(--text-main)',
                   fontWeight: 700,
                   fontSize: '0.82rem',
                   cursor: 'pointer'
                 }}
-                title="يملأ الإطار بالكامل"
               >
-                ملء الإطار (Fill)
+                {t('fitCover')}
               </button>
             </div>
 
             {/* Global Zoom / Scale Slider */}
-            <div style={{ marginBottom: '14px', background: '#141f36', padding: '10px 12px', borderRadius: '8px', border: '1px solid #334155' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#94a3b8', marginBottom: '6px' }}>
-                <span style={{ fontWeight: 700, color: '#f8fafc' }}>🔍 مقياس حجم الصور العام</span>
+            <div style={{ marginBottom: '14px', background: 'var(--bg-card)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>
+                <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>{t('globalScale')}</span>
                 <span style={{ color: '#38bdf8', fontWeight: 800 }}>{globalScale}%</span>
               </div>
               <input
@@ -464,14 +492,14 @@ export function PrintStudioView({
                     flex: 1,
                     padding: '4px',
                     fontSize: '0.72rem',
-                    background: '#1e293b',
-                    border: '1px solid #334155',
-                    color: globalScale === 100 ? '#38bdf8' : '#cbd5e1',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-subtle)',
+                    color: globalScale === 100 ? '#38bdf8' : 'var(--text-main)',
                     borderRadius: '4px',
                     cursor: 'pointer'
                   }}
                 >
-                  100% قياسي
+                  {t('standard100')}
                 </button>
                 <button
                   type="button"
@@ -480,23 +508,22 @@ export function PrintStudioView({
                     flex: 1,
                     padding: '4px',
                     fontSize: '0.72rem',
-                    background: '#1e293b',
-                    border: '1px solid #334155',
-                    color: globalScale === 145 ? '#38bdf8' : '#cbd5e1',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-subtle)',
+                    color: globalScale === 145 ? '#38bdf8' : 'var(--text-main)',
                     borderRadius: '4px',
                     cursor: 'pointer'
                   }}
-                  title="تكبير الصور بنسبة 145% لتناسب الخانات الطولية بدون فراغات"
                 >
-                  ملء العرض 145%
+                  {t('fitWidth145')}
                 </button>
               </div>
             </div>
 
             {/* Brightness slider */}
             <div style={{ marginBottom: '10px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#94a3b8', marginBottom: '4px' }}>
-                <span>سطوع الصورة (Brightness)</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                <span>{t('brightness')}</span>
                 <span style={{ color: '#38bdf8', fontWeight: 700 }}>{brightness}%</span>
               </div>
               <input
@@ -511,8 +538,8 @@ export function PrintStudioView({
 
             {/* Contrast slider */}
             <div style={{ marginBottom: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#94a3b8', marginBottom: '4px' }}>
-                <span>تباين الأنسجة (Contrast)</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                <span>{t('contrast')}</span>
                 <span style={{ color: '#38bdf8', fontWeight: 700 }}>{contrast}%</span>
               </div>
               <input
@@ -533,13 +560,13 @@ export function PrintStudioView({
                   padding: '6px',
                   borderRadius: '6px',
                   fontSize: '0.75rem',
-                  border: '1px solid #334155',
-                  background: isGrayscale ? '#0284c7' : '#141f36',
-                  color: '#ffffff',
+                  border: '1px solid var(--border-subtle)',
+                  background: isGrayscale ? '#0284c7' : 'var(--bg-card)',
+                  color: isGrayscale ? '#ffffff' : 'var(--text-main)',
                   cursor: 'pointer'
                 }}
               >
-                {isGrayscale ? '✓ رمادي طبي' : 'أبيض وأسود طبي'}
+                {isGrayscale ? t('grayscaleActive') : t('grayscale')}
               </button>
 
               <button
@@ -548,41 +575,41 @@ export function PrintStudioView({
                   padding: '6px',
                   borderRadius: '6px',
                   fontSize: '0.75rem',
-                  border: '1px solid #334155',
-                  background: isInverted ? '#0284c7' : '#141f36',
-                  color: '#ffffff',
+                  border: '1px solid var(--border-subtle)',
+                  background: isInverted ? '#0284c7' : 'var(--bg-card)',
+                  color: isInverted ? '#ffffff' : 'var(--text-main)',
                   cursor: 'pointer'
                 }}
               >
-                {isInverted ? '✓ وضع معكوس (Neg)' : 'صورة معكوسة (Negative)'}
+                {isInverted ? t('negativeActive') : t('negative')}
               </button>
             </div>
           </div>
 
           {/* 4. PAGE HEADER & FOOTER TOGGLES */}
-          <div style={{ marginBottom: '22px', background: '#141f36', padding: '12px', borderRadius: '10px', border: '1px solid #334155' }}>
-            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc', marginBottom: '8px' }}>
-              عناصر الصفحة
+          <div style={{ marginBottom: '22px', background: 'var(--bg-card)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
+              {t('pageElements')}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: '#cbd5e1', cursor: 'pointer' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
                 <input
                   type="checkbox"
                   checked={doctorInfo.showHeaderOnPrint}
                   onChange={(e) => updateDoctorInfo({ showHeaderOnPrint: e.target.checked })}
                   style={{ accentColor: '#0284c7' }}
                 />
-                <span>إظهار ترويسة الدكتور واللوجو</span>
+                <span>{t('showHeader')}</span>
               </label>
 
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: '#cbd5e1', cursor: 'pointer' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
                 <input
                   type="checkbox"
                   checked={doctorInfo.showFooterOnPrint}
                   onChange={(e) => updateDoctorInfo({ showFooterOnPrint: e.target.checked })}
                   style={{ accentColor: '#0284c7' }}
                 />
-                <span>إظهار التوقيع والملاحظة أسفل الورقة</span>
+                <span>{t('showFooter')}</span>
               </label>
             </div>
           </div>
@@ -590,7 +617,7 @@ export function PrintStudioView({
           {/* 5. ACTIVE SLOT ASSIGNMENT DRAWER */}
           {activeSlotIndex !== null && (
             <div style={{
-              background: '#152445',
+              background: 'var(--bg-card)',
               border: '2px solid #0284c7',
               borderRadius: '12px',
               padding: '14px',
@@ -598,33 +625,33 @@ export function PrintStudioView({
             }} className="fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#38bdf8' }}>
-                  تخصيص الخانة رقم ({activeSlotIndex + 1}):
+                  {t('slotCustomization', { num: activeSlotIndex + 1 })}
                 </div>
                 <button
                   onClick={() => setActiveSlotIndex(null)}
-                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '0.8rem' }}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.8rem' }}
                 >
-                  إغلاق ✕
+                  ✕
                 </button>
               </div>
 
               {/* Slot label edit */}
               <div style={{ marginBottom: '12px' }}>
-                <label style={{ display: 'block', fontSize: '0.74rem', color: '#94a3b8', marginBottom: '4px' }}>
-                  كتابة وصف أو تشخيص للخانة:
+                <label style={{ display: 'block', fontSize: '0.74rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                  {t('slotLabelInput')}
                 </label>
                 <input
                   type="text"
                   value={slotLabels[activeSlotIndex] || ''}
                   onChange={(e) => setSlotLabels({ ...slotLabels, [activeSlotIndex]: e.target.value })}
-                  placeholder="مثال: Right Kidney, Gallbladder..."
+                  placeholder={t('slotLabelPlaceholder')}
                   style={{
                     width: '100%',
                     padding: '6px 10px',
                     borderRadius: '6px',
-                    border: '1px solid #334155',
-                    background: '#0f172a',
-                    color: '#ffffff',
+                    border: '1px solid var(--border-subtle)',
+                    background: 'var(--bg-secondary)',
+                    color: 'var(--text-main)',
                     fontSize: '0.8rem',
                     outline: 'none'
                   }}
@@ -635,14 +662,14 @@ export function PrintStudioView({
               {slotImages[activeSlotIndex] && (
                 <div style={{
                   marginBottom: '14px',
-                  background: '#0d1527',
+                  background: 'var(--bg-secondary)',
                   padding: '12px',
                   borderRadius: '8px',
-                  border: '1px solid #1e293b'
+                  border: '1px solid var(--border-subtle)'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#f8fafc' }}>
-                      📐 حجم وتكبير الصورة بالخانة:
+                    <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-main)' }}>
+                      {t('slotScaleTitle')}
                     </span>
                     <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#38bdf8' }}>
                       {Math.round(((slotTransforms[activeSlotIndex]?.scale) || 1) * 100)}%
@@ -669,14 +696,14 @@ export function PrintStudioView({
                         borderRadius: '6px',
                         fontSize: '0.72rem',
                         fontWeight: 700,
-                        border: '1px solid #334155',
-                        background: (slotTransforms[activeSlotIndex]?.scale || 1) === 1.45 ? '#0284c7' : '#141f36',
-                        color: '#ffffff',
+                        border: '1px solid var(--border-subtle)',
+                        background: (slotTransforms[activeSlotIndex]?.scale || 1) === 1.45 ? '#0284c7' : 'var(--bg-card)',
+                        color: (slotTransforms[activeSlotIndex]?.scale || 1) === 1.45 ? '#ffffff' : 'var(--text-main)',
                         cursor: 'pointer'
                       }}
-                      title="ملء عرض الخانة والتخلص من الفراغ الرأسي"
+                      title="145%"
                     >
-                      ملء العرض (145%)
+                      {t('fitWidthBtn')}
                     </button>
                     <button
                       type="button"
@@ -686,14 +713,14 @@ export function PrintStudioView({
                         borderRadius: '6px',
                         fontSize: '0.72rem',
                         fontWeight: 700,
-                        border: '1px solid #334155',
-                        background: (slotTransforms[activeSlotIndex]?.scale || 1) === 1.8 ? '#0284c7' : '#141f36',
-                        color: '#ffffff',
+                        border: '1px solid var(--border-subtle)',
+                        background: (slotTransforms[activeSlotIndex]?.scale || 1) === 1.8 ? '#0284c7' : 'var(--bg-card)',
+                        color: (slotTransforms[activeSlotIndex]?.scale || 1) === 1.8 ? '#ffffff' : 'var(--text-main)',
                         cursor: 'pointer'
                       }}
-                      title="تكبير واضح للقياسات (180%)"
+                      title="180%"
                     >
-                      مكبر (180%)
+                      {t('zoom180Btn')}
                     </button>
                     <button
                       type="button"
@@ -703,14 +730,14 @@ export function PrintStudioView({
                         borderRadius: '6px',
                         fontSize: '0.72rem',
                         fontWeight: 700,
-                        border: '1px solid #334155',
-                        background: '#1e293b',
-                        color: '#cbd5e1',
+                        border: '1px solid var(--border-subtle)',
+                        background: 'var(--bg-card)',
+                        color: 'var(--text-muted)',
                         cursor: 'pointer'
                       }}
-                      title="استعادة الحجم الأصلي 100%"
+                      title="100%"
                     >
-                      100% قياسي
+                      {t('standard100')}
                     </button>
                   </div>
 
@@ -731,17 +758,17 @@ export function PrintStudioView({
                       marginBottom: '6px'
                     }}
                   >
-                    ⤨ تطبيق هذا الحجم على جميع صور الصفحة
+                    {t('applyToAllBtn')}
                   </button>
 
-                  <div style={{ fontSize: '0.7rem', color: '#94a3b8', lineHeight: 1.4, textAlign: 'center' }}>
-                    💡 يمكنك سحب المقابض الدائرية بزوايا الصورة مباشرة في الورقة لتكبير/تصغير حجمها، أو سحب الصورة لتحريكها.
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.4, textAlign: 'center' }}>
+                    {t('slotDragHint')}
                   </div>
                 </div>
               )}
 
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '8px' }}>
-                اختر صورة لوضعها في هذه الخانة (أو اسحبها وأفلتها في الورقة):
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                {t('chooseImageForSlot')}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', maxHeight: '160px', overflowY: 'auto' }}>
@@ -760,9 +787,9 @@ export function PrintStudioView({
                       borderRadius: '6px',
                       overflow: 'hidden',
                       cursor: 'grab',
-                      border: '1px solid #334155'
+                      border: '1px solid var(--border-subtle)'
                     }}
-                    title={`${img.name} (اضغط أو اسحب وأسقط في أي خانة)`}
+                    title={`${img.name}`}
                   >
                     <img src={img.url} alt={img.name} style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }} />
                   </div>
@@ -782,7 +809,7 @@ export function PrintStudioView({
                     cursor: 'pointer'
                   }}
                 >
-                  مسح وتفريغ هذه الخانة
+                  {t('clearSlotBtn')}
                 </button>
               </div>
             </div>
@@ -793,14 +820,44 @@ export function PrintStudioView({
         {/* BOTTOM PRINT & EXPORT BUTTONS */}
         <div style={{
           padding: '16px 20px',
-          borderTop: '1px solid #1e293b',
-          backgroundColor: '#090d16',
+          borderTop: '1px solid var(--border-subtle)',
+          backgroundColor: 'var(--bg-secondary)',
           display: 'flex',
           flexDirection: 'column',
           gap: '10px'
         }}>
+          {selectedPrinterName && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '0.75rem',
+              color: 'var(--text-muted)',
+              padding: '6px 10px',
+              borderRadius: '8px',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-subtle)'
+            }}>
+              <span>{t('selectedPrinter')} <strong style={{ color: '#38bdf8' }}>{selectedPrinterName}</strong></span>
+              <button
+                type="button"
+                onClick={() => setIsPrinterModalOpen(true)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#0284c7',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  fontSize: '0.72rem'
+                }}
+              >
+                {t('changePrinter')}
+              </button>
+            </div>
+          )}
+
           <button
-            onClick={handleDirectPrint}
+            onClick={() => setIsPrinterModalOpen(true)}
             disabled={isPrinting}
             className="btn btn-primary"
             style={{
@@ -815,7 +872,7 @@ export function PrintStudioView({
             }}
           >
             <Printer size={22} />
-            <span>طباعة فورية مباشرة (Print)</span>
+            <span>{t('directPrint')}</span>
           </button>
 
           <button
@@ -832,7 +889,7 @@ export function PrintStudioView({
             }}
           >
             <FileDown size={18} />
-            <span>حفظ كملف PDF عالي الجودة</span>
+            <span>{t('savePdf')}</span>
           </button>
         </div>
       </div>
@@ -842,8 +899,6 @@ export function PrintStudioView({
         flex: 1,
         height: '100%',
         overflow: 'auto',
-        backgroundColor: '#090d16',
-        backgroundImage: 'radial-gradient(circle at 50% 50%, #152033 0%, #090d16 100%)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -857,26 +912,26 @@ export function PrintStudioView({
           top: '0',
           marginBottom: '20px',
           zIndex: 10,
-          background: 'rgba(15, 23, 42, 0.92)',
+          background: 'var(--bg-card)',
           backdropFilter: 'blur(10px)',
-          border: '1px solid #1e293b',
+          border: '1px solid var(--border-subtle)',
           borderRadius: '30px',
           padding: '6px 18px',
           display: 'flex',
           alignItems: 'center',
           gap: '16px',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
+          boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
         }}>
-          <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>
-            معاينة دقيقة للورقة:
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+            {t('precisePreview')}
           </span>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
               onClick={() => setPreviewZoom((z) => Math.max(0.4, Number((z - 0.1).toFixed(2))))}
               className="btn-icon"
-              style={{ background: '#1e293b', border: 'none', color: '#f8fafc', cursor: 'pointer' }}
-              title="تصغير"
+              style={{ background: 'var(--bg-secondary)', border: 'none', color: 'var(--text-main)', cursor: 'pointer' }}
+              title="Zoom out"
             >
               <ZoomOut size={16} />
             </button>
@@ -888,8 +943,8 @@ export function PrintStudioView({
             <button
               onClick={() => setPreviewZoom((z) => Math.min(1.5, Number((z + 0.1).toFixed(2))))}
               className="btn-icon"
-              style={{ background: '#1e293b', border: 'none', color: '#f8fafc', cursor: 'pointer' }}
-              title="تكبير"
+              style={{ background: 'var(--bg-secondary)', border: 'none', color: 'var(--text-main)', cursor: 'pointer' }}
+              title="Zoom in"
             >
               <ZoomIn size={16} />
             </button>
@@ -897,9 +952,9 @@ export function PrintStudioView({
             <button
               onClick={() => setPreviewZoom(0.85)}
               style={{
-                background: '#1e293b',
+                background: 'var(--bg-secondary)',
                 border: 'none',
-                color: '#cbd5e1',
+                color: 'var(--text-main)',
                 padding: '4px 10px',
                 borderRadius: '6px',
                 fontSize: '0.75rem',
@@ -910,8 +965,8 @@ export function PrintStudioView({
             </button>
           </div>
 
-          <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
-            (اضغط على أي خانة بالورقة لتعديلها أو استبدال صورتها)
+          <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+            {t('clickSlotHint')}
           </div>
         </div>
 
@@ -951,6 +1006,14 @@ export function PrintStudioView({
         </div>
 
       </div>
+
+      <PrinterSelectModal
+        isOpen={isPrinterModalOpen}
+        onClose={() => setIsPrinterModalOpen(false)}
+        onPrint={handleExecutePrint}
+        paperSize={paperSize}
+        orientation={orientation}
+      />
 
       <Toast message={toastMsg} onClose={() => setToastMsg(null)} />
     </div>

@@ -1,15 +1,19 @@
 import React from 'react';
 import { useDoctor } from '../context/DoctorContext';
-import { Stethoscope, UserCog, Printer, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
+import { Stethoscope, UserCog, Printer, Image as ImageIcon, Sun, Moon, Globe } from 'lucide-react';
 
 export function Header({ currentView, setCurrentView, selectedImagesCount, onOpenDoctorSettings }) {
   const { doctorInfo } = useDoctor();
+  const { lang, toggleLang, t, isRTL } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <header className="no-print" style={{
-      backgroundColor: 'rgba(15, 23, 42, 0.95)',
+      backgroundColor: 'var(--bg-secondary)',
       backdropFilter: 'blur(12px)',
-      borderBottom: '1px solid #1e293b',
+      borderBottom: '1px solid var(--border-subtle)',
       padding: '12px 24px',
       position: 'sticky',
       top: 0,
@@ -17,7 +21,9 @@ export function Header({ currentView, setCurrentView, selectedImagesCount, onOpe
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      gap: '16px'
+      gap: '16px',
+      direction: isRTL ? 'rtl' : 'ltr',
+      boxShadow: 'var(--shadow-card)'
     }}>
       {/* Brand & Title */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
@@ -29,29 +35,30 @@ export function Header({ currentView, setCurrentView, selectedImagesCount, onOpe
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 0 16px rgba(6, 182, 212, 0.35)'
+          boxShadow: '0 0 16px rgba(6, 182, 212, 0.35)',
+          flexShrink: 0
         }}>
           <Stethoscope size={24} color="#ffffff" />
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.3px', margin: 0 }}>
-              Sonar Print Studio
+            <h1 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.3px', margin: 0 }}>
+              {t('appTitle')}
             </h1>
             <span style={{
               background: 'rgba(16, 185, 129, 0.15)',
-              color: '#34d399',
+              color: '#10b981',
               fontSize: '0.72rem',
               fontWeight: 700,
               padding: '2px 8px',
               borderRadius: '20px',
-              border: '1px solid rgba(52, 211, 153, 0.3)'
+              border: '1px solid rgba(16, 185, 129, 0.3)'
             }}>
-              برنامج ديسكتوب
+              {t('desktopBadge')}
             </span>
           </div>
-          <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
-            تجهيز وتنظيم وطباعة صور السونار والتقارير الطبية
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0 }}>
+            {t('appSubtitle')}
           </p>
         </div>
       </div>
@@ -60,10 +67,10 @@ export function Header({ currentView, setCurrentView, selectedImagesCount, onOpe
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        background: '#090d16',
+        background: 'var(--bg-primary)',
         padding: '4px',
         borderRadius: '12px',
-        border: '1px solid #1e293b'
+        border: '1px solid var(--border-subtle)'
       }}>
         <button
           onClick={() => setCurrentView('home')}
@@ -73,18 +80,18 @@ export function Header({ currentView, setCurrentView, selectedImagesCount, onOpe
             gap: '8px',
             padding: '8px 18px',
             borderRadius: '9px',
-            fontSize: '0.9rem',
+            fontSize: '0.88rem',
             fontWeight: 600,
             border: 'none',
             cursor: 'pointer',
             transition: 'all 0.2s',
-            background: currentView === 'home' ? '#1e293b' : 'transparent',
-            color: currentView === 'home' ? '#38bdf8' : '#94a3b8',
-            boxShadow: currentView === 'home' ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
+            background: currentView === 'home' ? 'var(--bg-card)' : 'transparent',
+            color: currentView === 'home' ? '#0284c7' : 'var(--text-muted)',
+            boxShadow: currentView === 'home' ? 'var(--shadow-card)' : 'none'
           }}
         >
           <ImageIcon size={18} />
-          <span>اختيار الصور والبحث</span>
+          <span>{t('navImages')}</span>
         </button>
 
         <button
@@ -95,18 +102,18 @@ export function Header({ currentView, setCurrentView, selectedImagesCount, onOpe
             gap: '8px',
             padding: '8px 18px',
             borderRadius: '9px',
-            fontSize: '0.9rem',
+            fontSize: '0.88rem',
             fontWeight: 600,
             border: 'none',
             cursor: 'pointer',
             transition: 'all 0.2s',
             background: currentView === 'studio' ? '#0284c7' : 'transparent',
-            color: currentView === 'studio' ? '#ffffff' : '#94a3b8',
+            color: currentView === 'studio' ? '#ffffff' : 'var(--text-muted)',
             boxShadow: currentView === 'studio' ? '0 2px 10px rgba(2, 132, 199, 0.5)' : 'none'
           }}
         >
           <Printer size={18} />
-          <span>استوديو الطباعة</span>
+          <span>{t('navStudio')}</span>
           {selectedImagesCount > 0 && (
             <span style={{
               background: currentView === 'studio' ? '#ffffff' : '#0284c7',
@@ -122,42 +129,96 @@ export function Header({ currentView, setCurrentView, selectedImagesCount, onOpe
         </button>
       </div>
 
-      {/* Doctor Info & Settings Badge */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      {/* Utilities: Language, Theme, Doctor Info */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Language Switcher */}
         <button
-          onClick={onOpenDoctorSettings}
-          title="تغيير اسم الطبيب، التخصص، واللوجو"
+          onClick={toggleLang}
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            background: '#141f36',
-            border: '1px solid #1e293b',
-            padding: '6px 14px 6px 10px',
+            gap: '6px',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-subtle)',
+            padding: '7px 12px',
+            borderRadius: '10px',
+            cursor: 'pointer',
+            color: 'var(--text-main)',
+            fontSize: '0.8rem',
+            fontWeight: 700,
+            transition: 'all 0.15s'
+          }}
+          title={lang === 'ar' ? 'Switch to English' : 'التحويل للغة العربية'}
+        >
+          <Globe size={15} color="#0284c7" />
+          <span>{t('langToggle')}</span>
+        </button>
+
+        {/* Theme Switcher */}
+        <button
+          onClick={toggleTheme}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-subtle)',
+            padding: '7px 12px',
+            borderRadius: '10px',
+            cursor: 'pointer',
+            color: 'var(--text-main)',
+            fontSize: '0.8rem',
+            fontWeight: 700,
+            transition: 'all 0.15s'
+          }}
+          title={theme === 'dark' ? 'التحويل للوضع الفاتح (Light Mode)' : 'التحويل للوضع الداكن (Dark Mode)'}
+        >
+          {theme === 'dark' ? (
+            <>
+              <Sun size={15} color="#f59e0b" />
+              <span>{t('themeLight')}</span>
+            </>
+          ) : (
+            <>
+              <Moon size={15} color="#38bdf8" />
+              <span>{t('themeDark')}</span>
+            </>
+          )}
+        </button>
+
+        {/* Doctor Info & Settings Badge */}
+        <button
+          onClick={onOpenDoctorSettings}
+          title={t('doctorProfile')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-subtle)',
+            padding: '5px 12px 5px 8px',
             borderRadius: '12px',
             cursor: 'pointer',
             transition: 'all 0.2s',
-            textAlign: 'right'
+            textAlign: isRTL ? 'right' : 'left'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = '#0284c7';
-            e.currentTarget.style.backgroundColor = '#1a2947';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = '#1e293b';
-            e.currentTarget.style.backgroundColor = '#141f36';
+            e.currentTarget.style.borderColor = 'var(--border-subtle)';
           }}
         >
           <div style={{
-            width: '36px',
-            height: '36px',
+            width: '34px',
+            height: '34px',
             borderRadius: '8px',
             overflow: 'hidden',
             backgroundColor: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
             flexShrink: 0
           }}>
             <img
@@ -169,15 +230,15 @@ export function Header({ currentView, setCurrentView, selectedImagesCount, onOpe
 
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#f8fafc' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)' }}>
                 {doctorInfo.doctorName || 'طبيب السونار'}
               </span>
-              <UserCog size={14} color="#38bdf8" />
+              <UserCog size={13} color="#0284c7" />
             </div>
             <div style={{
               fontSize: '0.72rem',
-              color: '#38bdf8',
-              maxWidth: '180px',
+              color: 'var(--text-muted)',
+              maxWidth: '140px',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis'

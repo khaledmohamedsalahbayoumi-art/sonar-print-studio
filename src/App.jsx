@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { DoctorProvider } from './context/DoctorContext';
+import { LanguageProvider } from './context/LanguageContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Header } from './components/Header';
 import { HomeView } from './views/HomeView';
 import { PrintStudioView } from './views/PrintStudioView';
@@ -72,8 +74,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <DoctorProvider>
-      <AppContent />
-    </DoctorProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <DoctorProvider>
+          <AppContent />
+        </DoctorProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }

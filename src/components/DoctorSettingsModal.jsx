@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useDoctor } from '../context/DoctorContext';
+import { useLanguage } from '../context/LanguageContext';
 import { X, Upload, Check, RotateCcw, Building2, Phone, MapPin, User, Award, ShieldAlert } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
 
 export function DoctorSettingsModal({ isOpen, onClose }) {
   const { doctorInfo, updateDoctorInfo, resetDoctorInfo, defaultLogo } = useDoctor();
+  const { t, isRTL } = useLanguage();
 
   const [formData, setFormData] = useState({ ...doctorInfo });
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -56,7 +58,7 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
     <div style={{
       position: 'fixed',
       inset: 0,
-      backgroundColor: 'rgba(5, 8, 16, 0.85)',
+      backgroundColor: 'rgba(5, 8, 16, 0.75)',
       backdropFilter: 'blur(8px)',
       display: 'flex',
       alignItems: 'center',
@@ -65,15 +67,18 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
       padding: '20px'
     }} onClick={onClose}>
       <div style={{
-        backgroundColor: '#0f172a',
-        border: '1px solid #1e293b',
+        backgroundColor: 'var(--bg-secondary)',
+        color: 'var(--text-main)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: '20px',
         width: '100%',
         maxWidth: '780px',
         maxHeight: '90vh',
         overflowY: 'auto',
-        boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(14, 165, 233, 0.2)',
-        padding: '28px'
+        boxShadow: 'var(--shadow-sheet)',
+        padding: '28px',
+        direction: isRTL ? 'rtl' : 'ltr',
+        textAlign: isRTL ? 'right' : 'left'
       }} onClick={(e) => e.stopPropagation()} className="fade-in">
         
         {/* Header */}
@@ -81,34 +86,30 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          borderBottom: '1px solid #1e293b',
+          borderBottom: '1px solid var(--border-subtle)',
           paddingBottom: '16px',
           marginBottom: '22px'
         }}>
           <div>
-            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-              تخصيص بيانات الطبيب واللوجو
+            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+              {t('doctorSettingsTitle')}
             </h2>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: '4px 0 0' }}>
-              يتم حفظ هذه البيانات تلقائياً وتظهر في ترويسة ورقة الطباعة في أي وقت دون الحاجة لتعديل الكود
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: '4px 0 0' }}>
+              {t('saveSettings')}
             </p>
           </div>
           <button
             onClick={onClose}
+            className="btn-icon"
             style={{
-              background: '#1e293b',
-              border: 'none',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-subtle)',
               borderRadius: '10px',
-              width: '36px',
-              height: '36px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#94a3b8',
+              color: 'var(--text-muted)',
               cursor: 'pointer'
             }}
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
@@ -194,8 +195,8 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
             
             {/* Doctor Name */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '6px' }}>
-                اسم الطبيب / الدكتورة
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '6px' }}>
+                {t('doctorName')}
               </label>
               <div style={{ position: 'relative' }}>
                 <input
@@ -208,9 +209,9 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                     width: '100%',
                     padding: '10px 14px',
                     borderRadius: '10px',
-                    border: '1px solid #334155',
-                    background: '#141f36',
-                    color: '#ffffff',
+                    border: '1px solid var(--border-subtle)',
+                    background: 'var(--bg-card)',
+                    color: 'var(--text-main)',
                     fontSize: '0.92rem',
                     outline: 'none'
                   }}
@@ -220,8 +221,8 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
 
             {/* Clinic Name */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '6px' }}>
-                اسم العيادة أو المركز
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '6px' }}>
+                {t('clinicName')}
               </label>
               <input
                 type="text"
@@ -232,9 +233,9 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                   width: '100%',
                   padding: '10px 14px',
                   borderRadius: '10px',
-                  border: '1px solid #334155',
-                  background: '#141f36',
-                  color: '#ffffff',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-main)',
                   fontSize: '0.92rem',
                   outline: 'none'
                 }}
@@ -243,8 +244,8 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
 
             {/* Specialty */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '6px' }}>
-                التخصص الطبي الدقيق
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '6px' }}>
+                {t('specialty')}
               </label>
               <input
                 type="text"
@@ -255,9 +256,9 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                   width: '100%',
                   padding: '10px 14px',
                   borderRadius: '10px',
-                  border: '1px solid #334155',
-                  background: '#141f36',
-                  color: '#ffffff',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-main)',
                   fontSize: '0.92rem',
                   outline: 'none'
                 }}
@@ -266,8 +267,8 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
 
             {/* Degree */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '6px' }}>
-                الدرجة العلمية والشهادات
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '6px' }}>
+                {t('degree')}
               </label>
               <input
                 type="text"
@@ -278,9 +279,9 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                   width: '100%',
                   padding: '10px 14px',
                   borderRadius: '10px',
-                  border: '1px solid #334155',
-                  background: '#141f36',
-                  color: '#ffffff',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-main)',
                   fontSize: '0.92rem',
                   outline: 'none'
                 }}
@@ -289,8 +290,8 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
 
             {/* Phone */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '6px' }}>
-                أرقام الهاتف للتواصل
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '6px' }}>
+                {t('phone')}
               </label>
               <input
                 type="text"
@@ -302,9 +303,9 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                   width: '100%',
                   padding: '10px 14px',
                   borderRadius: '10px',
-                  border: '1px solid #334155',
-                  background: '#141f36',
-                  color: '#ffffff',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-main)',
                   fontSize: '0.92rem',
                   outline: 'none'
                 }}
@@ -313,8 +314,8 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
 
             {/* Address */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '6px' }}>
-                عنوان العيادة / المركز
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '6px' }}>
+                {t('address')}
               </label>
               <input
                 type="text"
@@ -325,9 +326,9 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                   width: '100%',
                   padding: '10px 14px',
                   borderRadius: '10px',
-                  border: '1px solid #334155',
-                  background: '#141f36',
-                  color: '#ffffff',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-main)',
                   fontSize: '0.92rem',
                   outline: 'none'
                 }}
@@ -335,9 +336,9 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
             </div>
 
             {/* Logo Upload Section */}
-            <div style={{ gridColumn: 'span 2', background: '#141f36', padding: '16px', borderRadius: '14px', border: '1px dashed #334155' }}>
+            <div style={{ gridColumn: 'span 2', background: 'var(--bg-card)', padding: '16px', borderRadius: '14px', border: '1px dashed var(--border-subtle)' }}>
               <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#38bdf8', marginBottom: '8px' }}>
-                شعار العيادة / المركز (Logo)
+                {t('clinicLogo')}
               </label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                 <div style={{
@@ -361,7 +362,7 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                     style={{ cursor: 'pointer', display: 'inline-flex', gap: '8px' }}
                   >
                     <Upload size={18} />
-                    <span>رفع لوجو جديد من الجهاز (PNG / JPG / SVG)</span>
+                    <span>{t('uploadLogo')} (PNG / JPG / SVG)</span>
                   </label>
                   <input
                     id="logo-file-input"
@@ -370,8 +371,8 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                     style={{ display: 'none' }}
                     onChange={handleLogoUpload}
                   />
-                  <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '6px' }}>
-                    يُفضل استخدام صورة شفافة PNG ذات دقة جيدة لتظهر بأعلى وضوح في الطباعة
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '6px' }}>
+                    {isRTL ? 'يُفضل استخدام صورة شفافة PNG ذات دقة جيدة لتظهر بأعلى وضوح في الطباعة' : 'A transparent PNG with high resolution is recommended for optimal print quality'}
                   </div>
                 </div>
               </div>
@@ -379,8 +380,8 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
 
             {/* Print Footer Note */}
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '6px' }}>
-                ملاحظة أسفل صفحة التقرير (Footer Note)
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '6px' }}>
+                {t('footerNote')}
               </label>
               <input
                 type="text"
@@ -391,9 +392,9 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                   width: '100%',
                   padding: '10px 14px',
                   borderRadius: '10px',
-                  border: '1px solid #334155',
-                  background: '#141f36',
-                  color: '#ffffff',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-main)',
                   fontSize: '0.88rem',
                   outline: 'none'
                 }}
@@ -408,16 +409,16 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
             justifyContent: 'space-between',
             marginTop: '26px',
             paddingTop: '18px',
-            borderTop: '1px solid #1e293b'
+            borderTop: '1px solid var(--border-subtle)'
           }}>
             <button
               type="button"
               onClick={() => setIsResetModalOpen(true)}
               className="btn btn-secondary"
-              style={{ color: '#94a3b8', fontSize: '0.85rem' }}
+              style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}
             >
               <RotateCcw size={16} />
-              <span>استعادة الافتراضي</span>
+              <span>{t('restoreDefaults')}</span>
             </button>
 
             <div style={{ display: 'flex', gap: '12px' }}>
@@ -426,7 +427,7 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                 onClick={onClose}
                 className="btn btn-secondary"
               >
-                إلغاء
+                {t('cancel')}
               </button>
 
               <button
@@ -437,10 +438,10 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                 {saveSuccess ? (
                   <>
                     <Check size={18} />
-                    <span>تم الحفظ بنجاح!</span>
+                    <span>{t('savedToast')}</span>
                   </>
                 ) : (
-                  <span>حفظ التعديلات</span>
+                  <span>{t('saveSettings')}</span>
                 )}
               </button>
             </div>
@@ -450,10 +451,10 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
 
       <ConfirmModal
         isOpen={isResetModalOpen}
-        title="استعادة البيانات الافتراضية"
-        message="هل تريد استعادة البيانات والشعار الافتراضي للمركز؟ سيتم مسح أي تعديلات غير محفوظة."
-        confirmText="استعادة الافتراضي"
-        cancelText="إلغاء"
+        title={t('restoreDefaults')}
+        message={isRTL ? "هل تريد استعادة البيانات والشعار الافتراضي للمركز؟ سيتم مسح أي تعديلات غير محفوظة." : "Are you sure you want to restore default clinic info & logo? Any unsaved changes will be cleared."}
+        confirmText={t('restoreDefaults')}
+        cancelText={t('cancel')}
         type="info"
         onConfirm={executeReset}
         onCancel={() => setIsResetModalOpen(false)}

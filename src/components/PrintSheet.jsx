@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDoctor } from '../context/DoctorContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export function PrintSheet({
   paperSize = 'A4', // A4 or A5
@@ -23,6 +24,7 @@ export function PrintSheet({
   isInteractive = true
 }) {
   const { doctorInfo } = useDoctor();
+  const { t, isRTL } = useLanguage();
   const [dragOverSlotIndex, setDragOverSlotIndex] = useState(null);
 
   // Paper dimensions in mm
@@ -278,7 +280,7 @@ export function PrintSheet({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        direction: 'rtl',
+        direction: isRTL ? 'rtl' : 'ltr',
         position: 'relative',
         margin: '0 auto',
         fontFamily: "'Cairo', 'Outfit', sans-serif"
@@ -297,7 +299,7 @@ export function PrintSheet({
             marginBottom: '8px'
           }}>
             {/* Right: Clinic & Doctor Details */}
-            <div style={{ textAlign: 'right' }}>
+            <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
               <h2 style={{
                 fontSize: paperSize === 'A5' ? '12pt' : '15pt',
                 fontWeight: 900,
@@ -305,7 +307,7 @@ export function PrintSheet({
                 margin: 0,
                 lineHeight: 1.2
               }}>
-                {doctorInfo.clinicName || 'مركز السونار والأشعة'}
+                {doctorInfo.clinicName || (isRTL ? 'مركز السونار والأشعة' : 'Ultrasound Imaging Center')}
               </h2>
               <div style={{
                 fontSize: paperSize === 'A5' ? '10.5pt' : '12pt',
@@ -313,7 +315,7 @@ export function PrintSheet({
                 color: '#0f172a',
                 marginTop: '2px'
               }}>
-                {doctorInfo.doctorName || 'اسم الطبيب'}
+                {doctorInfo.doctorName || (isRTL ? 'اسم الطبيب' : 'Doctor Name')}
               </div>
               <div style={{
                 fontSize: paperSize === 'A5' ? '8pt' : '9.5pt',
@@ -387,19 +389,19 @@ export function PrintSheet({
           color: '#1e293b'
         }}>
           <div>
-            <span style={{ color: '#64748b', fontWeight: 600 }}>المريض: </span>
-            <strong style={{ color: '#0f172a' }}>{patientInfo.patientName || 'غير محدد'}</strong>
+            <span style={{ color: '#64748b', fontWeight: 600 }}>{t('patientLabel')} </span>
+            <strong style={{ color: '#0f172a' }}>{patientInfo.patientName || t('unspecified')}</strong>
           </div>
           <div>
-            <span style={{ color: '#64748b', fontWeight: 600 }}>السن/النوع: </span>
+            <span style={{ color: '#64748b', fontWeight: 600 }}>{t('ageGenderLabel')} </span>
             <strong>{patientInfo.age ? `${patientInfo.age} (${patientInfo.gender || 'أنثى'})` : (patientInfo.gender || '-')}</strong>
           </div>
           <div>
-            <span style={{ color: '#64748b', fontWeight: 600 }}>التاريخ: </span>
+            <span style={{ color: '#64748b', fontWeight: 600 }}>{t('dateLabel')} </span>
             <strong dir="ltr">{patientInfo.examDate || new Date().toISOString().slice(0, 10)}</strong>
           </div>
           <div>
-            <span style={{ color: '#64748b', fontWeight: 600 }}>نوع الفحص: </span>
+            <span style={{ color: '#64748b', fontWeight: 600 }}>{t('studyLabel')} </span>
             <strong style={{ color: '#0284c7' }}>{patientInfo.studyType || 'Ultrasound Scan'}</strong>
           </div>
         </div>
@@ -455,7 +457,7 @@ export function PrintSheet({
                 boxShadow: isDropTarget ? '0 0 16px rgba(56, 189, 248, 0.4)' : 'none',
                 transition: 'border-color 0.15s, background-color 0.15s'
               }}
-              title={img ? `خانة ${index + 1}: ${img.name} (اضغط للتحكم بالحجم أو السحب)` : `خانة ${index + 1} فارغة - اضغط أو أسقط صورة هنا`}
+              title={img ? (isRTL ? `خانة ${index + 1}: ${img.name} (اضغط للتحكم بالحجم أو السحب)` : `Slot ${index + 1}: ${img.name} (Click to resize or drag)`) : (isRTL ? `خانة ${index + 1} فارغة - اضغط أو أسقط صورة هنا` : `Slot ${index + 1} is empty - click or drop image here`)}
             >
               {img ? (
                 <div
@@ -715,8 +717,8 @@ export function PrintSheet({
                   padding: '8px'
                 }}>
                   <div style={{ fontSize: '14pt', marginBottom: '4px' }}>➕</div>
-                  <div>خانة {index + 1}</div>
-                  <div style={{ fontSize: '7.5pt', color: '#475569' }}>(اضغط أو اسحب صورة هنا)</div>
+                  <div>{t('emptySlotText', { num: index + 1 })}</div>
+                  <div style={{ fontSize: '7.5pt', color: '#475569' }}>{t('emptySlotHint')}</div>
                 </div>
               )}
             </div>

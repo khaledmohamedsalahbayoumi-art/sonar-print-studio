@@ -17,7 +17,7 @@ export function ConfirmModal({
     <div style={{
       position: 'fixed',
       inset: 0,
-      backgroundColor: 'rgba(5, 8, 16, 0.85)',
+      backgroundColor: 'rgba(5, 8, 16, 0.75)',
       backdropFilter: 'blur(8px)',
       display: 'flex',
       alignItems: 'center',
@@ -26,12 +26,12 @@ export function ConfirmModal({
       padding: '20px'
     }} onClick={onCancel} className="fade-in">
       <div style={{
-        backgroundColor: '#0f172a',
-        border: '1px solid #1e293b',
+        backgroundColor: 'var(--bg-secondary)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: '18px',
         width: '100%',
         maxWidth: '440px',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 25px rgba(2, 132, 199, 0.15)',
+        boxShadow: 'var(--shadow-sheet)',
         padding: '24px',
         textAlign: 'center',
         position: 'relative'
@@ -43,7 +43,7 @@ export function ConfirmModal({
           height: '56px',
           borderRadius: '50%',
           backgroundColor: type === 'danger' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(2, 132, 199, 0.12)',
-          color: type === 'danger' ? '#ef4444' : '#38bdf8',
+          color: type === 'danger' ? '#ef4444' : '#0284c7',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -54,12 +54,12 @@ export function ConfirmModal({
         </div>
 
         {/* Title */}
-        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#f8fafc', marginBottom: '8px' }}>
+        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '8px' }}>
           {title}
         </h3>
 
         {/* Message */}
-        <p style={{ fontSize: '0.92rem', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 24px' }}>
+        <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: '0 0 24px' }}>
           {message}
         </p>
 

@@ -74,20 +74,39 @@ ipcMain.handle('dialog:open-files', async () => {
   return filesData;
 });
 
+// IPC Handler to fetch available system printers
+ipcMain.handle('printers:get', async () => {
+  if (!mainWindow) return [];
+  try {
+    const printers = await mainWindow.webContents.getPrintersAsync();
+    return printers || [];
+  } catch (error) {
+    console.error('Failed to get printers:', error);
+    return [];
+  }
+});
+
 ipcMain.handle('print:direct', async (event, options = {}) => {
   if (!mainWindow) return { success: false, error: 'No active window' };
 
   try {
-    mainWindow.webContents.print({
-      silent: false,
+    const printOptions = {
+      silent: options.silent ?? (options.deviceName ? true : false),
       printBackground: true,
       color: options.color !== false,
       margins: {
         marginType: 'none'
       },
       landscape: options.landscape || false,
-      pageSize: options.pageSize || 'A4'
-    }, (success, failureReason) => {
+      pageSize: options.pageSize || 'A4',
+      copies: options.copies || 1
+    };
+
+    if (options.deviceName) {
+      printOptions.deviceName = options.deviceName;
+    }
+
+    mainWindow.webContents.print(printOptions, (success, failureReason) => {
       if (!success) console.log('Print cancelled/failed:', failureReason);
     });
     return { success: true };

@@ -14,10 +14,12 @@ import {
   Sparkles,
   Layers,
   ArrowLeft,
+  ArrowRight,
   Tag
 } from 'lucide-react';
 import { SAMPLE_SONAR_SCANS } from '../utils/sampleImages';
 import { ConfirmModal } from '../components/ConfirmModal';
+import { useLanguage } from '../context/LanguageContext';
 
 export function HomeView({
   images,
@@ -28,6 +30,9 @@ export function HomeView({
   setPatientInfo,
   onProceedToPrint
 }) {
+  const { t, isRTL } = useLanguage();
+  const ProceedIcon = isRTL ? ArrowLeft : ArrowRight;
+
   const [searchTerm, setSearchTerm] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
@@ -160,7 +165,7 @@ export function HomeView({
   };
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 20px 80px' }}>
+    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 20px 80px', direction: isRTL ? 'rtl' : 'ltr' }}>
       
       {/* Hidden File Input Fallback */}
       <input
@@ -174,8 +179,8 @@ export function HomeView({
 
       {/* Patient Information Banner */}
       <div style={{
-        background: '#0f172a',
-        border: '1px solid #1e293b',
+        background: 'var(--bg-secondary)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: '16px',
         padding: '16px 20px',
         marginBottom: '24px',
@@ -191,7 +196,7 @@ export function HomeView({
           fontWeight: 700
         }}>
           <User size={18} />
-          <span>بيانات المريض والفحص (تظهر في ترويسة ورقة السونار):</span>
+          <span>{t('patientDataTitle')}</span>
         </div>
 
         <div style={{
@@ -200,21 +205,21 @@ export function HomeView({
           gap: '12px'
         }}>
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: '4px' }}>
-              اسم المريض
+            <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              {t('patientName')}
             </label>
             <input
               type="text"
               value={patientInfo.patientName || ''}
               onChange={(e) => setPatientInfo({ ...patientInfo, patientName: e.target.value })}
-              placeholder="مثال: سارة محمد أحمد"
+              placeholder={isRTL ? "مثال: سارة محمد أحمد" : "e.g. Sarah Johnson"}
               style={{
                 width: '100%',
                 padding: '8px 12px',
-                background: '#141f36',
-                border: '1px solid #334155',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '8px',
-                color: '#ffffff',
+                color: 'var(--text-main)',
                 fontSize: '0.9rem',
                 outline: 'none'
               }}
@@ -222,50 +227,50 @@ export function HomeView({
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: '4px' }}>
-              السن والنوع
+            <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              {t('patientAge')}
             </label>
             <div style={{ display: 'flex', gap: '6px' }}>
               <input
                 type="text"
                 value={patientInfo.age || ''}
                 onChange={(e) => setPatientInfo({ ...patientInfo, age: e.target.value })}
-                placeholder="السن (مثلاً: 34 سنة)"
+                placeholder={isRTL ? "السن (مثلاً: 34 سنة)" : "Age (e.g. 34y)"}
                 style={{
                   width: '60%',
                   padding: '8px 12px',
-                  background: '#141f36',
-                  border: '1px solid #334155',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
                   borderRadius: '8px',
-                  color: '#ffffff',
+                  color: 'var(--text-main)',
                   fontSize: '0.9rem',
                   outline: 'none'
                 }}
               />
               <select
-                value={patientInfo.gender || 'أنثى'}
+                value={patientInfo.gender || (isRTL ? 'أنثى' : 'Female')}
                 onChange={(e) => setPatientInfo({ ...patientInfo, gender: e.target.value })}
                 style={{
                   width: '40%',
                   padding: '8px 8px',
-                  background: '#141f36',
-                  border: '1px solid #334155',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
                   borderRadius: '8px',
-                  color: '#ffffff',
+                  color: 'var(--text-main)',
                   fontSize: '0.85rem',
                   outline: 'none'
                 }}
               >
-                <option value="أنثى">أنثى</option>
-                <option value="ذكر">ذكر</option>
-                <option value="طفل">طفل</option>
+                <option value={isRTL ? "أنثى" : "Female"}>{isRTL ? "أنثى" : "Female"}</option>
+                <option value={isRTL ? "ذكر" : "Male"}>{isRTL ? "ذكر" : "Male"}</option>
+                <option value={isRTL ? "طفل" : "Child"}>{isRTL ? "طفل" : "Child"}</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: '4px' }}>
-              تاريخ الفحص
+            <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              {t('examDate')}
             </label>
             <input
               type="date"
@@ -274,10 +279,10 @@ export function HomeView({
               style={{
                 width: '100%',
                 padding: '8px 12px',
-                background: '#141f36',
-                border: '1px solid #334155',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '8px',
-                color: '#ffffff',
+                color: 'var(--text-main)',
                 fontSize: '0.9rem',
                 outline: 'none',
                 direction: 'ltr'
@@ -286,21 +291,21 @@ export function HomeView({
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: '4px' }}>
-              نوع فحص السونار
+            <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              {t('studyType')}
             </label>
             <input
               type="text"
               value={patientInfo.studyType || ''}
               onChange={(e) => setPatientInfo({ ...patientInfo, studyType: e.target.value })}
-              placeholder="مثلاً: سونار بطن وحوض Pelvic-Abdominal US"
+              placeholder={isRTL ? "مثلاً: سونار بطن وحوض Pelvic-Abdominal US" : "e.g. Abdomino-Pelvic Ultrasound"}
               style={{
                 width: '100%',
                 padding: '8px 12px',
-                background: '#141f36',
-                border: '1px solid #334155',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '8px',
-                color: '#ffffff',
+                color: 'var(--text-main)',
                 fontSize: '0.9rem',
                 outline: 'none'
               }}
@@ -308,8 +313,8 @@ export function HomeView({
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: '4px' }}>
-              رقم الملف / ID
+            <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              {t('patientId')}
             </label>
             <input
               type="text"
@@ -320,10 +325,10 @@ export function HomeView({
               style={{
                 width: '100%',
                 padding: '8px 12px',
-                background: '#141f36',
-                border: '1px solid #334155',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '8px',
-                color: '#ffffff',
+                color: 'var(--text-main)',
                 fontSize: '0.9rem',
                 outline: 'none'
               }}
@@ -334,8 +339,8 @@ export function HomeView({
 
       {/* Central Search & Drag-Drop Hero Section */}
       <div style={{
-        background: 'linear-gradient(180deg, #0f172a 0%, #090d16 100%)',
-        border: '1px solid #1e293b',
+        background: 'var(--bg-secondary)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: '24px',
         padding: '36px 24px',
         textAlign: 'center',
@@ -364,10 +369,11 @@ export function HomeView({
         }}>
           <div style={{
             position: 'absolute',
-            right: '16px',
+            right: isRTL ? '16px' : 'auto',
+            left: isRTL ? 'auto' : '16px',
             top: '50%',
             transform: 'translateY(-50%)',
-            color: '#64748b',
+            color: 'var(--text-muted)',
             display: 'flex',
             alignItems: 'center',
             pointerEvents: 'none'
@@ -378,21 +384,21 @@ export function HomeView({
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="ابحث في صور السونار بالاسم أو العضو (مثلاً: Kidney, Liver)..."
+            placeholder={t('searchPlaceholder')}
             style={{
               width: '100%',
-              padding: '14px 48px 14px 18px',
-              backgroundColor: '#141f36',
-              border: '2px solid #334155',
+              padding: isRTL ? '14px 48px 14px 18px' : '14px 18px 14px 48px',
+              backgroundColor: 'var(--bg-card)',
+              border: '2px solid var(--border-subtle)',
               borderRadius: '16px',
-              color: '#ffffff',
+              color: 'var(--text-main)',
               fontSize: '1rem',
               outline: 'none',
-              boxShadow: '0 4px 18px rgba(0,0,0,0.3)',
+              boxShadow: 'var(--shadow-card)',
               transition: 'border-color 0.2s'
             }}
             onFocus={(e) => (e.target.style.borderColor = '#0284c7')}
-            onBlur={(e) => (e.target.style.borderColor = '#334155')}
+            onBlur={(e) => (e.target.style.borderColor = 'var(--border-subtle)')}
           />
         </div>
 
@@ -406,8 +412,8 @@ export function HomeView({
             maxWidth: '680px',
             margin: '0 auto',
             padding: '36px 20px',
-            border: isDragging ? '2px dashed #38bdf8' : '2px dashed #334155',
-            backgroundColor: isDragging ? 'rgba(14, 165, 233, 0.08)' : '#0d1527',
+            border: isDragging ? '2px dashed #38bdf8' : '2px dashed var(--border-subtle)',
+            backgroundColor: isDragging ? 'rgba(14, 165, 233, 0.08)' : 'var(--bg-primary)',
             borderRadius: '20px',
             cursor: 'pointer',
             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -417,7 +423,7 @@ export function HomeView({
             if (!isDragging) e.currentTarget.style.borderColor = '#0ea5e9';
           }}
           onMouseLeave={(e) => {
-            if (!isDragging) e.currentTarget.style.borderColor = '#334155';
+            if (!isDragging) e.currentTarget.style.borderColor = 'var(--border-subtle)';
           }}
         >
           <div style={{
@@ -435,11 +441,11 @@ export function HomeView({
             <UploadCloud size={34} />
           </div>
 
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc', marginBottom: '8px' }}>
-            اسحب وأفلت صور السونار هنا
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '8px' }}>
+            {t('dragDropTitle')}
           </h3>
-          <p style={{ fontSize: '0.88rem', color: '#94a3b8', margin: '0 auto 18px', maxWidth: '420px' }}>
-            يدعم صور السونار بأي امتداد (JPG, PNG, WEBP, BMP) ويمكنك اختيار عدة صور في وقت واحد
+          <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: '0 auto 18px', maxWidth: '420px' }}>
+            {t('dragDropSubtitle')}
           </p>
 
           <div style={{ display: 'inline-flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -453,7 +459,7 @@ export function HomeView({
               }}
             >
               <FolderOpen size={20} />
-              <span>استعراض ملفات الكمبيوتر (Browse)</span>
+              <span>{t('browseFiles')}</span>
             </button>
 
             <button
@@ -463,10 +469,10 @@ export function HomeView({
                 e.stopPropagation();
                 handleLoadSamples();
               }}
-              title="تجربة فورية بصور سونار جاهزة"
+              title={t('loadSamples')}
             >
               <Sparkles size={18} color="#f59e0b" />
-              <span>تحميل صور عينات للتجربة</span>
+              <span>{t('loadSamples')}</span>
             </button>
           </div>
         </div>
@@ -483,18 +489,19 @@ export function HomeView({
         padding: '0 4px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-            الصور المحملة ({images.length})
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+            {isRTL ? `الصور المحملة (${images.length})` : `Loaded Scans (${images.length})`}
           </h2>
           <span style={{
-            background: '#1e293b',
+            background: 'var(--bg-card)',
             color: '#38bdf8',
             fontSize: '0.8rem',
             fontWeight: 700,
             padding: '4px 10px',
-            borderRadius: '20px'
+            borderRadius: '20px',
+            border: '1px solid var(--border-subtle)'
           }}>
-            المحدد للطباعة: {selectedImageIds.length} صورة
+            {t('imagesSelected', { count: selectedImageIds.length, total: images.length })}
           </span>
         </div>
 
@@ -505,7 +512,7 @@ export function HomeView({
               className="btn btn-secondary"
               style={{ fontSize: '0.85rem', padding: '8px 14px' }}
             >
-              {selectedImageIds.length === images.length ? 'إلغاء تحديد الكل' : 'تحديد كل الصور'}
+              {selectedImageIds.length === images.length ? t('deselectAll') : t('selectAll')}
             </button>
 
             <button
@@ -514,7 +521,7 @@ export function HomeView({
               style={{ fontSize: '0.85rem', padding: '8px 14px', color: '#f43f5e' }}
             >
               <Trash2 size={16} />
-              <span>مسح القائمة</span>
+              <span>{t('clearAll')}</span>
             </button>
 
             <button
@@ -528,8 +535,8 @@ export function HomeView({
                 cursor: selectedImageIds.length === 0 ? 'not-allowed' : 'pointer'
               }}
             >
-              <span>التجهيز للطباعة</span>
-              <ArrowLeft size={18} />
+              <span>{t('proceedToPrint')}</span>
+              <ProceedIcon size={18} />
             </button>
           </div>
         )}
@@ -540,12 +547,15 @@ export function HomeView({
         <div style={{
           textAlign: 'center',
           padding: '60px 20px',
-          background: '#0f172a',
+          background: 'var(--bg-secondary)',
           borderRadius: '16px',
-          border: '1px solid #1e293b'
+          border: '1px solid var(--border-subtle)'
         }}>
-          <p style={{ fontSize: '1rem', color: '#94a3b8', margin: 0 }}>
-            لم يتم تحميل أي صور سونار حتى الآن. استخدم خيار الاستعراض أعلاه لاختيار الصور من جهازك.
+          <p style={{ fontSize: '1rem', color: 'var(--text-muted)', margin: 0 }}>
+            {t('noImagesYet')}
+          </p>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '6px' }}>
+            {t('noImagesSubtitle')}
           </p>
         </div>
       ) : (
@@ -560,8 +570,8 @@ export function HomeView({
               <div
                 key={img.id}
                 style={{
-                  background: isSelected ? '#152445' : '#0f172a',
-                  border: isSelected ? '2px solid #0284c7' : '1px solid #1e293b',
+                  background: isSelected ? 'var(--bg-card)' : 'var(--bg-secondary)',
+                  border: isSelected ? '2px solid #0284c7' : '1px solid var(--border-subtle)',
                   borderRadius: '16px',
                   overflow: 'hidden',
                   boxShadow: isSelected ? '0 8px 24px rgba(2, 132, 199, 0.25)' : 'var(--shadow-card)',
@@ -599,7 +609,8 @@ export function HomeView({
                   <div style={{
                     position: 'absolute',
                     top: '12px',
-                    right: '12px',
+                    right: isRTL ? '12px' : 'auto',
+                    left: isRTL ? 'auto' : '12px',
                     backgroundColor: isSelected ? '#0284c7' : 'rgba(15, 23, 42, 0.75)',
                     color: '#ffffff',
                     borderRadius: '50%',
@@ -620,7 +631,8 @@ export function HomeView({
                     <div style={{
                       position: 'absolute',
                       bottom: '10px',
-                      left: '10px',
+                      left: isRTL ? '10px' : 'auto',
+                      right: isRTL ? 'auto' : '10px',
                       background: 'rgba(0,0,0,0.7)',
                       color: '#38bdf8',
                       fontSize: '0.72rem',
@@ -637,7 +649,7 @@ export function HomeView({
                   <div style={{
                     fontSize: '0.85rem',
                     fontWeight: 700,
-                    color: '#f8fafc',
+                    color: 'var(--text-main)',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -652,12 +664,12 @@ export function HomeView({
                       type="text"
                       value={img.tag || ''}
                       onChange={(e) => handleUpdateTag(img.id, e.target.value)}
-                      placeholder="وصف الصورة (مثال: كبد، مرارة، حوض)..."
+                      placeholder={t('tagPlaceholder')}
                       style={{
                         width: '100%',
                         padding: '6px 10px',
-                        background: '#141f36',
-                        border: '1px solid #334155',
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-subtle)',
                         borderRadius: '8px',
                         color: '#38bdf8',
                         fontSize: '0.78rem',
@@ -671,27 +683,27 @@ export function HomeView({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    borderTop: '1px solid #1e293b',
+                    borderTop: '1px solid var(--border-subtle)',
                     paddingTop: '8px'
                   }}>
                     <button
                       onClick={() => handleRotateImage(img.id)}
                       className="btn btn-secondary"
                       style={{ padding: '6px 10px', fontSize: '0.75rem' }}
-                      title="تدوير الصورة 90 درجة"
+                      title={t('rotate')}
                     >
                       <RotateCw size={14} />
-                      <span>تدوير</span>
+                      <span>{t('rotate')}</span>
                     </button>
 
                     <button
                       onClick={() => handleDeleteImage(img.id)}
                       className="btn btn-secondary"
                       style={{ padding: '6px 10px', fontSize: '0.75rem', color: '#f43f5e' }}
-                      title="حذف الصورة من القائمة"
+                      title={t('delete')}
                     >
                       <Trash2 size={14} />
-                      <span>حذف</span>
+                      <span>{t('delete')}</span>
                     </button>
                   </div>
                 </div>
@@ -708,19 +720,19 @@ export function HomeView({
           bottom: '24px',
           left: '50%',
           transform: 'translateX(-50%)',
-          background: 'rgba(15, 23, 42, 0.95)',
+          background: 'var(--bg-secondary)',
           backdropFilter: 'blur(16px)',
           border: '1px solid #0284c7',
           padding: '12px 28px',
           borderRadius: '50px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.7), 0 0 20px rgba(14, 165, 233, 0.3)',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(14, 165, 233, 0.3)',
           display: 'flex',
           alignItems: 'center',
           gap: '20px',
           zIndex: 30
         }} className="fade-in">
-          <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#f8fafc' }}>
-            تم تحديد <span style={{ color: '#38bdf8', fontSize: '1.1rem' }}>{selectedImageIds.length}</span> صورة للطباعة
+          <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-main)' }}>
+            {t('imagesSelected', { count: selectedImageIds.length, total: images.length })}
           </div>
 
           <button
@@ -728,8 +740,8 @@ export function HomeView({
             className="btn btn-primary"
             style={{ padding: '10px 26px', borderRadius: '30px', fontSize: '1rem' }}
           >
-            <span>التجهيز والترتيب للطباعة</span>
-            <Printer size={18} />
+            <span>{t('proceedToPrint')}</span>
+            <ProceedIcon size={18} />
           </button>
         </div>
       )}
@@ -737,10 +749,10 @@ export function HomeView({
       {/* In-app custom confirmation dialog */}
       <ConfirmModal
         isOpen={isClearModalOpen}
-        title="مسح جميع الصور"
-        message="هل أنت متأكد من مسح جميع الصور المحملة؟ يمكنك إعادة اختيار صور جديدة في أي وقت."
-        confirmText="نعم، امسح الصور"
-        cancelText="إلغاء"
+        title={t('clearModalTitle')}
+        message={t('clearModalDesc')}
+        confirmText={t('confirm')}
+        cancelText={t('cancel')}
         type="danger"
         onConfirm={() => {
           setImages([]);
