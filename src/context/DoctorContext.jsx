@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useLanguage } from './LanguageContext';
 
 // Default modern medical ultrasound emblem as SVG Data URL
 const DEFAULT_LOGO = "data:image/svg+xml;utf8," + encodeURIComponent(`
@@ -25,38 +26,74 @@ const DEFAULT_LOGO = "data:image/svg+xml;utf8," + encodeURIComponent(`
 </svg>
 `);
 
-const INITIAL_DOCTOR_STATE = {
-  doctorName: 'د. أحمد السقا',
-  specialty: 'استشاري الأشعة التشخيصية والتصوير الطبي التلفزيوني (السونار)',
-  degree: 'دكتوراه الأشعة التشخيصية والتداخلية - كلية الطب',
-  clinicName: 'مركز الشفاء للأشعة والسونار التشخيصي',
-  phone: '01012345678 - 01287654321',
-  address: 'القاهرة - مدينة نصر - شارع عباس العقاد - برج الأطباء',
-  logo: DEFAULT_LOGO,
-  showHeaderOnPrint: true,
-  showFooterOnPrint: true,
-  footerNote: 'فحص دلالي بالأشعة التلفزيونية (Ultrasound) - يُرجى المتابعة السريرية مع الطبيب المعالج.',
-  reportTitle: 'تقرير أشعة تلفزيونية سونار (Ultrasound Report)'
+export const DOCTOR_PRESETS = {
+  ar: {
+    doctorName: 'د. أحمد السقا',
+    specialty: 'استشاري الأشعة التشخيصية والتصوير الطبي التلفزيوني (السونار)',
+    degree: 'دكتوراه الأشعة التشخيصية والتداخلية - كلية الطب',
+    clinicName: 'مركز الشفاء للأشعة والسونار التشخيصي',
+    phone: '01012345678 - 01287654321',
+    address: 'القاهرة - مدينة نصر - شارع عباس العقاد - برج الأطباء',
+    logo: DEFAULT_LOGO,
+    showHeaderOnPrint: true,
+    showFooterOnPrint: true,
+    footerNote: 'فحص دلالي بالأشعة التلفزيونية (Ultrasound) - يُرجى المتابعة السريرية مع الطبيب المعالج.',
+    reportTitle: 'تقرير أشعة تلفزيونية سونار (Ultrasound Report)'
+  },
+  en: {
+    doctorName: 'Dr. Ahmed El-Sakka',
+    specialty: 'Consultant of Diagnostic Ultrasound & Medical Imaging',
+    degree: 'M.D. Diagnostic & Interventional Radiology - Faculty of Medicine',
+    clinicName: 'Al-Shefaa Ultrasound & Diagnostic Imaging Center',
+    phone: '+20 1012345678 / +20 1287654321',
+    address: 'Abbas El-Akkad St., Nasr City, Cairo - Doctors Tower',
+    logo: DEFAULT_LOGO,
+    showHeaderOnPrint: true,
+    showFooterOnPrint: true,
+    footerNote: 'Diagnostic Ultrasound Examination - Clinical correlation is recommended.',
+    reportTitle: 'Diagnostic Ultrasound Examination Report'
+  }
 };
 
 const DoctorContext = createContext();
 
-const STORAGE_KEY = 'sonar_print_doctor_profile_v1';
+const STORAGE_KEY = 'sonar_print_doctor_profile_v2';
 
 export function DoctorProvider({ children }) {
+  const { lang } = useLanguage();
+
   const [doctorInfo, setDoctorInfo] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        return { ...INITIAL_DOCTOR_STATE, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        if (parsed.isCustom) {
+          return parsed;
+        }
       }
     } catch (e) {
       console.warn('Could not read doctor profile from localStorage:', e);
     }
-    return INITIAL_DOCTOR_STATE;
+    return { ...DOCTOR_PRESETS[lang] || DOCTOR_PRESETS.ar, isCustom: false };
   });
 
-  // Save changes to localStorage automatically
+  // Automatically update preset if user hasn't explicitly customized their own doctor info
+  useEffect(() => {
+    setDoctorInfo((prev) => {
+      const isDefaultArabic = prev.doctorName === DOCTOR_PRESETS.ar.doctorName || !prev.doctorName;
+      const isDefaultEnglish = prev.doctorName === DOCTOR_PRESETS.en.doctorName;
+      if (!prev.isCustom || isDefaultArabic || isDefaultEnglish) {
+        return {
+          ...prev,
+          ...DOCTOR_PRESETS[lang] || DOCTOR_PRESETS.ar,
+          isCustom: false
+        };
+      }
+      return prev;
+    });
+  }, [lang]);
+
+  // Save changes to localStorage
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(doctorInfo));
@@ -66,15 +103,20 @@ export function DoctorProvider({ children }) {
   }, [doctorInfo]);
 
   const updateDoctorInfo = (updates) => {
-    setDoctorInfo((prev) => ({ ...prev, ...updates }));
+    setDoctorInfo((prev) => ({
+      ...prev,
+      ...updates,
+      isCustom: true
+    }));
   };
 
   const resetDoctorInfo = () => {
-    setDoctorInfo(INITIAL_DOCTOR_STATE);
+    const freshPreset = DOCTOR_PRESETS[lang] || DOCTOR_PRESETS.ar;
+    setDoctorInfo({ ...freshPreset, isCustom: false });
   };
 
   return (
-    <DoctorContext.Provider value={{ doctorInfo, updateDoctorInfo, resetDoctorInfo, defaultLogo: DEFAULT_LOGO }}>
+    <DoctorContext.Provider value={{ doctorInfo, updateDoctorInfo, resetDoctorInfo, defaultLogo: DEFAULT_LOGO, presets: DOCTOR_PRESETS }}>
       {children}
     </DoctorContext.Provider>
   );

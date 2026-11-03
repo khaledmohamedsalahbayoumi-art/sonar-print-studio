@@ -72,47 +72,70 @@ function createSonarSvg(title, probeType, depth, gain) {
   return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
 }
 
-export const SAMPLE_SONAR_SCANS = [
-  {
-    id: 'sample_scan_1',
-    name: 'Right_Kidney_Longitudinal.jpg',
-    url: createSonarSvg('فحص الكلى اليمنى (Right Kidney - Long)', 'C5-1 Convex', '14.0', '58'),
-    tag: 'Right Kidney',
-    timestamp: Date.now() - 3600000 * 2
-  },
-  {
-    id: 'sample_scan_2',
-    name: 'Liver_Gallbladder_View.jpg',
-    url: createSonarSvg('فحص الكبد والمرارة (Liver &amp; GB View)', 'C5-1 Convex', '16.0', '62'),
-    tag: 'Gallbladder',
-    timestamp: Date.now() - 3600000 * 1.5
-  },
-  {
-    id: 'sample_scan_3',
-    name: 'Pelvic_Urinary_Bladder.jpg',
-    url: createSonarSvg('المثانة البولية والحوض (Urinary Bladder)', 'C5-1 Convex', '12.0', '54'),
-    tag: 'Bladder',
-    timestamp: Date.now() - 3600000 * 1
-  },
-  {
-    id: 'sample_scan_4',
-    name: 'Spleen_Span_Measurement.jpg',
-    url: createSonarSvg('قياس أبعاد الطحال (Spleen Measurement)', 'C5-1 Convex', '15.0', '60'),
-    tag: 'Spleen',
-    timestamp: Date.now() - 3600000 * 0.8
-  },
-  {
-    id: 'sample_scan_5',
-    name: 'Thyroid_Gland_Transverse.jpg',
-    url: createSonarSvg('الغدة الدرقية مقطع عرضي (Thyroid Transverse)', 'L12-3 Linear', '4.0', '66'),
-    tag: 'Thyroid',
-    timestamp: Date.now() - 3600000 * 0.5
-  },
-  {
-    id: 'sample_scan_6',
-    name: 'Doppler_Vascular_Flow.jpg',
-    url: createSonarSvg('تدفق الدوبلر الوعائي (Color Doppler Flow)', 'C5-1 Vascular', '10.0', '52'),
-    tag: 'Doppler Flow',
-    timestamp: Date.now() - 3600000 * 0.2
-  }
-];
+export function getSampleSonarScans(lang = 'ar') {
+  const isEn = lang === 'en';
+  return [
+    {
+      id: 'sample_scan_1',
+      name: 'Right_Kidney_Longitudinal.jpg',
+      url: createSonarSvg(
+        isEn ? 'Right Kidney - Longitudinal View' : 'فحص الكلى اليمنى (Right Kidney - Long)',
+        'C5-1 Convex', '14.0', '58'
+      ),
+      tag: isEn ? 'Right Kidney' : 'الكلى اليمنى (Right Kidney)',
+      timestamp: Date.now() - 3600000 * 2
+    },
+    {
+      id: 'sample_scan_2',
+      name: 'Liver_Gallbladder_View.jpg',
+      url: createSonarSvg(
+        isEn ? 'Liver &amp; Gallbladder View' : 'فحص الكبد والمرارة (Liver &amp; GB View)',
+        'C5-1 Convex', '16.0', '62'
+      ),
+      tag: isEn ? 'Gallbladder' : 'المرارة (Gallbladder)',
+      timestamp: Date.now() - 3600000 * 1.5
+    },
+    {
+      id: 'sample_scan_3',
+      name: 'Pelvic_Urinary_Bladder.jpg',
+      url: createSonarSvg(
+        isEn ? 'Urinary Bladder &amp; Pelvis' : 'المثانة البولية والحوض (Urinary Bladder)',
+        'C5-1 Convex', '12.0', '54'
+      ),
+      tag: isEn ? 'Urinary Bladder' : 'المثانة (Bladder)',
+      timestamp: Date.now() - 3600000 * 1
+    },
+    {
+      id: 'sample_scan_4',
+      name: 'Spleen_Span_Measurement.jpg',
+      url: createSonarSvg(
+        isEn ? 'Spleen Span Measurement' : 'قياس أبعاد الطحال (Spleen Measurement)',
+        'C5-1 Convex', '15.0', '60'
+      ),
+      tag: isEn ? 'Spleen' : 'الطحال (Spleen)',
+      timestamp: Date.now() - 3600000 * 0.8
+    },
+    {
+      id: 'sample_scan_5',
+      name: 'Thyroid_Gland_Transverse.jpg',
+      url: createSonarSvg(
+        isEn ? 'Thyroid Gland Transverse View' : 'الغدة الدرقية مقطع عرضي (Thyroid Transverse)',
+        'L12-3 Linear', '4.0', '66'
+      ),
+      tag: isEn ? 'Thyroid Gland' : 'الغدة الدرقية (Thyroid)',
+      timestamp: Date.now() - 3600000 * 0.5
+    },
+    {
+      id: 'sample_scan_6',
+      name: 'Doppler_Vascular_Flow.jpg',
+      url: createSonarSvg(
+        isEn ? 'Color Doppler Vascular Flow' : 'تدفق الدوبلر الوعائي (Color Doppler Flow)',
+        'C5-1 Vascular', '10.0', '52'
+      ),
+      tag: isEn ? 'Color Doppler' : 'الدوبلر الملون (Doppler)',
+      timestamp: Date.now() - 3600000 * 0.2
+    }
+  ];
+}
+
+export const SAMPLE_SONAR_SCANS = getSampleSonarScans('ar');

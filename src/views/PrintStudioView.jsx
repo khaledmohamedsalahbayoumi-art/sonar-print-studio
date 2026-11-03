@@ -119,7 +119,7 @@ export function PrintStudioView({
       newTransforms[idx] = { ...source };
     });
     setSlotTransforms(newTransforms);
-    setToastMsg(`تم تطبيق مقاس الصورة (${Math.round((source.scale || 1) * 100)}%) على جميع خانات الصفحة`);
+    setToastMsg(isRTL ? `تم تطبيق مقاس الصورة (${Math.round((source.scale || 1) * 100)}%) على جميع خانات الصفحة` : `Applied zoom (${Math.round((source.scale || 1) * 100)}%) to all page slots`);
   };
 
   // Adjust general scale across all slots
@@ -155,9 +155,9 @@ export function PrintStudioView({
         });
         setIsPrinting(false);
         if (options.deviceName) {
-          setToastMsg(`تم إرسال أمر الطباعة بنجاح إلى: ${options.deviceName}`);
+          setToastMsg(isRTL ? `تم إرسال أمر الطباعة بنجاح إلى: ${options.deviceName}` : `Print job sent successfully to: ${options.deviceName}`);
         } else {
-          setToastMsg('تم إرسال أمر الطباعة بنجاح');
+          setToastMsg(isRTL ? 'تم إرسال أمر الطباعة بنجاح' : 'Print job sent successfully');
         }
         return;
       } catch (err) {
@@ -177,7 +177,7 @@ export function PrintStudioView({
       try {
         const res = await window.electronAPI.savePdf();
         if (res.success) {
-          setToastMsg(`تم حفظ ملف الـ PDF بنجاح في: ${res.filePath}`);
+          setToastMsg(isRTL ? `تم حفظ ملف الـ PDF بنجاح في: ${res.filePath}` : `PDF saved successfully to: ${res.filePath}`);
           return;
         }
       } catch (err) {
@@ -215,7 +215,7 @@ export function PrintStudioView({
     if (found.tag) {
       setSlotLabels((prev) => ({ ...prev, [slotIndex]: found.tag }));
     }
-    setToastMsg(`تم إدراج صورة (${found.name}) في الخانة ${slotIndex + 1}`);
+    setToastMsg(isRTL ? `تم إدراج صورة (${found.name}) في الخانة ${slotIndex + 1}` : `Placed (${found.name}) into slot ${slotIndex + 1}`);
   };
 
   // Clear slot

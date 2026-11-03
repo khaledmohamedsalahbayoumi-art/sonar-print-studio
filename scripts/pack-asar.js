@@ -98,3 +98,4 @@ try {
   console.warn('Could not overwrite app.asar directly (it might be in use):', err.message);
   console.log('app.asar.new is ready, and unpacked resources/app directory is fully updated.');
 }
+

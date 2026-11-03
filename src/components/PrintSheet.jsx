@@ -394,7 +394,15 @@ export function PrintSheet({
           </div>
           <div>
             <span style={{ color: '#64748b', fontWeight: 600 }}>{t('ageGenderLabel')} </span>
-            <strong>{patientInfo.age ? `${patientInfo.age} (${patientInfo.gender || 'أنثى'})` : (patientInfo.gender || '-')}</strong>
+            <strong>{patientInfo.age ? `${patientInfo.age} (${
+              patientInfo.gender === 'ذكر' || patientInfo.gender === 'Male' ? (isRTL ? 'ذكر' : 'Male') :
+              patientInfo.gender === 'طفل' || patientInfo.gender === 'Child' ? (isRTL ? 'طفل' : 'Child') :
+              (isRTL ? 'أنثى' : 'Female')
+            })` : (
+              patientInfo.gender === 'ذكر' || patientInfo.gender === 'Male' ? (isRTL ? 'ذكر' : 'Male') :
+              patientInfo.gender === 'طفل' || patientInfo.gender === 'Child' ? (isRTL ? 'طفل' : 'Child') :
+              (isRTL ? 'أنثى' : 'Female')
+            )}</strong>
           </div>
           <div>
             <span style={{ color: '#64748b', fontWeight: 600 }}>{t('dateLabel')} </span>
@@ -589,7 +597,7 @@ export function PrintSheet({
                           }}
                           onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.25)')}
                           onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-                          title="اسحب هذا المقبض بالماوس لتكبير أو تصغير حجم الصورة"
+                          title={isRTL ? "اسحب هذا المقبض بالماوس لتكبير أو تصغير حجم الصورة" : "Drag this handle to zoom or resize scan"}
                         >
                           <div style={{ width: '5px', height: '5px', backgroundColor: '#ffffff', borderRadius: '50%', pointerEvents: 'none' }} />
                         </div>
@@ -640,7 +648,7 @@ export function PrintSheet({
                             fontWeight: 'bold',
                             lineHeight: 1
                           }}
-                          title="تصغير (-10%)"
+                          title={isRTL ? "تصغير (-10%)" : "Zoom Out (-10%)"}
                         >
                           -
                         </button>
@@ -663,7 +671,7 @@ export function PrintSheet({
                             fontWeight: 'bold',
                             lineHeight: 1
                           }}
-                          title="تكبير (+10%)"
+                          title={isRTL ? "تكبير (+10%)" : "Zoom In (+10%)"}
                         >
                           +
                         </button>
@@ -681,9 +689,9 @@ export function PrintSheet({
                             fontWeight: 700,
                             cursor: 'pointer'
                           }}
-                          title="ملء العرض (Fit Width) - تكبير لإزالة الفراغ الرأسي"
+                          title={isRTL ? "ملء العرض (Fit Width) - تكبير لإزالة الفراغ الرأسي" : "Fit Width - zoom to eliminate vertical gap"}
                         >
-                          ملء العرض ↔
+                          {isRTL ? 'ملء العرض ↔' : 'Fit Width ↔'}
                         </button>
 
                         {(scaleVal !== 1 || transX !== 0 || transY !== 0) && (
@@ -700,7 +708,7 @@ export function PrintSheet({
                               fontWeight: 700,
                               cursor: 'pointer'
                             }}
-                            title="إعادة ضبط الحجم والموضع"
+                            title={isRTL ? "إعادة ضبط الحجم والموضع" : "Reset size and position"}
                           >
                             ↺
                           </button>

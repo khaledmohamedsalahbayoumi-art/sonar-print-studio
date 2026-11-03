@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDoctor } from '../context/DoctorContext';
 import { useLanguage } from '../context/LanguageContext';
 import { X, Upload, Check, RotateCcw, Building2, Phone, MapPin, User, Award, ShieldAlert } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
 
 export function DoctorSettingsModal({ isOpen, onClose }) {
-  const { doctorInfo, updateDoctorInfo, resetDoctorInfo, defaultLogo } = useDoctor();
-  const { t, isRTL } = useLanguage();
+  const { doctorInfo, updateDoctorInfo, resetDoctorInfo, defaultLogo, presets } = useDoctor();
+  const { lang, t, isRTL } = useLanguage();
 
   const [formData, setFormData] = useState({ ...doctorInfo });
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({ ...doctorInfo });
+    }
+  }, [doctorInfo, isOpen]);
 
   if (!isOpen) return null;
 
@@ -41,14 +47,9 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
 
   const executeReset = () => {
     resetDoctorInfo();
+    const freshPreset = presets ? (presets[lang] || presets.ar) : doctorInfo;
     setFormData({
-      ...doctorInfo,
-      doctorName: 'د. أحمد السقا',
-      specialty: 'استشاري الأشعة التشخيصية والتصوير الطبي التلفزيوني (السونار)',
-      degree: 'دكتوراه الأشعة التشخيصية والتداخلية - كلية الطب',
-      clinicName: 'مركز الشفاء للأشعة والسونار التشخيصي',
-      phone: '01012345678 - 01287654321',
-      address: 'القاهرة - مصر',
+      ...freshPreset,
       logo: defaultLogo
     });
     setIsResetModalOpen(false);
@@ -134,8 +135,8 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
             alignItems: 'center',
             justifyContent: 'space-between'
           }}>
-            <span>معاينة حية لشكل الترويسة على ورقة الطباعة:</span>
-            <span style={{ color: '#0284c7' }}>ترويسة رسمية</span>
+            <span>{isRTL ? 'معاينة حية لشكل الترويسة على ورقة الطباعة:' : 'Live Preview of Paper Header:'}</span>
+            <span style={{ color: '#0284c7' }}>{isRTL ? 'ترويسة رسمية' : 'Official Header'}</span>
           </div>
 
           <div style={{
@@ -149,13 +150,13 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
             {/* Right: Clinic & Doctor info */}
             <div>
               <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#0369a1', margin: 0 }}>
-                {formData.clinicName || 'اسم المركز أو العيادة'}
+                {formData.clinicName || (isRTL ? 'اسم المركز أو العيادة' : 'Clinic / Center Name')}
               </h3>
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>
-                {formData.doctorName || 'اسم الطبيب'}
+                {formData.doctorName || (isRTL ? 'اسم الطبيب' : 'Doctor Name')}
               </div>
               <div style={{ fontSize: '0.8rem', color: '#334155', fontWeight: 600 }}>
-                {formData.specialty || 'التخصص'}
+                {formData.specialty || (isRTL ? 'التخصص' : 'Specialty')}
               </div>
               <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
                 {formData.degree}
@@ -166,7 +167,7 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', textAlign: 'left', direction: 'ltr' }}>
               <div style={{ fontSize: '0.74rem', color: '#475569', lineHeight: 1.4 }}>
                 <div style={{ fontWeight: 600 }}>📞 {formData.phone || '0100000000'}</div>
-                <div>📍 {formData.address || 'العنوان'}</div>
+                <div>📍 {formData.address || (isRTL ? 'العنوان' : 'Address')}</div>
               </div>
               <div style={{
                 width: '64px',
@@ -203,7 +204,7 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                   type="text"
                   value={formData.doctorName}
                   onChange={(e) => handleChange('doctorName', e.target.value)}
-                  placeholder="مثال: د. أحمد السقا"
+                  placeholder={isRTL ? "مثال: د. أحمد السقا" : "e.g. Dr. Ahmed El-Sakka"}
                   required
                   style={{
                     width: '100%',
@@ -228,7 +229,7 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                 type="text"
                 value={formData.clinicName}
                 onChange={(e) => handleChange('clinicName', e.target.value)}
-                placeholder="مثال: مركز الشفاء للأشعة والسونار"
+                placeholder={isRTL ? "مثال: مركز الشفاء للأشعة والسونار" : "e.g. Al-Shefaa Ultrasound Center"}
                 style={{
                   width: '100%',
                   padding: '10px 14px',
@@ -251,7 +252,7 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                 type="text"
                 value={formData.specialty}
                 onChange={(e) => handleChange('specialty', e.target.value)}
-                placeholder="استشاري الأشعة التشخيصية والسونار"
+                placeholder={isRTL ? "استشاري الأشعة التشخيصية والسونار" : "Consultant of Diagnostic Ultrasound"}
                 style={{
                   width: '100%',
                   padding: '10px 14px',
@@ -274,7 +275,7 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                 type="text"
                 value={formData.degree}
                 onChange={(e) => handleChange('degree', e.target.value)}
-                placeholder="دكتوراه الأشعة التشخيصية والتداخلية"
+                placeholder={isRTL ? "دكتوراه الأشعة التشخيصية والتداخلية" : "M.D. Diagnostic & Interventional Radiology"}
                 style={{
                   width: '100%',
                   padding: '10px 14px',
@@ -321,7 +322,7 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                 type="text"
                 value={formData.address}
                 onChange={(e) => handleChange('address', e.target.value)}
-                placeholder="المدينة، الشارع، رقم العمارة"
+                placeholder={isRTL ? "المدينة، الشارع، رقم العمارة" : "City, Street, Building"}
                 style={{
                   width: '100%',
                   padding: '10px 14px',
@@ -387,7 +388,7 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                 type="text"
                 value={formData.footerNote}
                 onChange={(e) => handleChange('footerNote', e.target.value)}
-                placeholder="فحص دلالي بالأشعة التلفزيونية..."
+                placeholder={isRTL ? "فحص دلالي بالأشعة التلفزيونية..." : "Diagnostic ultrasound exam..."}
                 style={{
                   width: '100%',
                   padding: '10px 14px',

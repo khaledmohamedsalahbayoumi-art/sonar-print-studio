@@ -1,19 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DoctorProvider } from './context/DoctorContext';
-import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Header } from './components/Header';
 import { HomeView } from './views/HomeView';
 import { PrintStudioView } from './views/PrintStudioView';
 import { DoctorSettingsModal } from './components/DoctorSettingsModal';
-import { SAMPLE_SONAR_SCANS } from './utils/sampleImages';
+import { getSampleSonarScans } from './utils/sampleImages';
+
+const PATIENT_PRESETS = {
+  ar: {
+    patientName: 'مريم عادل الشريف',
+    age: '29 سنة',
+    gender: 'أنثى',
+    examDate: new Date().toISOString().slice(0, 10),
+    studyType: 'فحص سونار بطن وحوض (Abdomino-Pelvic US)',
+    patientId: 'US-2026-104',
+    isCustom: false
+  },
+  en: {
+    patientName: 'Mariam Adel El-Sherif',
+    age: '29 Years',
+    gender: 'Female',
+    examDate: new Date().toISOString().slice(0, 10),
+    studyType: 'Abdomino-Pelvic Ultrasound (US)',
+    patientId: 'US-2026-104',
+    isCustom: false
+  }
+};
 
 function AppContent() {
+  const { lang } = useLanguage();
   const [currentView, setCurrentView] = useState('home'); // 'home' | 'studio'
   const [isDoctorSettingsOpen, setIsDoctorSettingsOpen] = useState(false);
 
-  // Ultrasound images state (preloaded with sample scans so it looks alive immediately)
-  const [images, setImages] = useState(SAMPLE_SONAR_SCANS);
+  // Ultrasound images state (preloaded with sample scans for current language)
+  const [images, setImages] = useState(() => getSampleSonarScans(lang));
   const [selectedImageIds, setSelectedImageIds] = useState([
     'sample_scan_1',
     'sample_scan_2',
@@ -22,14 +44,41 @@ function AppContent() {
   ]);
 
   // Patient metadata
-  const [patientInfo, setPatientInfo] = useState({
-    patientName: 'مريم عادل الشريف',
-    age: '29 سنة',
-    gender: 'أنثى',
-    examDate: new Date().toISOString().slice(0, 10),
-    studyType: 'فحص سونار بطن وحوض (Abdomino-Pelvic US)',
-    patientId: 'US-2026-104'
-  });
+  const [patientInfo, setPatientInfo] = useState(() => PATIENT_PRESETS[lang] || PATIENT_PRESETS.ar);
+
+  // When language switches, dynamically translate sample scans & default patient info
+  useEffect(() => {
+    // 1. Update patient preset if user hasn't typed custom data, or if it matches the preset
+    setPatientInfo((prev) => {
+      const isDefaultArabic = prev.patientName === PATIENT_PRESETS.ar.patientName || !prev.patientName;
+      const isDefaultEnglish = prev.patientName === PATIENT_PRESETS.en.patientName;
+      if (!prev.isCustom || isDefaultArabic || isDefaultEnglish) {
+        return {
+          ...PATIENT_PRESETS[lang] || PATIENT_PRESETS.ar,
+          examDate: prev.examDate || new Date().toISOString().slice(0, 10),
+          isCustom: false
+        };
+      }
+      return prev;
+    });
+
+    // 2. Update sample scans to matching language if still using mock scans
+    setImages((prev) => {
+      const isAllSamples = prev.every((img) => img.id.startsWith('sample_scan_'));
+      if (isAllSamples) {
+        return getSampleSonarScans(lang);
+      }
+      return prev;
+    });
+  }, [lang]);
+
+  const handlePatientInfoChange = (updates) => {
+    setPatientInfo((prev) => ({
+      ...prev,
+      ...updates,
+      isCustom: true
+    }));
+  };
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -50,7 +99,7 @@ function AppContent() {
             selectedImageIds={selectedImageIds}
             setSelectedImageIds={setSelectedImageIds}
             patientInfo={patientInfo}
-            setPatientInfo={setPatientInfo}
+            setPatientInfo={handlePatientInfoChange}
             onProceedToPrint={() => setCurrentView('studio')}
           />
         ) : (

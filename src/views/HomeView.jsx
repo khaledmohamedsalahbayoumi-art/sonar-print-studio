@@ -248,8 +248,18 @@ export function HomeView({
                 }}
               />
               <select
-                value={patientInfo.gender || (isRTL ? 'أنثى' : 'Female')}
-                onChange={(e) => setPatientInfo({ ...patientInfo, gender: e.target.value })}
+                value={
+                  patientInfo.gender === 'ذكر' || patientInfo.gender === 'Male' ? 'male' :
+                  patientInfo.gender === 'طفل' || patientInfo.gender === 'Child' ? 'child' :
+                  'female'
+                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const localizedGender = val === 'male' ? (isRTL ? 'ذكر' : 'Male') :
+                    val === 'child' ? (isRTL ? 'طفل' : 'Child') :
+                    (isRTL ? 'أنثى' : 'Female');
+                  setPatientInfo({ ...patientInfo, gender: localizedGender });
+                }}
                 style={{
                   width: '40%',
                   padding: '8px 8px',
@@ -261,9 +271,9 @@ export function HomeView({
                   outline: 'none'
                 }}
               >
-                <option value={isRTL ? "أنثى" : "Female"}>{isRTL ? "أنثى" : "Female"}</option>
-                <option value={isRTL ? "ذكر" : "Male"}>{isRTL ? "ذكر" : "Male"}</option>
-                <option value={isRTL ? "طفل" : "Child"}>{isRTL ? "طفل" : "Child"}</option>
+                <option value="female">{isRTL ? 'أنثى' : 'Female'}</option>
+                <option value="male">{isRTL ? 'ذكر' : 'Male'}</option>
+                <option value="child">{isRTL ? 'طفل' : 'Child'}</option>
               </select>
             </div>
           </div>
@@ -320,7 +330,7 @@ export function HomeView({
               type="text"
               value={patientInfo.patientId || ''}
               onChange={(e) => setPatientInfo({ ...patientInfo, patientId: e.target.value })}
-              placeholder="مثلاً: #2026-089"
+              placeholder={isRTL ? "مثلاً: #2026-089" : "e.g. #2026-089"}
               dir="ltr"
               style={{
                 width: '100%',

@@ -172,7 +172,7 @@ export function PrinterSelectModal({
                 }}
               >
                 <RefreshCw size={12} className={loading ? 'spin' : ''} />
-                <span>تحديث</span>
+                <span>{isRTL ? 'تحديث' : 'Refresh'}</span>
               </button>
             </div>
 
@@ -249,7 +249,7 @@ export function PrinterSelectModal({
                           padding: '2px 6px',
                           borderRadius: '4px'
                         }}>
-                          جاهزة
+                          {isRTL ? 'جاهزة' : 'Ready'}
                         </span>
                       </div>
                     </div>
@@ -427,9 +427,9 @@ export function PrinterSelectModal({
             background: 'var(--bg-accent-soft)',
             border: '1px solid var(--border-subtle)'
           }}>
-            <span>📄 مقاس الورقة: <strong>{paperSize}</strong></span>
-            <span>📐 الاتجاه: <strong>{orientation === 'portrait' ? 'طولي (Portrait)' : 'عرضي (Landscape)'}</strong></span>
-            <span>🖨️ الطابعة: <strong>{selectedDevice || 'نافذة النظام'}</strong></span>
+            <span>📄 {isRTL ? 'مقاس الورقة:' : 'Paper Size:'} <strong>{paperSize}</strong></span>
+            <span>📐 {isRTL ? 'الاتجاه:' : 'Orientation:'} <strong>{orientation === 'portrait' ? (isRTL ? 'طولي (Portrait)' : 'Portrait') : (isRTL ? 'عرضي (Landscape)' : 'Landscape')}</strong></span>
+            <span>🖨️ {isRTL ? 'الطابعة:' : 'Printer:'} <strong>{selectedDevice || (isRTL ? 'نافذة النظام' : 'System Dialog')}</strong></span>
           </div>
 
         </div>
@@ -474,3 +474,4 @@ export function PrinterSelectModal({
     </div>
   );
 }
+

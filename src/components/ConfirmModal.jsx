@@ -1,17 +1,24 @@
 import React from 'react';
 import { AlertCircle, AlertTriangle, CheckCircle2, X } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export function ConfirmModal({
   isOpen,
-  title = 'تأكيد الإجراء',
+  title,
   message,
-  confirmText = 'تأكيد',
-  cancelText = 'إلغاء',
+  confirmText,
+  cancelText,
   type = 'danger', // 'danger' | 'info' | 'success'
   onConfirm,
   onCancel
 }) {
+  const { isRTL, t } = useLanguage();
+
   if (!isOpen) return null;
+
+  const resolvedTitle = title || (isRTL ? 'تأكيد الإجراء' : 'Confirm Action');
+  const resolvedConfirmText = confirmText || (isRTL ? 'تأكيد' : 'Confirm');
+  const resolvedCancelText = cancelText || (isRTL ? 'إلغاء' : 'Cancel');
 
   return (
     <div style={{
@@ -23,7 +30,8 @@ export function ConfirmModal({
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 200,
-      padding: '20px'
+      padding: '20px',
+      direction: isRTL ? 'rtl' : 'ltr'
     }} onClick={onCancel} className="fade-in">
       <div style={{
         backgroundColor: 'var(--bg-secondary)',
@@ -55,7 +63,7 @@ export function ConfirmModal({
 
         {/* Title */}
         <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '8px' }}>
-          {title}
+          {resolvedTitle}
         </h3>
 
         {/* Message */}
@@ -70,7 +78,7 @@ export function ConfirmModal({
             className="btn btn-secondary"
             style={{ flex: 1, padding: '10px' }}
           >
-            {cancelText}
+            {resolvedCancelText}
           </button>
 
           <button
@@ -89,7 +97,7 @@ export function ConfirmModal({
               transition: 'all 0.2s'
             }}
           >
-            {confirmText}
+            {resolvedConfirmText}
           </button>
         </div>
 

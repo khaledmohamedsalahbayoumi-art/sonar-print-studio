@@ -171,7 +171,7 @@ export function Header({ currentView, setCurrentView, selectedImagesCount, onOpe
             fontWeight: 700,
             transition: 'all 0.15s'
           }}
-          title={theme === 'dark' ? 'التحويل للوضع الفاتح (Light Mode)' : 'التحويل للوضع الداكن (Dark Mode)'}
+          title={theme === 'dark' ? (isRTL ? 'التحويل للوضع الفاتح (Light Mode)' : 'Switch to Light Mode') : (isRTL ? 'التحويل للوضع الداكن (Dark Mode)' : 'Switch to Dark Mode')}
         >
           {theme === 'dark' ? (
             <>
@@ -231,7 +231,7 @@ export function Header({ currentView, setCurrentView, selectedImagesCount, onOpe
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)' }}>
-                {doctorInfo.doctorName || 'طبيب السونار'}
+                {doctorInfo.doctorName || (isRTL ? 'طبيب السونار' : 'Ultrasound Specialist')}
               </span>
               <UserCog size={13} color="#0284c7" />
             </div>
