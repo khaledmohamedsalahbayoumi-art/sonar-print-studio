@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { SAMPLE_SONAR_SCANS } from '../utils/sampleImages';
 import { ConfirmModal } from '../components/ConfirmModal';
+import { StudyTypeCombobox } from '../components/StudyTypeCombobox';
 import { useLanguage } from '../context/LanguageContext';
 
 export function HomeView({
@@ -304,21 +305,11 @@ export function HomeView({
             <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
               {t('studyType')}
             </label>
-            <input
-              type="text"
+            <StudyTypeCombobox
               value={patientInfo.studyType || ''}
-              onChange={(e) => setPatientInfo({ ...patientInfo, studyType: e.target.value })}
+              onChange={(val) => setPatientInfo({ ...patientInfo, studyType: val })}
               placeholder={isRTL ? "مثلاً: سونار بطن وحوض Pelvic-Abdominal US" : "e.g. Abdomino-Pelvic Ultrasound"}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: '8px',
-                color: 'var(--text-main)',
-                fontSize: '0.9rem',
-                outline: 'none'
-              }}
+              isRTL={isRTL}
             />
           </div>
 
