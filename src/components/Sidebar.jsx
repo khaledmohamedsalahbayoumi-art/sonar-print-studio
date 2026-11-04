@@ -300,25 +300,46 @@ export function Sidebar({
               </span>
 
               {folderData && (
-                <button
-                  type="button"
-                  onClick={onReloadFolder}
-                  disabled={isReloadingFolder}
-                  title={t('refreshFolder')}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--text-muted)',
-                    cursor: isReloadingFolder ? 'not-allowed' : 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '2px'
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
-                >
-                  <RotateCw size={13} style={{ animation: isReloadingFolder ? 'spin 1s linear infinite' : 'none' }} />
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '0.66rem',
+                      fontWeight: 700,
+                      color: '#10b981',
+                      background: 'rgba(16, 185, 129, 0.12)',
+                      padding: '1px 6px',
+                      borderRadius: '10px',
+                      border: '1px solid rgba(16, 185, 129, 0.25)'
+                    }}
+                    title={isRTL ? "مزامنة وريفريش تلقائي لأي مجلد أو صورة جديدة" : "Live Auto-Sync Active"}
+                  >
+                    <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#10b981' }} />
+                    <span>{isRTL ? 'تلقائي' : 'Live'}</span>
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={onReloadFolder}
+                    disabled={isReloadingFolder}
+                    title={t('refreshFolder')}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'var(--text-muted)',
+                      cursor: isReloadingFolder ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '2px'
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                  >
+                    <RotateCw size={13} style={{ animation: isReloadingFolder ? 'spin 1s linear infinite' : 'none' }} />
+                  </button>
+                </div>
               )}
             </div>
           )}

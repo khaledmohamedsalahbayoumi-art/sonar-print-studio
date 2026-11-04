@@ -119,7 +119,46 @@ function AppContent() {
   const handleCloseFolder = () => {
     setFolderData(null);
     setActivePatientId(null);
+    if (window.electronAPI && typeof window.electronAPI.closeFolder === 'function') {
+      window.electronAPI.closeFolder();
+    }
   };
+
+  // Automatic Folder Watcher Listener (Real-time Auto-Refresh)
+  useEffect(() => {
+    if (window.electronAPI && typeof window.electronAPI.onFolderUpdated === 'function') {
+      const unsubscribe = window.electronAPI.onFolderUpdated((newData) => {
+        if (!newData || !newData.patients) return;
+        setFolderData(newData);
+
+        // Keep active patient or update their images in real-time
+        setActivePatientId((prevActiveId) => {
+          const updatedActive =
+            newData.patients.find((p) => p.id === prevActiveId || p.folderName === prevActiveId) ||
+            newData.patients.find((p) => p.folderName === patientInfo.patientId) ||
+            newData.patients[0];
+
+          if (updatedActive) {
+            const patientScans = updatedActive.images || [];
+            setImages(patientScans);
+            setSelectedImageIds(patientScans.map((img) => img.id));
+            setPatientInfo((prev) => ({
+              ...prev,
+              patientName: updatedActive.patientName || updatedActive.folderName,
+              patientId: updatedActive.folderName,
+              isCustom: true
+            }));
+            return updatedActive.id;
+          }
+          return prevActiveId;
+        });
+      });
+
+      return () => {
+        if (typeof unsubscribe === 'function') unsubscribe();
+      };
+    }
+  }, [patientInfo.patientId]);
 
   // When language switches, dynamically translate sample scans & default patient info
   useEffect(() => {

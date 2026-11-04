@@ -3,6 +3,53 @@ const path = require('path');
 const fs = require('fs');
 
 let mainWindow;
+let activeFolderWatcher = null;
+let watcherDebounceTimer = null;
+let currentWatchedPath = null;
+
+function stopFolderWatcher() {
+  if (activeFolderWatcher) {
+    try {
+      activeFolderWatcher.close();
+    } catch (e) {}
+    activeFolderWatcher = null;
+  }
+  if (watcherDebounceTimer) {
+    clearTimeout(watcherDebounceTimer);
+    watcherDebounceTimer = null;
+  }
+  currentWatchedPath = null;
+}
+
+function startFolderWatcher(folderPath) {
+  stopFolderWatcher();
+  if (!folderPath || !fs.existsSync(folderPath)) return;
+
+  currentWatchedPath = folderPath;
+
+  try {
+    activeFolderWatcher = fs.watch(folderPath, { recursive: true }, (eventType, filename) => {
+      // Debounce because file writing / folder creation triggers multiple rapid events
+      if (watcherDebounceTimer) clearTimeout(watcherDebounceTimer);
+      watcherDebounceTimer = setTimeout(() => {
+        if (!mainWindow || mainWindow.isDestroyed() || !currentWatchedPath) return;
+        try {
+          const freshData = scanFolderForPatients(currentWatchedPath);
+          mainWindow.webContents.send('folder:updated', freshData);
+        } catch (err) {
+          console.error('Error during auto-refresh of watched folder:', err);
+        }
+      }, 400);
+    });
+
+    activeFolderWatcher.on('error', (err) => {
+      console.warn('Folder watcher error:', err);
+      stopFolderWatcher();
+    });
+  } catch (err) {
+    console.warn('Could not start fs.watch:', err);
+  }
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -26,6 +73,7 @@ function createWindow() {
   mainWindow.loadFile(indexPath);
 
   mainWindow.on('closed', () => {
+    stopFolderWatcher();
     mainWindow = null;
   });
 }
@@ -137,12 +185,20 @@ ipcMain.handle('dialog:open-folder', async () => {
   if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
     return null;
   }
-  return scanFolderForPatients(result.filePaths[0]);
+  const folderPath = result.filePaths[0];
+  startFolderWatcher(folderPath);
+  return scanFolderForPatients(folderPath);
 });
 
 ipcMain.handle('folder:reload', async (event, folderPath) => {
   if (!folderPath) return null;
+  startFolderWatcher(folderPath);
   return scanFolderForPatients(folderPath);
+});
+
+ipcMain.handle('folder:close', async () => {
+  stopFolderWatcher();
+  return { success: true };
 });
 
 ipcMain.handle('dialog:open-files', async () => {
