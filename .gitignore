@@ -29,3 +29,8 @@ run_output.txt
 .DS_Store
 Thumbs.db
 
+# Private developer tools & keygen (keep out of distributed client app)
+*توليد_أكواد_التفعيل*
+LicenseGenerator.html
+license.dat
+
