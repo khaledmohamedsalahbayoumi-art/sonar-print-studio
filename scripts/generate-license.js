@@ -20,7 +20,16 @@ if (!machineId) {
 
 const rawType = (args[1] || 'perpetual').toLowerCase();
 const isPerp = rawType === 'perpetual' || rawType === 'perp' || rawType === 'p';
-const days = parseInt(args[2], 10) || (isPerp ? 36500 : 365);
+let days = 36500;
+if (!isPerp) {
+  if (rawType === 'day' || rawType === '1') {
+    days = 1;
+  } else if (rawType === 'month' || rawType === '30') {
+    days = 30;
+  } else {
+    days = parseInt(args[2] || args[1], 10) || 365;
+  }
+}
 const type = isPerp ? 'PERPETUAL' : 'TIME_LIMITED';
 
 const key = generateActivationKey(machineId, type, days);
