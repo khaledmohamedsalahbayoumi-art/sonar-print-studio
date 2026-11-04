@@ -30,7 +30,7 @@ const PATIENT_PRESETS = {
 };
 
 function AppContent() {
-  const { lang } = useLanguage();
+  const { lang, isRTL } = useLanguage();
   const [currentView, setCurrentView] = useState('home'); // 'home' | 'studio'
   const [isDoctorSettingsOpen, setIsDoctorSettingsOpen] = useState(false);
 
