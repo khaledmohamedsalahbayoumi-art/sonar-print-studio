@@ -144,6 +144,12 @@ const translations = {
     saveSettings: 'حفظ البيانات محلياً',
     restoreDefaults: 'استعادة البيانات الافتراضية',
     savedToast: 'تم حفظ بيانات الطبيب بنجاح',
+    headerTypographyTitle: 'تنسيق مظهر النصوص (الألوان والخطوط والأحجام)',
+    headerColor: 'اللون الرئيسي (اسم المركز والخط الفاصل)',
+    doctorNameColor: 'لون اسم الطبيب',
+    fontFamily: 'شكل ونوع الخط',
+    textSize: 'حجم نصوص الترويسة',
+    fontWeight: 'سُمك الخط',
 
     // Print Sheet Labels
     patientLabel: 'المريض:',
@@ -297,6 +303,12 @@ const translations = {
     saveSettings: 'Save Settings Locally',
     restoreDefaults: 'Restore Default Data',
     savedToast: 'Doctor profile updated successfully',
+    headerTypographyTitle: 'Header Typography & Styling (Colors, Fonts, Sizes)',
+    headerColor: 'Primary Accent Color (Center & Divider)',
+    doctorNameColor: 'Doctor Name Color',
+    fontFamily: 'Font Family & Style',
+    textSize: 'Header Text Size',
+    fontWeight: 'Font Weight / Boldness',
 
     // Print Sheet Labels
     patientLabel: 'Patient:',

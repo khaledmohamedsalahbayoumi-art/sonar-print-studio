@@ -343,31 +343,32 @@ export function PrintSheet({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            borderBottom: '2.5px solid #0284c7',
+            borderBottom: `2.5px solid ${doctorInfo.headerColor || '#0284c7'}`,
             paddingBottom: isLandscape ? '4px' : '8px',
-            marginBottom: isLandscape ? '5px' : '8px'
+            marginBottom: isLandscape ? '5px' : '8px',
+            fontFamily: `'${doctorInfo.headerFontFamily || 'Cairo'}', system-ui, sans-serif`
           }}>
             {/* Right: Clinic & Doctor Details */}
             <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
               <h2 style={{
-                fontSize: paperSize === 'A5' ? '11pt' : (isLandscape ? '13pt' : '15pt'),
-                fontWeight: 900,
-                color: '#0369a1',
+                fontSize: `calc(${paperSize === 'A5' ? '11pt' : (isLandscape ? '13pt' : '15pt')} * ${((doctorInfo.headerScale || 100) / 100)})`,
+                fontWeight: doctorInfo.headerFontWeight || '900',
+                color: doctorInfo.headerColor || '#0369a1',
                 margin: 0,
                 lineHeight: 1.2
               }}>
                 {doctorInfo.clinicName || (isRTL ? 'مركز السونار والأشعة' : 'Ultrasound Imaging Center')}
               </h2>
               <div style={{
-                fontSize: paperSize === 'A5' ? '9.5pt' : (isLandscape ? '10.5pt' : '12pt'),
-                fontWeight: 800,
-                color: '#0f172a',
+                fontSize: `calc(${paperSize === 'A5' ? '9.5pt' : (isLandscape ? '10.5pt' : '12pt')} * ${((doctorInfo.headerScale || 100) / 100)})`,
+                fontWeight: doctorInfo.headerFontWeight || '800',
+                color: doctorInfo.doctorNameColor || '#0f172a',
                 marginTop: '1px'
               }}>
                 {doctorInfo.doctorName || (isRTL ? 'اسم الطبيب' : 'Doctor Name')}
               </div>
               <div style={{
-                fontSize: paperSize === 'A5' ? '7.5pt' : (isLandscape ? '8pt' : '9.5pt'),
+                fontSize: `calc(${paperSize === 'A5' ? '7.5pt' : (isLandscape ? '8pt' : '9.5pt')} * ${((doctorInfo.headerScale || 100) / 100)})`,
                 fontWeight: 600,
                 color: '#334155'
               }}>
@@ -375,7 +376,7 @@ export function PrintSheet({
               </div>
               {doctorInfo.degree && (
                 <div style={{
-                  fontSize: paperSize === 'A5' ? '6.5pt' : (isLandscape ? '7pt' : '8pt'),
+                  fontSize: `calc(${paperSize === 'A5' ? '6.5pt' : (isLandscape ? '7pt' : '8pt')} * ${((doctorInfo.headerScale || 100) / 100)})`,
                   color: '#64748b'
                 }}>
                   {doctorInfo.degree}
@@ -392,7 +393,7 @@ export function PrintSheet({
               textAlign: 'left'
             }}>
               <div style={{
-                fontSize: paperSize === 'A5' ? '7pt' : (isLandscape ? '7.5pt' : '8pt'),
+                fontSize: `calc(${paperSize === 'A5' ? '7pt' : (isLandscape ? '7.5pt' : '8pt')} * ${((doctorInfo.headerScale || 100) / 100)})`,
                 color: '#475569',
                 lineHeight: 1.3
               }}>

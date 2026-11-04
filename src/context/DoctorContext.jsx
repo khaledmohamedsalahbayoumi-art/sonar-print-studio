@@ -38,7 +38,12 @@ export const DOCTOR_PRESETS = {
     showHeaderOnPrint: true,
     showFooterOnPrint: true,
     footerNote: 'فحص دلالي بالأشعة التلفزيونية (Ultrasound) - يُرجى المتابعة السريرية مع الطبيب المعالج.',
-    reportTitle: 'تقرير أشعة تلفزيونية سونار (Ultrasound Report)'
+    reportTitle: 'تقرير أشعة تلفزيونية سونار (Ultrasound Report)',
+    headerColor: '#0284c7',
+    doctorNameColor: '#0f172a',
+    headerFontFamily: 'Cairo',
+    headerScale: 100,
+    headerFontWeight: '800'
   },
   en: {
     doctorName: 'Dr. Ahmed El-Sakka',
@@ -51,7 +56,12 @@ export const DOCTOR_PRESETS = {
     showHeaderOnPrint: true,
     showFooterOnPrint: true,
     footerNote: 'Diagnostic Ultrasound Examination - Clinical correlation is recommended.',
-    reportTitle: 'Diagnostic Ultrasound Examination Report'
+    reportTitle: 'Diagnostic Ultrasound Examination Report',
+    headerColor: '#0284c7',
+    doctorNameColor: '#0f172a',
+    headerFontFamily: 'Cairo',
+    headerScale: 100,
+    headerFontWeight: '800'
   }
 };
 

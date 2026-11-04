@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDoctor } from '../context/DoctorContext';
 import { useLanguage } from '../context/LanguageContext';
-import { X, Upload, Check, RotateCcw, Building2, Phone, MapPin, User, Award, ShieldAlert } from 'lucide-react';
+import { X, Upload, Check, RotateCcw, Building2, Phone, MapPin, User, Award, ShieldAlert, Palette, Type, Sliders } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
 
 export function DoctorSettingsModal({ isOpen, onClose }) {
@@ -122,7 +122,8 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
           marginBottom: '24px',
           color: '#0f172a',
           boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
-          border: '1px solid #cbd5e1'
+          border: '1px solid #cbd5e1',
+          fontFamily: `'${formData.headerFontFamily || 'Cairo'}', system-ui, sans-serif`
         }}>
           <div style={{
             fontSize: '0.72rem',
@@ -136,36 +137,55 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
             justifyContent: 'space-between'
           }}>
             <span>{isRTL ? 'معاينة حية لشكل الترويسة على ورقة الطباعة:' : 'Live Preview of Paper Header:'}</span>
-            <span style={{ color: '#0284c7' }}>{isRTL ? 'ترويسة رسمية' : 'Official Header'}</span>
+            <span style={{ color: formData.headerColor || '#0284c7', fontWeight: 800 }}>{isRTL ? 'ترويسة رسمية' : 'Official Header'}</span>
           </div>
 
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            borderBottom: '2px solid #0284c7',
+            borderBottom: `2.5px solid ${formData.headerColor || '#0284c7'}`,
             paddingBottom: '12px',
             gap: '16px'
           }}>
             {/* Right: Clinic & Doctor info */}
             <div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#0369a1', margin: 0 }}>
+              <h3 style={{
+                fontSize: `${1.2 * ((formData.headerScale || 100) / 100)}rem`,
+                fontWeight: formData.headerFontWeight || '900',
+                color: formData.headerColor || '#0369a1',
+                margin: 0,
+                transition: 'all 0.15s'
+              }}>
                 {formData.clinicName || (isRTL ? 'اسم المركز أو العيادة' : 'Clinic / Center Name')}
               </h3>
-              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>
+              <div style={{
+                fontSize: `${1.05 * ((formData.headerScale || 100) / 100)}rem`,
+                fontWeight: formData.headerFontWeight || '800',
+                color: formData.doctorNameColor || '#0f172a',
+                marginTop: '2px',
+                transition: 'all 0.15s'
+              }}>
                 {formData.doctorName || (isRTL ? 'اسم الطبيب' : 'Doctor Name')}
               </div>
-              <div style={{ fontSize: '0.8rem', color: '#334155', fontWeight: 600 }}>
+              <div style={{
+                fontSize: `${0.8 * ((formData.headerScale || 100) / 100)}rem`,
+                color: '#334155',
+                fontWeight: 600
+              }}>
                 {formData.specialty || (isRTL ? 'التخصص' : 'Specialty')}
               </div>
-              <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
+              <div style={{
+                fontSize: `${0.74 * ((formData.headerScale || 100) / 100)}rem`,
+                color: '#64748b'
+              }}>
                 {formData.degree}
               </div>
             </div>
 
             {/* Left: Logo + Contacts */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', textAlign: 'left', direction: 'ltr' }}>
-              <div style={{ fontSize: '0.74rem', color: '#475569', lineHeight: 1.4 }}>
+              <div style={{ fontSize: `${0.74 * ((formData.headerScale || 100) / 100)}rem`, color: '#475569', lineHeight: 1.4 }}>
                 <div style={{ fontWeight: 600 }}>📞 {formData.phone || '0100000000'}</div>
                 <div>📍 {formData.address || (isRTL ? 'العنوان' : 'Address')}</div>
               </div>
@@ -374,6 +394,226 @@ export function DoctorSettingsModal({ isOpen, onClose }) {
                   />
                   <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '6px' }}>
                     {isRTL ? 'يُفضل استخدام صورة شفافة PNG ذات دقة جيدة لتظهر بأعلى وضوح في الطباعة' : 'A transparent PNG with high resolution is recommended for optimal print quality'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Typography & Appearance Control Card */}
+            <div style={{
+              gridColumn: 'span 2',
+              background: 'var(--bg-card)',
+              borderRadius: '16px',
+              padding: '20px',
+              border: '1px solid var(--border-subtle)',
+              marginTop: '4px'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '0.95rem',
+                fontWeight: 800,
+                color: '#38bdf8',
+                marginBottom: '16px',
+                borderBottom: '1px solid var(--border-subtle)',
+                paddingBottom: '10px'
+              }}>
+                <Palette size={18} color="#0ea5e9" />
+                <span>{t('headerTypographyTitle')}</span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                {/* 1. Header Primary Color */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
+                    {t('headerColor')}
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <input
+                      type="color"
+                      value={formData.headerColor || '#0284c7'}
+                      onChange={(e) => handleChange('headerColor', e.target.value)}
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        padding: 0,
+                        borderRadius: '8px',
+                        border: '2px solid var(--border-subtle)',
+                        cursor: 'pointer',
+                        backgroundColor: 'transparent'
+                      }}
+                      title={isRTL ? "اختر لوناً مخصصاً" : "Pick custom color"}
+                    />
+
+                    {['#0284c7', '#1e3a8a', '#0d9488', '#059669', '#7c3aed', '#be123c', '#334155'].map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => handleChange('headerColor', color)}
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '50%',
+                          backgroundColor: color,
+                          border: (formData.headerColor || '#0284c7') === color ? '3px solid #ffffff' : '2px solid transparent',
+                          boxShadow: (formData.headerColor || '#0284c7') === color ? '0 0 8px rgba(255,255,255,0.6)' : 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s'
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. Doctor Name Color */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
+                    {t('doctorNameColor')}
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <input
+                      type="color"
+                      value={formData.doctorNameColor || '#0f172a'}
+                      onChange={(e) => handleChange('doctorNameColor', e.target.value)}
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        padding: 0,
+                        borderRadius: '8px',
+                        border: '2px solid var(--border-subtle)',
+                        cursor: 'pointer',
+                        backgroundColor: 'transparent'
+                      }}
+                    />
+
+                    {['#0f172a', '#0284c7', '#1e3a8a', '#334155', '#475569'].map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => handleChange('doctorNameColor', color)}
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '50%',
+                          backgroundColor: color,
+                          border: (formData.doctorNameColor || '#0f172a') === color ? '3px solid #ffffff' : '2px solid transparent',
+                          boxShadow: (formData.doctorNameColor || '#0f172a') === color ? '0 0 8px rgba(255,255,255,0.6)' : 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s'
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Font Family */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
+                    {t('fontFamily')}
+                  </label>
+                  <select
+                    value={formData.headerFontFamily || 'Cairo'}
+                    onChange={(e) => handleChange('headerFontFamily', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: '10px',
+                      border: '1px solid var(--border-subtle)',
+                      background: 'var(--bg-primary)',
+                      color: 'var(--text-main)',
+                      fontSize: '0.92rem',
+                      outline: 'none',
+                      fontFamily: `'${formData.headerFontFamily || 'Cairo'}', sans-serif`
+                    }}
+                  >
+                    <option value="Cairo" style={{ fontFamily: 'Cairo' }}>القاهرة (Cairo) - خط قياسي طبي أنيق</option>
+                    <option value="Tajawal" style={{ fontFamily: 'Tajawal' }}>تجوال (Tajawal) - خط هندسي عصري</option>
+                    <option value="Almarai" style={{ fontFamily: 'Almarai' }}>المراعي (Almarai) - عريض وواضح جداً</option>
+                    <option value="Alexandria" style={{ fontFamily: 'Alexandria' }}>الإسكندرية (Alexandria) - متناسق حديث</option>
+                    <option value="Amiri" style={{ fontFamily: 'Amiri' }}>أميري (Amiri) - كلاسيكي فخم</option>
+                    <option value="Outfit" style={{ fontFamily: 'Outfit' }}>Outfit - Modern Display Font</option>
+                  </select>
+                </div>
+
+                {/* 4. Font Weight */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
+                    {t('fontWeight')}
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+                    {[
+                      { id: '600', label: isRTL ? 'متوسط' : 'Medium' },
+                      { id: '700', label: isRTL ? 'عريض' : 'Bold' },
+                      { id: '800', label: isRTL ? 'عريض+' : 'ExBold' },
+                      { id: '900', label: isRTL ? 'ثقيل' : 'Black' }
+                    ].map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleChange('headerFontWeight', item.id)}
+                        style={{
+                          padding: '8px 4px',
+                          borderRadius: '8px',
+                          border: (formData.headerFontWeight || '800') === item.id ? '2px solid #0284c7' : '1px solid var(--border-subtle)',
+                          background: (formData.headerFontWeight || '800') === item.id ? 'rgba(2, 132, 199, 0.2)' : 'var(--bg-primary)',
+                          color: (formData.headerFontWeight || '800') === item.id ? '#38bdf8' : 'var(--text-muted)',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s'
+                        }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 5. Header Size Scale Slider */}
+                <div style={{ gridColumn: 'span 2' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
+                      {t('textSize')}
+                    </label>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'monospace' }}>
+                      {formData.headerScale || 100}%
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>80%</span>
+                    <input
+                      type="range"
+                      min="80"
+                      max="140"
+                      step="5"
+                      value={formData.headerScale || 100}
+                      onChange={(e) => handleChange('headerScale', Number(e.target.value))}
+                      style={{ flex: '1 1 180px', accentColor: '#0284c7', cursor: 'pointer' }}
+                    />
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>140%</span>
+
+                    {/* Quick presets */}
+                    {[85, 100, 115, 130].map((presetVal) => (
+                      <button
+                        key={presetVal}
+                        type="button"
+                        onClick={() => handleChange('headerScale', presetVal)}
+                        style={{
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          border: (formData.headerScale || 100) === presetVal ? '1px solid #0284c7' : '1px solid var(--border-subtle)',
+                          background: (formData.headerScale || 100) === presetVal ? 'rgba(2, 132, 199, 0.2)' : 'var(--bg-primary)',
+                          color: (formData.headerScale || 100) === presetVal ? '#38bdf8' : 'var(--text-muted)',
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {presetVal}%
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
