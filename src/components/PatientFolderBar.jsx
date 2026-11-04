@@ -316,3 +316,4 @@ export function PatientFolderBar({
     </div>
   );
 }
+

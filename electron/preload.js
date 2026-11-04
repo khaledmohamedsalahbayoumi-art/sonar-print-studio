@@ -6,6 +6,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   reloadFolder: (folderPath) => ipcRenderer.invoke('folder:reload', folderPath),
   directPrint: (options) => ipcRenderer.invoke('print:direct', options),
   getPrinters: () => ipcRenderer.invoke('printers:get'),
-  savePdf: () => ipcRenderer.invoke('print:to-pdf'),
+  savePdf: (options) => ipcRenderer.invoke('print:to-pdf', options),
   isElectron: true
 });

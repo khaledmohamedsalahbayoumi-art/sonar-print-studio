@@ -229,10 +229,13 @@ ipcMain.handle('print:direct', async (event, options = {}) => {
   }
 });
 
-ipcMain.handle('print:to-pdf', async () => {
+ipcMain.handle('print:to-pdf', async (event, options = {}) => {
   if (!mainWindow) return { success: false, error: 'No active window' };
 
   try {
+    const isLandscape = options.landscape === true;
+    const pageSize = options.pageSize || 'A4';
+
     const { filePath } = await dialog.showSaveDialog(mainWindow, {
       title: 'حفظ تقرير السونار كملف PDF',
       defaultPath: `Ultrasound_Report_${new Date().toISOString().slice(0, 10)}.pdf`,
@@ -243,8 +246,11 @@ ipcMain.handle('print:to-pdf', async () => {
 
     const pdfData = await mainWindow.webContents.printToPDF({
       printBackground: true,
-      landscape: false,
-      pageSize: 'A4'
+      landscape: isLandscape,
+      pageSize: pageSize,
+      margins: {
+        marginType: 'none'
+      }
     });
 
     fs.writeFileSync(filePath, pdfData);

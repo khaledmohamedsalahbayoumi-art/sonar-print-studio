@@ -27,18 +27,24 @@ export function PrintSheet({
   const { t, isRTL } = useLanguage();
   const [dragOverSlotIndex, setDragOverSlotIndex] = useState(null);
 
-  // Paper dimensions in mm
+  // Paper dimensions in mm (exact width, height, minHeight, maxHeight)
+  const isLandscape = orientation === 'landscape';
+
   const dimensions = {
-    A4: orientation === 'portrait' ? { width: '210mm', minHeight: '297mm' } : { width: '297mm', minHeight: '210mm' },
-    A5: orientation === 'portrait' ? { width: '148mm', minHeight: '210mm' } : { width: '210mm', minHeight: '148mm' }
-  }[paperSize] || { width: '210mm', minHeight: '297mm' };
+    A4: isLandscape
+      ? { width: '297mm', height: '210mm', minHeight: '210mm', maxHeight: '210mm' }
+      : { width: '210mm', height: '297mm', minHeight: '297mm', maxHeight: '297mm' },
+    A5: isLandscape
+      ? { width: '210mm', height: '148mm', minHeight: '148mm', maxHeight: '148mm' }
+      : { width: '148mm', height: '210mm', minHeight: '210mm', maxHeight: '210mm' }
+  }[paperSize] || { width: '210mm', height: '297mm', minHeight: '297mm', maxHeight: '297mm' };
 
   // Margin padding
   const marginPadding = {
-    tight: '6mm',
-    normal: '10mm',
-    wide: '15mm'
-  }[margins] || '10mm';
+    tight: isLandscape ? '5mm' : '6mm',
+    normal: isLandscape ? '8mm' : '10mm',
+    wide: isLandscape ? '12mm' : '15mm'
+  }[margins] || (isLandscape ? '8mm' : '10mm');
 
   // Grid layout config based on preset
   const getGridConfig = () => {
@@ -272,7 +278,8 @@ export function PrintSheet({
       className="printable-paper"
       style={{
         width: dimensions.width,
-        minHeight: dimensions.minHeight,
+        height: dimensions.height,
+        maxHeight: dimensions.maxHeight,
         padding: marginPadding,
         backgroundColor: '#ffffff',
         color: '#000000',
@@ -283,9 +290,51 @@ export function PrintSheet({
         direction: isRTL ? 'rtl' : 'ltr',
         position: 'relative',
         margin: '0 auto',
+        overflow: 'hidden',
         fontFamily: "'Cairo', 'Outfit', sans-serif"
       }}
     >
+      {/* Dynamic @page and @media print rule for exact orientation and paper size */}
+      <style>{`
+        @page {
+          size: ${paperSize} ${orientation};
+          margin: 0;
+        }
+        @media print {
+          @page {
+            size: ${paperSize} ${orientation};
+            margin: 0;
+          }
+          html, body {
+            width: ${dimensions.width} !important;
+            height: ${dimensions.height} !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            background: #ffffff !important;
+          }
+          .printable-paper-wrapper {
+            transform: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+          }
+          .printable-paper {
+            width: ${dimensions.width} !important;
+            height: ${dimensions.height} !important;
+            max-height: ${dimensions.height} !important;
+            margin: 0 !important;
+            padding: ${marginPadding} !important;
+            box-shadow: none !important;
+            border: none !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+            page-break-after: avoid !important;
+            page-break-inside: avoid !important;
+          }
+        }
+      `}</style>
+
       {/* Top Section: Header & Patient Info */}
       <div>
         {/* DOCTOR & CLINIC HEADER BANNER */}
@@ -295,13 +344,13 @@ export function PrintSheet({
             alignItems: 'center',
             justifyContent: 'space-between',
             borderBottom: '2.5px solid #0284c7',
-            paddingBottom: '8px',
-            marginBottom: '8px'
+            paddingBottom: isLandscape ? '4px' : '8px',
+            marginBottom: isLandscape ? '5px' : '8px'
           }}>
             {/* Right: Clinic & Doctor Details */}
             <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
               <h2 style={{
-                fontSize: paperSize === 'A5' ? '12pt' : '15pt',
+                fontSize: paperSize === 'A5' ? '11pt' : (isLandscape ? '13pt' : '15pt'),
                 fontWeight: 900,
                 color: '#0369a1',
                 margin: 0,
@@ -310,15 +359,15 @@ export function PrintSheet({
                 {doctorInfo.clinicName || (isRTL ? 'مركز السونار والأشعة' : 'Ultrasound Imaging Center')}
               </h2>
               <div style={{
-                fontSize: paperSize === 'A5' ? '10.5pt' : '12pt',
+                fontSize: paperSize === 'A5' ? '9.5pt' : (isLandscape ? '10.5pt' : '12pt'),
                 fontWeight: 800,
                 color: '#0f172a',
-                marginTop: '2px'
+                marginTop: '1px'
               }}>
                 {doctorInfo.doctorName || (isRTL ? 'اسم الطبيب' : 'Doctor Name')}
               </div>
               <div style={{
-                fontSize: paperSize === 'A5' ? '8pt' : '9.5pt',
+                fontSize: paperSize === 'A5' ? '7.5pt' : (isLandscape ? '8pt' : '9.5pt'),
                 fontWeight: 600,
                 color: '#334155'
               }}>
@@ -326,7 +375,7 @@ export function PrintSheet({
               </div>
               {doctorInfo.degree && (
                 <div style={{
-                  fontSize: paperSize === 'A5' ? '7pt' : '8pt',
+                  fontSize: paperSize === 'A5' ? '6.5pt' : (isLandscape ? '7pt' : '8pt'),
                   color: '#64748b'
                 }}>
                   {doctorInfo.degree}
@@ -343,9 +392,9 @@ export function PrintSheet({
               textAlign: 'left'
             }}>
               <div style={{
-                fontSize: paperSize === 'A5' ? '7pt' : '8pt',
+                fontSize: paperSize === 'A5' ? '7pt' : (isLandscape ? '7.5pt' : '8pt'),
                 color: '#475569',
-                lineHeight: 1.4
+                lineHeight: 1.3
               }}>
                 {doctorInfo.phone && <div style={{ fontWeight: 600 }}>📞 {doctorInfo.phone}</div>}
                 {doctorInfo.address && <div>📍 {doctorInfo.address}</div>}
@@ -353,8 +402,8 @@ export function PrintSheet({
 
               {doctorInfo.logo && (
                 <div style={{
-                  width: paperSize === 'A5' ? '46px' : '62px',
-                  height: paperSize === 'A5' ? '46px' : '62px',
+                  width: paperSize === 'A5' ? '40px' : (isLandscape ? '46px' : '62px'),
+                  height: paperSize === 'A5' ? '40px' : (isLandscape ? '46px' : '62px'),
                   borderRadius: '6px',
                   border: '1px solid #cbd5e1',
                   overflow: 'hidden',
@@ -380,12 +429,12 @@ export function PrintSheet({
           backgroundColor: '#f1f5f9',
           border: '1px solid #cbd5e1',
           borderRadius: '6px',
-          padding: '6px 10px',
-          marginBottom: '10px',
+          padding: isLandscape ? '4px 8px' : '6px 10px',
+          marginBottom: isLandscape ? '6px' : '10px',
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: '6px',
-          fontSize: paperSize === 'A5' ? '7.5pt' : '8.5pt',
+          fontSize: paperSize === 'A5' ? '7.5pt' : (isLandscape ? '8pt' : '8.5pt'),
           color: '#1e293b'
         }}>
           <div>
@@ -421,9 +470,10 @@ export function PrintSheet({
         display: 'grid',
         gridTemplateColumns: `repeat(${gridConfig.cols}, 1fr)`,
         gridTemplateRows: `repeat(${gridConfig.rows}, 1fr)`,
-        gap: paperSize === 'A5' ? '6px' : '10px',
+        gap: paperSize === 'A5' ? '4px' : (isLandscape ? '6px' : '10px'),
         alignItems: 'stretch',
         minHeight: '0',
+        height: '100%',
         padding: '2px 0'
       }}>
         {slots.map((img, index) => {
@@ -461,7 +511,8 @@ export function PrintSheet({
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: onSlotClick ? 'pointer' : 'default',
-                minHeight: '120px',
+                minHeight: 0,
+                height: '100%',
                 boxShadow: isDropTarget ? '0 0 16px rgba(56, 189, 248, 0.4)' : 'none',
                 transition: 'border-color 0.15s, background-color 0.15s'
               }}
@@ -737,13 +788,13 @@ export function PrintSheet({
       {/* Bottom Section: Footer Disclaimer & Signature */}
       {doctorInfo.showFooterOnPrint && (
         <div style={{
-          marginTop: '8px',
-          paddingTop: '6px',
+          marginTop: isLandscape ? '4px' : '8px',
+          paddingTop: isLandscape ? '3px' : '6px',
           borderTop: '1px solid #cbd5e1',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          fontSize: paperSize === 'A5' ? '6.5pt' : '7.5pt',
+          fontSize: paperSize === 'A5' ? '6.5pt' : (isLandscape ? '7pt' : '7.5pt'),
           color: '#64748b'
         }}>
           <div>

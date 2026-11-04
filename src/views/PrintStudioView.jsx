@@ -175,7 +175,10 @@ export function PrintStudioView({
     setActiveSlotIndex(null); // Clear active slot before print
     if (window.electronAPI && typeof window.electronAPI.savePdf === 'function') {
       try {
-        const res = await window.electronAPI.savePdf();
+        const res = await window.electronAPI.savePdf({
+          landscape: orientation === 'landscape',
+          pageSize: paperSize
+        });
         if (res.success) {
           setToastMsg(isRTL ? `تم حفظ ملف الـ PDF بنجاح في: ${res.filePath}` : `PDF saved successfully to: ${res.filePath}`);
           return;
@@ -1010,6 +1013,7 @@ export function PrintStudioView({
       <PrinterSelectModal
         isOpen={isPrinterModalOpen}
         onClose={() => setIsPrinterModalOpen(false)}
+        onConfirmPrint={handleExecutePrint}
         onPrint={handleExecutePrint}
         paperSize={paperSize}
         orientation={orientation}

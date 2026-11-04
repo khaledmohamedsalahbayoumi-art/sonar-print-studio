@@ -6,6 +6,7 @@ export function PrinterSelectModal({
   isOpen,
   onClose,
   onConfirmPrint,
+  onPrint,
   paperSize = 'A4',
   orientation = 'portrait',
   defaultColor = true
@@ -51,14 +52,17 @@ export function PrinterSelectModal({
   if (!isOpen) return null;
 
   const handlePrintSubmit = () => {
-    onConfirmPrint({
-      deviceName: selectedDevice || undefined,
-      copies: Number(copies) || 1,
-      color: isColor,
-      pageSize: paperSize,
-      landscape: orientation === 'landscape',
-      silent: selectedDevice ? true : false
-    });
+    const callback = onConfirmPrint || onPrint;
+    if (callback) {
+      callback({
+        deviceName: selectedDevice || undefined,
+        copies: Number(copies) || 1,
+        color: isColor,
+        pageSize: paperSize,
+        landscape: orientation === 'landscape',
+        silent: selectedDevice ? true : false
+      });
+    }
     onClose();
   };
 
