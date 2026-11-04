@@ -13,5 +13,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   directPrint: (options) => ipcRenderer.invoke('print:direct', options),
   getPrinters: () => ipcRenderer.invoke('printers:get'),
   savePdf: (options) => ipcRenderer.invoke('print:to-pdf', options),
+  // License & Activation
+  getLicenseStatus: () => ipcRenderer.invoke('license:get-status'),
+  getMachineId: () => ipcRenderer.invoke('license:get-machine-id'),
+  activateLicense: (data) => ipcRenderer.invoke('license:activate', data),
+  deactivateLicense: () => ipcRenderer.invoke('license:deactivate'),
   isElectron: true
 });

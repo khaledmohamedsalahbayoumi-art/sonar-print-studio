@@ -9,6 +9,7 @@
     "pack": "node scripts/pack-asar.js",
     "preview": "vite preview",
     "electron": "electron .",
+    "keygen": "node scripts/generate-license.js",
     "app": "concurrently \"vite\" \"wait-on tcp:5173 && electron .\""
   },
   "keywords": [

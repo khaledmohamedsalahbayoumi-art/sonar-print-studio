@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { LicenseProvider } from './context/LicenseContext';
 import { DoctorProvider } from './context/DoctorContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -6,6 +7,7 @@ import { Sidebar } from './components/Sidebar';
 import { HomeView } from './views/HomeView';
 import { PrintStudioView } from './views/PrintStudioView';
 import { DoctorSettingsModal } from './components/DoctorSettingsModal';
+import { ActivationModal } from './components/ActivationModal';
 import { getSampleSonarScans } from './utils/sampleImages';
 
 const PATIENT_PRESETS = {
@@ -244,6 +246,9 @@ function AppContent() {
         isOpen={isDoctorSettingsOpen}
         onClose={() => setIsDoctorSettingsOpen(false)}
       />
+
+      {/* Software Licensing & Activation Protection Modal */}
+      <ActivationModal />
     </div>
   );
 }
@@ -253,7 +258,9 @@ export default function App() {
     <ThemeProvider>
       <LanguageProvider>
         <DoctorProvider>
-          <AppContent />
+          <LicenseProvider>
+            <AppContent />
+          </LicenseProvider>
         </DoctorProvider>
       </LanguageProvider>
     </ThemeProvider>

@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const licenseManager = require('./licenseManager');
 
 let mainWindow;
 let activeFolderWatcher = null;
@@ -314,6 +315,25 @@ ipcMain.handle('print:to-pdf', async (event, options = {}) => {
   } catch (error) {
     return { success: false, error: error.message };
   }
+});
+
+// ==========================================
+// License & Software Protection IPC Handlers
+// ==========================================
+ipcMain.handle('license:get-status', async () => {
+  return licenseManager.getLicenseStatus(app);
+});
+
+ipcMain.handle('license:get-machine-id', async () => {
+  return licenseManager.getMachineId();
+});
+
+ipcMain.handle('license:activate', async (_event, { activationKey, clientName }) => {
+  return licenseManager.activateLicense(app, activationKey, clientName);
+});
+
+ipcMain.handle('license:deactivate', async () => {
+  return licenseManager.deactivateLicense(app);
 });
 
 app.whenReady().then(createWindow);

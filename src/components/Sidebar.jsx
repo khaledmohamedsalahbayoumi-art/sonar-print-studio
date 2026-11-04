@@ -16,11 +16,14 @@ import {
   ChevronRight,
   CheckCircle2,
   UserCog,
-  Sparkles
+  Sparkles,
+  ShieldCheck,
+  Key
 } from 'lucide-react';
 import { useDoctor } from '../context/DoctorContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
+import { useLicense } from '../context/LicenseContext';
 
 export function Sidebar({
   currentView,
@@ -38,6 +41,7 @@ export function Sidebar({
   const { doctorInfo } = useDoctor();
   const { lang, toggleLang, t, isRTL } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+  const { isActivated, openActivationModal } = useLicense();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const CollapseIcon = isRTL
@@ -529,6 +533,44 @@ export function Sidebar({
         flexDirection: 'column',
         gap: '8px'
       }}>
+        {/* Software License Status Badge */}
+        <button
+          type="button"
+          onClick={openActivationModal}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isCollapsed ? 'center' : 'flex-start',
+            gap: '8px',
+            padding: isCollapsed ? '8px 0' : '7px 10px',
+            borderRadius: '8px',
+            background: isActivated ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+            border: isActivated ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(239, 68, 68, 0.35)',
+            color: isActivated ? '#10b981' : '#f87171',
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+            width: '100%',
+            fontSize: '0.74rem',
+            fontWeight: 700
+          }}
+          title={isRTL
+            ? (isActivated ? 'الترخيص مفعل - اضغط لعرض التفاصيل' : 'البرنامج غير مفعل - اضغط هنا للتفعيل')
+            : (isActivated ? 'Licensed - Click to view' : 'Unlicensed - Click to activate')}
+        >
+          {isActivated ? (
+            <ShieldCheck size={14} style={{ color: '#10b981', flexShrink: 0 }} />
+          ) : (
+            <Key size={14} style={{ color: '#f87171', flexShrink: 0 }} />
+          )}
+          {!isCollapsed && (
+            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {isActivated
+                ? (isRTL ? 'نسخة أصلية مرخصة 🟢' : 'Genuine License 🟢')
+                : (isRTL ? 'غير مفعل (اضغط للتفعيل) 🔴' : 'Not Activated 🔴')}
+            </span>
+          )}
+        </button>
+
         {/* Doctor & Clinic Profile Button */}
         <button
           type="button"
