@@ -31,6 +31,120 @@ function createWindow() {
 }
 
 // IPC Handlers
+function scanFolderForPatients(folderPath) {
+  if (!fs.existsSync(folderPath)) {
+    return { success: false, error: 'Folder does not exist' };
+  }
+  const folderName = path.basename(folderPath);
+  const supportedExts = new Set(['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff']);
+
+  const parseImageFile = (filePath) => {
+    const filename = path.basename(filePath);
+    const ext = path.extname(filePath).toLowerCase();
+    if (!supportedExts.has(ext)) return null;
+
+    let mime = 'image/jpeg';
+    if (ext === '.png') mime = 'image/png';
+    else if (ext === '.webp') mime = 'image/webp';
+    else if (ext === '.bmp') mime = 'image/bmp';
+
+    try {
+      const fileBuffer = fs.readFileSync(filePath);
+      const base64Data = fileBuffer.toString('base64');
+      return {
+        id: 'img_' + Math.random().toString(36).substring(2, 9),
+        name: filename,
+        path: filePath,
+        url: `data:${mime};base64,${base64Data}`,
+        size: fileBuffer.length,
+        rotation: 0,
+        tag: filename.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
+        timestamp: Date.now()
+      };
+    } catch (err) {
+      console.error('Error reading image file:', filePath, err);
+      return null;
+    }
+  };
+
+  try {
+    const entries = fs.readdirSync(folderPath, { withFileTypes: true });
+    const subDirs = entries.filter((e) => e.isDirectory());
+    const rootFiles = entries.filter((e) => e.isFile());
+
+    const patients = [];
+
+    // 1. Check each subdirectory as a patient folder (e.g. patient1, patient2...)
+    for (const subDir of subDirs) {
+      const subDirPath = path.join(folderPath, subDir.name);
+      try {
+        const subFiles = fs.readdirSync(subDirPath, { withFileTypes: true });
+        const images = [];
+        for (const file of subFiles) {
+          if (file.isFile()) {
+            const parsed = parseImageFile(path.join(subDirPath, file.name));
+            if (parsed) images.push(parsed);
+          }
+        }
+        patients.push({
+          id: 'patient_' + Math.random().toString(36).substring(2, 9),
+          folderName: subDir.name,
+          patientName: subDir.name.replace(/[-_]/g, ' '),
+          path: subDirPath,
+          images
+        });
+      } catch (err) {
+        console.error('Error reading subfolder:', subDirPath, err);
+      }
+    }
+
+    // 2. Check root files
+    const rootImages = [];
+    for (const file of rootFiles) {
+      const parsed = parseImageFile(path.join(folderPath, file.name));
+      if (parsed) rootImages.push(parsed);
+    }
+
+    if (rootImages.length > 0 || patients.length === 0) {
+      patients.unshift({
+        id: 'patient_root_' + Math.random().toString(36).substring(2, 9),
+        folderName: folderName,
+        patientName: folderName.replace(/[-_]/g, ' '),
+        path: folderPath,
+        images: rootImages
+      });
+    }
+
+    return {
+      success: true,
+      folderPath,
+      folderName,
+      patients
+    };
+  } catch (err) {
+    console.error('Error scanning folder:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+ipcMain.handle('dialog:open-folder', async () => {
+  if (!mainWindow) return null;
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'استدعاء مجلد صور وفحوصات السونار',
+    properties: ['openDirectory']
+  });
+
+  if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
+    return null;
+  }
+  return scanFolderForPatients(result.filePaths[0]);
+});
+
+ipcMain.handle('folder:reload', async (event, folderPath) => {
+  if (!folderPath) return null;
+  return scanFolderForPatients(folderPath);
+});
+
 ipcMain.handle('dialog:open-files', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     title: 'اختر صور السونار المطلوبة',

@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import {
   UploadCloud,
   FolderOpen,
+  Folder,
   Search,
   CheckCircle2,
   Circle,
@@ -29,7 +30,11 @@ export function HomeView({
   setSelectedImageIds,
   patientInfo,
   setPatientInfo,
-  onProceedToPrint
+  onProceedToPrint,
+  onOpenFolder,
+  onFolderLoaded,
+  folderData,
+  activePatientId
 }) {
   const { t, isRTL } = useLanguage();
   const ProceedIcon = isRTL ? ArrowLeft : ArrowRight;
@@ -38,6 +43,115 @@ export function HomeView({
   const [isDragging, setIsDragging] = useState(false);
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const fileInputRef = useRef(null);
+  const folderInputRef = useRef(null);
+
+  const handleOpenFolderClick = async () => {
+    if (window.electronAPI && typeof window.electronAPI.openFolderDialog === 'function') {
+      if (onOpenFolder) {
+        await onOpenFolder();
+        return;
+      }
+    }
+    // Browser fallback
+    folderInputRef.current?.click();
+  };
+
+  const handleBrowserFolderChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const patientMap = {};
+    const rootImages = [];
+
+    files.forEach((file) => {
+      if (!file.type.startsWith('image/')) return;
+      const relPath = file.webkitRelativePath || file.name;
+      const parts = relPath.split('/');
+
+      if (parts.length > 2) {
+        const patientSubfolder = parts[1];
+        if (!patientMap[patientSubfolder]) {
+          patientMap[patientSubfolder] = [];
+        }
+        patientMap[patientSubfolder].push(file);
+      } else {
+        rootImages.push(file);
+      }
+    });
+
+    const readPromises = [];
+    const patients = [];
+
+    Object.keys(patientMap).forEach((patientName) => {
+      const pImages = [];
+      const pObj = {
+        id: 'patient_' + Math.random().toString(36).substring(2, 9),
+        folderName: patientName,
+        patientName: patientName.replace(/[-_]/g, ' '),
+        path: '',
+        images: pImages
+      };
+      patients.push(pObj);
+
+      patientMap[patientName].forEach((file) => {
+        const p = new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            pImages.push({
+              id: 'img_' + Math.random().toString(36).substring(2, 9),
+              name: file.name,
+              url: ev.target.result,
+              rotation: 0,
+              tag: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
+              timestamp: Date.now()
+            });
+            resolve();
+          };
+          reader.readAsDataURL(file);
+        });
+        readPromises.push(p);
+      });
+    });
+
+    if (rootImages.length > 0) {
+      const rootPatient = {
+        id: 'patient_root_' + Math.random().toString(36).substring(2, 9),
+        folderName: 'General',
+        patientName: isRTL ? 'ملف عام' : 'General',
+        path: '',
+        images: []
+      };
+      patients.unshift(rootPatient);
+      rootImages.forEach((file) => {
+        const p = new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            rootPatient.images.push({
+              id: 'img_' + Math.random().toString(36).substring(2, 9),
+              name: file.name,
+              url: ev.target.result,
+              rotation: 0,
+              tag: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
+              timestamp: Date.now()
+            });
+            resolve();
+          };
+          reader.readAsDataURL(file);
+        });
+        readPromises.push(p);
+      });
+    }
+
+    Promise.all(readPromises).then(() => {
+      if (onFolderLoaded) {
+        onFolderLoaded({
+          folderName: files[0]?.webkitRelativePath?.split('/')[0] || 'Ultrasound Folder',
+          patients
+        });
+      }
+    });
+    e.target.value = '';
+  };
 
   // Filter images by search query
   const filteredImages = images.filter((img) =>
@@ -175,6 +289,17 @@ export function HomeView({
         onChange={handleBrowserFileInput}
         multiple
         accept="image/*"
+        style={{ display: 'none' }}
+      />
+
+      {/* Hidden Folder Input Fallback */}
+      <input
+        type="file"
+        ref={folderInputRef}
+        onChange={handleBrowserFolderChange}
+        webkitdirectory=""
+        directory=""
+        multiple
         style={{ display: 'none' }}
       />
 
@@ -450,19 +575,40 @@ export function HomeView({
           </p>
 
           <div style={{ display: 'inline-flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            {/* Primary Action: Import Entire Patients Folder */}
             <button
               type="button"
               className="btn btn-primary"
-              style={{ padding: '12px 24px', fontSize: '1rem' }}
+              style={{
+                padding: '12px 24px',
+                fontSize: '1rem',
+                background: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
+                boxShadow: '0 4px 16px rgba(6, 182, 212, 0.35)'
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenFolderClick();
+              }}
+            >
+              <Folder size={20} />
+              <span>{t('importFolderBtn')}</span>
+            </button>
+
+            {/* Browse Individual Scans */}
+            <button
+              type="button"
+              className="btn btn-secondary"
+              style={{ padding: '12px 20px', fontSize: '0.95rem' }}
               onClick={(e) => {
                 e.stopPropagation();
                 handleBrowseFiles();
               }}
             >
-              <FolderOpen size={20} />
+              <FolderOpen size={19} />
               <span>{t('browseFiles')}</span>
             </button>
 
+            {/* Load Mock Samples */}
             <button
               type="button"
               className="btn btn-secondary"
@@ -552,12 +698,27 @@ export function HomeView({
           borderRadius: '16px',
           border: '1px solid var(--border-subtle)'
         }}>
-          <p style={{ fontSize: '1rem', color: 'var(--text-muted)', margin: 0 }}>
-            {t('noImagesYet')}
-          </p>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-            {t('noImagesSubtitle')}
-          </p>
+          {folderData ? (
+            <div>
+              <p style={{ fontSize: '1.05rem', fontWeight: 700, color: '#38bdf8', margin: 0 }}>
+                {t('noScansInPatientFolder')}
+              </p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '8px' }}>
+                {isRTL
+                  ? 'يمكنك وضع صور السونار داخل هذا المجلد على جهازك والضغط على زر "تحديث المجلد 🔄" في شريط ملفات المرضى بالأعلى، أو سحب الصور وإفلاتها هنا.'
+                  : 'You can place ultrasound scans into this patient folder on your computer and click "Refresh Folder 🔄" in the bar above, or drag & drop images here.'}
+              </p>
+            </div>
+          ) : (
+            <div>
+              <p style={{ fontSize: '1rem', color: 'var(--text-muted)', margin: 0 }}>
+                {t('noImagesYet')}
+              </p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '6px' }}>
+                {t('noImagesSubtitle')}
+              </p>
+            </div>
+          )}
         </div>
       ) : (
         <div style={{

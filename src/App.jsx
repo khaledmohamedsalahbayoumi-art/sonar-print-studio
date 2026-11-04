@@ -3,6 +3,7 @@ import { DoctorProvider } from './context/DoctorContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Header } from './components/Header';
+import { PatientFolderBar } from './components/PatientFolderBar';
 import { HomeView } from './views/HomeView';
 import { PrintStudioView } from './views/PrintStudioView';
 import { DoctorSettingsModal } from './components/DoctorSettingsModal';
@@ -46,6 +47,81 @@ function AppContent() {
   // Patient metadata
   const [patientInfo, setPatientInfo] = useState(() => PATIENT_PRESETS[lang] || PATIENT_PRESETS.ar);
 
+  // Folder & Patients import state
+  const [folderData, setFolderData] = useState(null);
+  const [activePatientId, setActivePatientId] = useState(null);
+  const [isReloadingFolder, setIsReloadingFolder] = useState(false);
+
+  // Handle selecting a patient from the patient bar or header
+  const handleSelectPatient = (patient) => {
+    if (!patient) return;
+    setActivePatientId(patient.id);
+    const patientScans = patient.images || [];
+    setImages(patientScans);
+    setSelectedImageIds(patientScans.map((img) => img.id));
+    setPatientInfo((prev) => ({
+      ...prev,
+      patientName: patient.patientName || patient.folderName,
+      patientId: patient.folderName,
+      isCustom: true
+    }));
+  };
+
+  // Handle when a folder is loaded
+  const handleFolderLoaded = (data) => {
+    if (!data || !data.patients) return;
+    setFolderData(data);
+    // Find first patient with images, or the first patient in folder
+    const targetPatient = data.patients.find((p) => p.images && p.images.length > 0) || data.patients[0];
+    if (targetPatient) {
+      handleSelectPatient(targetPatient);
+    }
+  };
+
+  // Open native folder dialog
+  const handleOpenFolder = async () => {
+    if (window.electronAPI && typeof window.electronAPI.openFolderDialog === 'function') {
+      try {
+        const result = await window.electronAPI.openFolderDialog();
+        if (result && result.success && result.patients && result.patients.length > 0) {
+          handleFolderLoaded(result);
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to open folder:', err);
+      }
+    }
+  };
+
+  // Reload current folder (e.g. check for new images from ultrasound machine)
+  const handleReloadFolder = async () => {
+    if (!folderData || !folderData.folderPath) return;
+    setIsReloadingFolder(true);
+    try {
+      if (window.electronAPI && typeof window.electronAPI.reloadFolder === 'function') {
+        const result = await window.electronAPI.reloadFolder(folderData.folderPath);
+        if (result && result.success && result.patients) {
+          setFolderData(result);
+          // Re-select active patient or first patient
+          const current = result.patients.find((p) => p.id === activePatientId || p.folderName === patientInfo.patientId) || result.patients[0];
+          if (current) {
+            handleSelectPatient(current);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error reloading folder:', err);
+    } finally {
+      setIsReloadingFolder(false);
+    }
+  };
+
+  // Close folder
+  const handleCloseFolder = () => {
+    setFolderData(null);
+    setActivePatientId(null);
+  };
+
   // When language switches, dynamically translate sample scans & default patient info
   useEffect(() => {
     // 1. Update patient preset if user hasn't typed custom data, or if it matches the preset
@@ -88,6 +164,23 @@ function AppContent() {
         setCurrentView={setCurrentView}
         selectedImagesCount={selectedImageIds.length}
         onOpenDoctorSettings={() => setIsDoctorSettingsOpen(true)}
+        folderData={folderData}
+        activePatientId={activePatientId}
+        onSelectPatient={handleSelectPatient}
+        onOpenFolder={handleOpenFolder}
+      />
+
+      {/* Patient Folders & Files Bar (Visible across the app when a folder is loaded) */}
+      <PatientFolderBar
+        folderData={folderData}
+        activePatientId={activePatientId}
+        onSelectPatient={handleSelectPatient}
+        onReloadFolder={handleReloadFolder}
+        onCloseFolder={handleCloseFolder}
+        onOpenNewFolder={handleOpenFolder}
+        onProceedToPrint={() => setCurrentView('studio')}
+        currentView={currentView}
+        isReloading={isReloadingFolder}
       />
 
       {/* Main Views */}
@@ -101,6 +194,10 @@ function AppContent() {
             patientInfo={patientInfo}
             setPatientInfo={handlePatientInfoChange}
             onProceedToPrint={() => setCurrentView('studio')}
+            onOpenFolder={handleOpenFolder}
+            onFolderLoaded={handleFolderLoaded}
+            folderData={folderData}
+            activePatientId={activePatientId}
           />
         ) : (
           <PrintStudioView

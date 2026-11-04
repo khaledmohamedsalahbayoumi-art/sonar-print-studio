@@ -2,9 +2,18 @@ import React from 'react';
 import { useDoctor } from '../context/DoctorContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
-import { Stethoscope, UserCog, Printer, Image as ImageIcon, Sun, Moon, Globe } from 'lucide-react';
+import { Stethoscope, UserCog, Printer, Image as ImageIcon, Sun, Moon, Globe, Folder, User, ChevronDown } from 'lucide-react';
 
-export function Header({ currentView, setCurrentView, selectedImagesCount, onOpenDoctorSettings }) {
+export function Header({
+  currentView,
+  setCurrentView,
+  selectedImagesCount,
+  onOpenDoctorSettings,
+  folderData,
+  activePatientId,
+  onSelectPatient,
+  onOpenFolder
+}) {
   const { doctorInfo } = useDoctor();
   const { lang, toggleLang, t, isRTL } = useLanguage();
   const { theme, toggleTheme } = useTheme();
@@ -127,6 +136,48 @@ export function Header({ currentView, setCurrentView, selectedImagesCount, onOpe
             </span>
           )}
         </button>
+
+        {/* If a folder of patients is loaded, show patient selector directly in the navigation bar */}
+        {folderData && folderData.patients?.length > 0 && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            borderRight: isRTL ? 'none' : '1px solid var(--border-subtle)',
+            borderLeft: isRTL ? '1px solid var(--border-subtle)' : 'none',
+            paddingRight: isRTL ? 0 : '8px',
+            paddingLeft: isRTL ? '8px' : 0,
+            marginRight: isRTL ? 0 : '4px',
+            marginLeft: isRTL ? '4px' : 0
+          }}>
+            <User size={15} style={{ color: '#0ea5e9', flexShrink: 0 }} />
+            <select
+              value={activePatientId || ''}
+              onChange={(e) => {
+                const target = folderData.patients.find((p) => p.id === e.target.value);
+                if (target) onSelectPatient(target);
+              }}
+              title={t('selectPatientToPrint')}
+              style={{
+                background: 'var(--bg-card)',
+                color: '#38bdf8',
+                border: '1px solid #0284c7',
+                borderRadius: '8px',
+                padding: '5px 10px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                outline: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              {folderData.patients.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.patientName} ({p.images?.length || 0} {isRTL ? 'صور' : 'scans'})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Utilities: Language, Theme, Doctor Info */}
