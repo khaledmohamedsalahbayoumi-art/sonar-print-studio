@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DoctorProvider } from './context/DoctorContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { Header } from './components/Header';
-import { PatientFolderBar } from './components/PatientFolderBar';
+import { Sidebar } from './components/Sidebar';
 import { HomeView } from './views/HomeView';
 import { PrintStudioView } from './views/PrintStudioView';
 import { DoctorSettingsModal } from './components/DoctorSettingsModal';
@@ -157,57 +156,49 @@ function AppContent() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Top Application Bar */}
-      <Header
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'row', direction: isRTL ? 'rtl' : 'ltr' }}>
+      {/* Sidebar Navigation & Patient Files */}
+      <Sidebar
         currentView={currentView}
         setCurrentView={setCurrentView}
         selectedImagesCount={selectedImageIds.length}
-        onOpenDoctorSettings={() => setIsDoctorSettingsOpen(true)}
         folderData={folderData}
         activePatientId={activePatientId}
         onSelectPatient={handleSelectPatient}
         onOpenFolder={handleOpenFolder}
-      />
-
-      {/* Patient Folders & Files Bar (Visible across the app when a folder is loaded) */}
-      <PatientFolderBar
-        folderData={folderData}
-        activePatientId={activePatientId}
-        onSelectPatient={handleSelectPatient}
         onReloadFolder={handleReloadFolder}
         onCloseFolder={handleCloseFolder}
-        onOpenNewFolder={handleOpenFolder}
-        onProceedToPrint={() => setCurrentView('studio')}
-        currentView={currentView}
-        isReloading={isReloadingFolder}
+        isReloadingFolder={isReloadingFolder}
+        onOpenDoctorSettings={() => setIsDoctorSettingsOpen(true)}
       />
 
-      {/* Main Views */}
-      <main style={{ flex: 1 }}>
-        {currentView === 'home' ? (
-          <HomeView
-            images={images}
-            setImages={setImages}
-            selectedImageIds={selectedImageIds}
-            setSelectedImageIds={setSelectedImageIds}
-            patientInfo={patientInfo}
-            setPatientInfo={handlePatientInfoChange}
-            onProceedToPrint={() => setCurrentView('studio')}
-            onOpenFolder={handleOpenFolder}
-            onFolderLoaded={handleFolderLoaded}
-            folderData={folderData}
-            activePatientId={activePatientId}
-          />
-        ) : (
-          <PrintStudioView
-            images={images}
-            selectedImageIds={selectedImageIds}
-            patientInfo={patientInfo}
-            onBackToHome={() => setCurrentView('home')}
-          />
-        )}
-      </main>
+      {/* Main Content Workspace */}
+      <div style={{ flex: 1, minWidth: 0, height: '100vh', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <main style={{ flex: 1 }}>
+          {currentView === 'home' ? (
+            <HomeView
+              images={images}
+              setImages={setImages}
+              selectedImageIds={selectedImageIds}
+              setSelectedImageIds={setSelectedImageIds}
+              patientInfo={patientInfo}
+              setPatientInfo={handlePatientInfoChange}
+              onProceedToPrint={() => setCurrentView('studio')}
+              onOpenFolder={handleOpenFolder}
+              onFolderLoaded={handleFolderLoaded}
+              folderData={folderData}
+              activePatientId={activePatientId}
+            />
+          ) : (
+            <PrintStudioView
+              images={images}
+              selectedImageIds={selectedImageIds}
+              patientInfo={patientInfo}
+              onBackToHome={() => setCurrentView('home')}
+            />
+          )}
+        </main>
+      </div>
 
       {/* Doctor & Clinic Branding Settings Modal */}
       <DoctorSettingsModal

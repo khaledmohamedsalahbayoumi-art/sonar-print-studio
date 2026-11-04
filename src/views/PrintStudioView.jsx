@@ -245,7 +245,7 @@ export function PrintStudioView({
   return (
     <div className="print-studio-container" style={{
       display: 'flex',
-      height: 'calc(100vh - 72px)',
+      height: '100vh',
       overflow: 'hidden',
       backgroundColor: 'var(--bg-primary)',
       direction: isRTL ? 'rtl' : 'ltr'
