@@ -437,26 +437,52 @@ export function ActivationModal() {
                 justifyContent: 'space-between',
                 flexWrap: 'wrap',
                 gap: '10px',
-                fontSize: '0.8rem',
+                fontSize: '0.84rem',
                 color: 'var(--text-muted)'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <MessageCircle size={16} color="#22c55e" />
-                <span>{isRTL ? 'لطلب التفعيل الفوري عبر واتساب:' : 'WhatsApp Support:'}</span>
+                <MessageCircle size={18} color="#22c55e" />
+                <span style={{ fontWeight: 600 }}>{isRTL ? 'لطلب كود التفعيل عبر واتساب:' : 'WhatsApp Support:'}</span>
               </div>
 
-              <span
+              <a
+                href={`https://wa.me/201553332921?text=${encodeURIComponent(
+                  `السلام عليكم، أود تفعيل برنامج Sonar Print Studio.\nكود جهازي هو: ${machineId || ''}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(34, 197, 94, 0.12)',
+                  border: '1px solid rgba(34, 197, 94, 0.35)',
+                  color: '#22c55e',
+                  padding: '6px 14px',
+                  borderRadius: '10px',
                   fontFamily: 'monospace',
-                  fontSize: '0.9rem',
-                  fontWeight: 700,
-                  color: '#38bdf8',
-                  direction: 'ltr'
+                  fontSize: '0.95rem',
+                  fontWeight: 800,
+                  textDecoration: 'none',
+                  direction: 'ltr',
+                  transition: 'all 0.15s'
                 }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(34, 197, 94, 0.22)';
+                  e.currentTarget.style.borderColor = '#22c55e';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(34, 197, 94, 0.12)';
+                  e.currentTarget.style.borderColor = 'rgba(34, 197, 94, 0.35)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+                title={isRTL ? 'اضغط لفتح محادثة واتساب فورية وإرسال كود جهازك' : 'Click to send your machine code via WhatsApp'}
               >
-                +20 100 000 0000
-              </span>
+                <span>01553332921</span>
+                <ExternalLink size={14} />
+              </a>
             </div>
           </form>
         )}
@@ -464,3 +490,4 @@ export function ActivationModal() {
     </div>
   );
 }
+

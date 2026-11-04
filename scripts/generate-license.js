@@ -33,3 +33,4 @@ console.log('  License Type:   ' + (isPerp ? 'دائم مدى الحياة (Perp
 console.log('------------------------------------------------------');
 console.log('  ACTIVATION KEY: \x1b[32m\x1b[1m' + key + '\x1b[0m');
 console.log('======================================================\n');
+
