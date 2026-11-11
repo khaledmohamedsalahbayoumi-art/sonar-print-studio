@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { PrintSheet } from '../components/PrintSheet';
-import { PrinterSelectModal } from '../components/PrinterSelectModal';
 import { useDoctor } from '../context/DoctorContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
+import { usePrinter } from '../context/PrinterContext';
 import {
   Printer,
   FileDown,
@@ -36,6 +36,7 @@ export function PrintStudioView({
   const { doctorInfo, updateDoctorInfo } = useDoctor();
   const { t, isRTL } = useLanguage();
   const { theme } = useTheme();
+  const { selectedPrinter, copies, colorMode } = usePrinter();
 
   // Selected images to display
   const selectedImages = images.filter((img) => selectedImageIds.includes(img.id));
@@ -139,23 +140,23 @@ export function PrintStudioView({
     setActiveSlotIndex(null); // Clear active slot before print so selection border doesn't print
     setIsPrinting(true);
 
-    if (options.deviceName) {
-      setSelectedPrinterName(options.deviceName);
-    }
+    const targetPrinter = options.deviceName !== undefined ? options.deviceName : (selectedPrinter || undefined);
+    const numCopies = Number(options.copies || copies) || 1;
+    const isColor = options.color !== undefined ? options.color : (colorMode === 'color');
 
     if (window.electronAPI && typeof window.electronAPI.directPrint === 'function') {
       try {
         await window.electronAPI.directPrint({
           pageSize: paperSize,
           landscape: orientation === 'landscape',
-          color: options.color !== false,
-          deviceName: options.deviceName,
-          copies: options.copies || 1,
+          color: isColor,
+          deviceName: targetPrinter,
+          copies: numCopies,
           silent: options.silent
         });
         setIsPrinting(false);
-        if (options.deviceName) {
-          setToastMsg(isRTL ? `تم إرسال أمر الطباعة بنجاح إلى: ${options.deviceName}` : `Print job sent successfully to: ${options.deviceName}`);
+        if (targetPrinter) {
+          setToastMsg(isRTL ? `تم إرسال أمر الطباعة بنجاح إلى: ${targetPrinter}` : `Print job sent successfully to: ${targetPrinter}`);
         } else {
           setToastMsg(isRTL ? 'تم إرسال أمر الطباعة بنجاح' : 'Print job sent successfully');
         }
@@ -829,38 +830,23 @@ export function PrintStudioView({
           flexDirection: 'column',
           gap: '10px'
         }}>
-          {selectedPrinterName && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontSize: '0.75rem',
-              color: 'var(--text-muted)',
-              padding: '6px 10px',
-              borderRadius: '8px',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-subtle)'
-            }}>
-              <span>{t('selectedPrinter')} <strong style={{ color: '#38bdf8' }}>{selectedPrinterName}</strong></span>
-              <button
-                type="button"
-                onClick={() => setIsPrinterModalOpen(true)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#0284c7',
-                  cursor: 'pointer',
-                  fontWeight: 700,
-                  fontSize: '0.72rem'
-                }}
-              >
-                {t('changePrinter')}
-              </button>
-            </div>
-          )}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '0.75rem',
+            color: 'var(--text-muted)',
+            padding: '6px 10px',
+            borderRadius: '8px',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-subtle)'
+          }}>
+            <span>{t('selectedPrinter')} <strong style={{ color: '#38bdf8' }}>{selectedPrinter || (isRTL ? 'الافتراضية' : 'Default')}</strong></span>
+            <span style={{ color: '#10b981', fontWeight: 700, fontSize: '0.7rem' }}>{copies} {isRTL ? 'نسخة' : 'copies'}</span>
+          </div>
 
           <button
-            onClick={() => setIsPrinterModalOpen(true)}
+            onClick={() => handleExecutePrint()}
             disabled={isPrinting}
             className="btn btn-primary"
             style={{
@@ -1009,15 +995,6 @@ export function PrintStudioView({
         </div>
 
       </div>
-
-      <PrinterSelectModal
-        isOpen={isPrinterModalOpen}
-        onClose={() => setIsPrinterModalOpen(false)}
-        onConfirmPrint={handleExecutePrint}
-        onPrint={handleExecutePrint}
-        paperSize={paperSize}
-        orientation={orientation}
-      />
 
       <Toast message={toastMsg} onClose={() => setToastMsg(null)} />
     </div>

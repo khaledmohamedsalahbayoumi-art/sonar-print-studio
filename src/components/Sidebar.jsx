@@ -21,12 +21,17 @@ import {
   Key,
   Clock,
   ArrowUpDown,
-  ArrowDownAZ
+  ArrowDownAZ,
+  Palette,
+  Minus,
+  Plus,
+  Zap
 } from 'lucide-react';
 import { useDoctor } from '../context/DoctorContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLicense } from '../context/LicenseContext';
+import { usePrinter } from '../context/PrinterContext';
 
 export function Sidebar({
   currentView,
@@ -39,12 +44,25 @@ export function Sidebar({
   onReloadFolder,
   onCloseFolder,
   isReloadingFolder = false,
-  onOpenDoctorSettings
+  onOpenDoctorSettings,
+  onInstantPrint
 }) {
   const { doctorInfo } = useDoctor();
   const { lang, toggleLang, t, isRTL } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const { isActivated, openActivationModal } = useLicense();
+  const {
+    printers,
+    selectedPrinter,
+    setSelectedPrinter,
+    copies,
+    setCopies,
+    colorMode,
+    setColorMode,
+    refreshPrinters,
+    isDetecting: isDetectingPrinters,
+    isPrinting
+  } = usePrinter();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [patientSortOrder, setPatientSortOrder] = useState('newest'); // 'newest' | 'alpha' | 'oldest'
 
@@ -304,6 +322,355 @@ export function Sidebar({
               </span>
             )}
           </button>
+
+          {/* DEDICATED PRINTER & PRINT SETTINGS BOX - DIRECTLY UNDER PRINT STUDIO */}
+          {!isCollapsed ? (
+            <div style={{
+              marginTop: '4px',
+              padding: '10px 10px 12px',
+              background: 'linear-gradient(180deg, rgba(2, 132, 199, 0.12) 0%, rgba(15, 23, 42, 0.75) 100%)',
+              border: '1px solid rgba(2, 132, 199, 0.35)',
+              borderRadius: '12px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '9px',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)'
+            }}>
+              {/* Header with Title and Refresh Button */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingBottom: '6px',
+                borderBottom: '1px solid rgba(2, 132, 199, 0.2)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Printer size={14} style={{ color: '#38bdf8' }} />
+                  <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#38bdf8' }}>
+                    {isRTL ? 'اختيار الطابعة وإعدادات الطباعة' : 'Printer & Settings'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={refreshPrinters}
+                  disabled={isDetectingPrinters}
+                  title={isRTL ? 'تحديث قائمة الطابعات المتصلة' : 'Refresh connected printers'}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#38bdf8',
+                    cursor: isDetectingPrinters ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '3px',
+                    fontSize: '0.66rem',
+                    fontWeight: 700,
+                    padding: '2px 4px'
+                  }}
+                >
+                  <RotateCw size={11} style={{ animation: isDetectingPrinters ? 'spin 1s linear infinite' : 'none' }} />
+                  <span>{isRTL ? 'تحديث' : 'Refresh'}</span>
+                </button>
+              </div>
+
+              {/* Printers List */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '0.67rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+                  {isRTL ? `الطابعات المتاحة على الجهاز (${printers.length})` : `Available Printers (${printers.length})`}
+                </span>
+
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  maxHeight: '130px',
+                  overflowY: 'auto',
+                  paddingRight: isRTL ? 0 : '2px',
+                  paddingLeft: isRTL ? '2px' : 0
+                }}>
+                  {printers.map((p) => {
+                    const isSelected = selectedPrinter === p.name;
+                    return (
+                      <button
+                        key={p.name}
+                        type="button"
+                        onClick={() => setSelectedPrinter(p.name)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '6px',
+                          padding: '6px 8px',
+                          borderRadius: '7px',
+                          border: isSelected ? '1px solid #0284c7' : '1px solid rgba(148, 163, 184, 0.15)',
+                          background: isSelected ? 'rgba(2, 132, 199, 0.22)' : 'rgba(15, 23, 42, 0.45)',
+                          color: isSelected ? '#38bdf8' : 'var(--text-main)',
+                          cursor: 'pointer',
+                          fontSize: '0.73rem',
+                          fontWeight: isSelected ? 700 : 500,
+                          textAlign: isRTL ? 'right' : 'left',
+                          transition: 'all 0.15s',
+                          width: '100%'
+                        }}
+                        title={p.name}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
+                          <div style={{
+                            width: '11px',
+                            height: '11px',
+                            borderRadius: '50%',
+                            border: isSelected ? '3px solid #0284c7' : '1px solid var(--text-dim)',
+                            background: isSelected ? '#ffffff' : 'transparent',
+                            flexShrink: 0
+                          }} />
+                          <span style={{
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}>
+                            {p.name}
+                          </span>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '3px', flexShrink: 0 }}>
+                          {p.isDefault && (
+                            <span style={{
+                              fontSize: '0.58rem',
+                              background: 'rgba(16, 185, 129, 0.2)',
+                              color: '#10b981',
+                              padding: '1px 4px',
+                              borderRadius: '4px',
+                              fontWeight: 700
+                            }}>
+                              {isRTL ? 'الافتراضية' : 'Default'}
+                            </span>
+                          )}
+                          <span style={{
+                            fontSize: '0.58rem',
+                            background: 'rgba(6, 182, 212, 0.15)',
+                            color: '#06b6d4',
+                            padding: '1px 4px',
+                            borderRadius: '4px'
+                          }}>
+                            {isRTL ? 'جاهزة' : 'Ready'}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+
+                  {/* Windows native print option */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPrinter('')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '5px 8px',
+                      borderRadius: '7px',
+                      border: !selectedPrinter ? '1px solid #0284c7' : '1px dashed rgba(148, 163, 184, 0.2)',
+                      background: !selectedPrinter ? 'rgba(2, 132, 199, 0.15)' : 'transparent',
+                      color: !selectedPrinter ? '#38bdf8' : 'var(--text-dim)',
+                      cursor: 'pointer',
+                      fontSize: '0.71rem',
+                      fontWeight: !selectedPrinter ? 700 : 500,
+                      width: '100%',
+                      textAlign: isRTL ? 'right' : 'left'
+                    }}
+                  >
+                    <div style={{
+                      width: '11px',
+                      height: '11px',
+                      borderRadius: '50%',
+                      border: !selectedPrinter ? '3px solid #0284c7' : '1px solid var(--text-dim)',
+                      background: !selectedPrinter ? '#ffffff' : 'transparent',
+                      flexShrink: 0
+                    }} />
+                    <span>{isRTL ? 'الطباعة عبر نافذة الويندوز' : 'System Print Dialog'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Settings: Copies & Colors */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '8px',
+                paddingTop: '6px',
+                borderTop: '1px solid rgba(2, 132, 199, 0.15)'
+              }}>
+                {/* Copies */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  <span style={{ fontSize: '0.66rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+                    {isRTL ? 'عدد النسخ:' : 'Copies:'}
+                  </span>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '6px',
+                    overflow: 'hidden'
+                  }}>
+                    <button
+                      type="button"
+                      onClick={() => setCopies((c) => Math.max(1, c - 1))}
+                      style={{
+                        padding: '4px 7px',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-main)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Minus size={11} />
+                    </button>
+                    <span style={{
+                      flex: 1,
+                      textAlign: 'center',
+                      fontSize: '0.76rem',
+                      fontWeight: 800,
+                      color: '#38bdf8'
+                    }}>
+                      {copies}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setCopies((c) => Math.min(20, c + 1))}
+                      style={{
+                        padding: '4px 7px',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-main)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Plus size={11} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Color Mode */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  <span style={{ fontSize: '0.66rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+                    {isRTL ? 'وضع الألوان:' : 'Color Mode:'}
+                  </span>
+                  <div style={{ display: 'flex', gap: '3px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setColorMode('color')}
+                      style={{
+                        flex: 1,
+                        padding: '4px 2px',
+                        borderRadius: '6px',
+                        border: colorMode === 'color' ? '1px solid #0284c7' : '1px solid var(--border-subtle)',
+                        background: colorMode === 'color' ? 'rgba(2, 132, 199, 0.28)' : 'var(--bg-primary)',
+                        color: colorMode === 'color' ? '#38bdf8' : 'var(--text-dim)',
+                        fontSize: '0.66rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '2px'
+                      }}
+                      title={isRTL ? 'ألوان كاملة' : 'Color'}
+                    >
+                      <Palette size={10} />
+                      <span>{isRTL ? 'ألوان' : 'Color'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setColorMode('monochrome')}
+                      style={{
+                        flex: 1,
+                        padding: '4px 2px',
+                        borderRadius: '6px',
+                        border: colorMode === 'monochrome' ? '1px solid #0284c7' : '1px solid var(--border-subtle)',
+                        background: colorMode === 'monochrome' ? 'rgba(2, 132, 199, 0.28)' : 'var(--bg-primary)',
+                        color: colorMode === 'monochrome' ? '#38bdf8' : 'var(--text-dim)',
+                        fontSize: '0.66rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '2px'
+                      }}
+                      title={isRTL ? 'أبيض وأسود طبي' : 'Monochrome'}
+                    >
+                      <span style={{ width: '7px', height: '7px', borderRadius: '2px', background: '#94a3b8' }} />
+                      <span>{isRTL ? 'B&W' : 'B&W'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Big Direct Action Button: طباعة الآن على هذه الطابعة */}
+              <button
+                type="button"
+                onClick={onInstantPrint}
+                disabled={isPrinting || selectedImagesCount === 0}
+                style={{
+                  width: '100%',
+                  padding: '9px 12px',
+                  borderRadius: '8px',
+                  background: selectedImagesCount > 0
+                    ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)'
+                    : 'rgba(100, 116, 139, 0.2)',
+                  border: selectedImagesCount > 0 ? '1px solid #38bdf8' : '1px solid transparent',
+                  color: selectedImagesCount > 0 ? '#ffffff' : 'var(--text-dim)',
+                  fontSize: '0.82rem',
+                  fontWeight: 800,
+                  cursor: selectedImagesCount > 0 && !isPrinting ? 'pointer' : 'not-allowed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '7px',
+                  boxShadow: selectedImagesCount > 0 ? '0 4px 14px rgba(2, 132, 199, 0.35)' : 'none',
+                  transition: 'all 0.15s'
+                }}
+              >
+                {isPrinting ? (
+                  <>
+                    <RotateCw size={14} style={{ animation: 'spin 1s linear infinite' }} />
+                    <span>{isRTL ? 'جاري إرسال أمر الطباعة...' : 'Printing...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Printer size={15} />
+                    <span>{isRTL ? 'طباعة الآن على هذه الطابعة' : 'Print Now to this Printer'}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          ) : (
+            /* Collapsed Instant Print Button */
+            <button
+              type="button"
+              onClick={onInstantPrint}
+              disabled={isPrinting || selectedImagesCount === 0}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '9px 0',
+                borderRadius: '8px',
+                border: '1px solid #0284c7',
+                background: 'rgba(2, 132, 199, 0.25)',
+                color: '#38bdf8',
+                cursor: selectedImagesCount > 0 && !isPrinting ? 'pointer' : 'not-allowed',
+                width: '100%',
+                marginTop: '4px'
+              }}
+              title={isRTL ? `طباعة فورية على: ${selectedPrinter || 'الطابعة الافتراضية'}` : `Print to: ${selectedPrinter}`}
+            >
+              <Printer size={17} />
+            </button>
+          )}
         </div>
 
         {/* PATIENT FILES SECTION */}

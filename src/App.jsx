@@ -3,11 +3,13 @@ import { LicenseProvider } from './context/LicenseContext';
 import { DoctorProvider } from './context/DoctorContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { PrinterProvider, usePrinter } from './context/PrinterContext';
 import { Sidebar } from './components/Sidebar';
 import { HomeView } from './views/HomeView';
 import { PrintStudioView } from './views/PrintStudioView';
 import { DoctorSettingsModal } from './components/DoctorSettingsModal';
 import { ActivationModal } from './components/ActivationModal';
+import { Toast } from './components/Toast';
 import { getSampleSonarScans } from './utils/sampleImages';
 
 const PATIENT_PRESETS = {
@@ -32,9 +34,11 @@ const PATIENT_PRESETS = {
 };
 
 function AppContent() {
-  const { lang, isRTL } = useLanguage();
+  const { lang, t, isRTL } = useLanguage();
+  const { selectedPrinter, executeDirectPrint, isPrinting } = usePrinter();
   const [currentView, setCurrentView] = useState('home'); // 'home' | 'studio'
   const [isDoctorSettingsOpen, setIsDoctorSettingsOpen] = useState(false);
+  const [toastInfo, setToastInfo] = useState(null);
 
   // Ultrasound images state (preloaded with sample scans for current language)
   const [images, setImages] = useState(() => getSampleSonarScans(lang));
@@ -196,6 +200,42 @@ function AppContent() {
     }));
   };
 
+  // Instant print handler triggered directly from sidebar
+  const handleInstantPrint = async () => {
+    if (selectedImageIds.length === 0) {
+      setToastInfo({
+        message: isRTL ? 'يرجى تحديد صورة سونار واحدة على الأقل للطباعة' : 'Please select at least one scan to print',
+        type: 'error'
+      });
+      return;
+    }
+
+    try {
+      if (currentView !== 'studio') {
+        setCurrentView('studio');
+        setTimeout(async () => {
+          try {
+            await executeDirectPrint({ deviceName: selectedPrinter });
+            setToastInfo({
+              message: isRTL ? `تم إرسال أمر الطباعة بنجاح إلى: ${selectedPrinter || 'الطابعة الافتراضية'}` : `Print job sent successfully to: ${selectedPrinter || 'Default'}`,
+              type: 'success'
+            });
+          } catch (err) {
+            console.error('Instant print failed:', err);
+          }
+        }, 200);
+      } else {
+        await executeDirectPrint({ deviceName: selectedPrinter });
+        setToastInfo({
+          message: isRTL ? `تم إرسال أمر الطباعة بنجاح إلى: ${selectedPrinter || 'الطابعة الافتراضية'}` : `Print job sent successfully to: ${selectedPrinter || 'Default'}`,
+          type: 'success'
+        });
+      }
+    } catch (err) {
+      console.error('Instant print failed:', err);
+    }
+  };
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'row', direction: isRTL ? 'rtl' : 'ltr' }}>
       {/* Sidebar Navigation & Patient Files */}
@@ -211,6 +251,7 @@ function AppContent() {
         onCloseFolder={handleCloseFolder}
         isReloadingFolder={isReloadingFolder}
         onOpenDoctorSettings={() => setIsDoctorSettingsOpen(true)}
+        onInstantPrint={handleInstantPrint}
       />
 
       {/* Main Content Workspace */}
@@ -249,6 +290,15 @@ function AppContent() {
 
       {/* Software Licensing & Activation Protection Modal */}
       <ActivationModal />
+
+      {/* Feedback Toast */}
+      {toastInfo && (
+        <Toast
+          message={toastInfo.message}
+          type={toastInfo.type}
+          onClose={() => setToastInfo(null)}
+        />
+      )}
     </div>
   );
 }
@@ -259,7 +309,9 @@ export default function App() {
       <LanguageProvider>
         <DoctorProvider>
           <LicenseProvider>
-            <AppContent />
+            <PrinterProvider>
+              <AppContent />
+            </PrinterProvider>
           </LicenseProvider>
         </DoctorProvider>
       </LanguageProvider>
