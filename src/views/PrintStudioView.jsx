@@ -31,20 +31,25 @@ export function PrintStudioView({
   images,
   selectedImageIds,
   patientInfo,
-  onBackToHome
+  onBackToHome,
+  onOpenPrinters
 }) {
   const { doctorInfo, updateDoctorInfo } = useDoctor();
   const { t, isRTL } = useLanguage();
   const { theme } = useTheme();
-  const { selectedPrinter, copies, colorMode } = usePrinter();
+  const {
+    selectedPrinter,
+    copies,
+    colorMode,
+    paperSize,
+    orientation,
+    margins
+  } = usePrinter();
 
   // Selected images to display
   const selectedImages = images.filter((img) => selectedImageIds.includes(img.id));
 
-  // Layout & Paper Configuration
-  const [paperSize, setPaperSize] = useState('A4'); // A4 or A5
-  const [orientation, setOrientation] = useState('portrait'); // portrait or landscape
-  const [margins, setMargins] = useState('normal'); // tight, normal, wide
+  // Layout Configuration
   const [gridPreset, setGridPreset] = useState(() => {
     const count = selectedImages.length;
     if (count <= 1) return '1';
@@ -326,113 +331,51 @@ export function PrintStudioView({
             </div>
           </div>
 
-          {/* 2. PAPER FORMAT & ORIENTATION */}
-          <div style={{ marginBottom: '22px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '10px' }}>
-              <Sliders size={18} color="#0ea5e9" />
-              <span>{t('paperSettings')}</span>
-            </label>
-
-            {/* Paper Size */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
-              <button
-                onClick={() => setPaperSize('A4')}
-                style={{
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: paperSize === 'A4' ? '2px solid #0284c7' : '1px solid var(--border-subtle)',
-                  background: paperSize === 'A4' ? '#0284c7' : 'var(--bg-card)',
-                  color: paperSize === 'A4' ? '#ffffff' : 'var(--text-main)',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer'
-                }}
-              >
-                {t('paperA4')}
-              </button>
-
-              <button
-                onClick={() => setPaperSize('A5')}
-                style={{
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: paperSize === 'A5' ? '2px solid #0284c7' : '1px solid var(--border-subtle)',
-                  background: paperSize === 'A5' ? '#0284c7' : 'var(--bg-card)',
-                  color: paperSize === 'A5' ? '#ffffff' : 'var(--text-main)',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer'
-                }}
-              >
-                {t('paperA5')}
-              </button>
+          {/* Paper Format Indicator (Configured in Printer Settings) */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '10px',
+            padding: '8px 12px',
+            marginBottom: '20px',
+            fontSize: '0.78rem',
+            gap: '8px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
+              <Sliders size={14} color="#0ea5e9" style={{ flexShrink: 0 }} />
+              <span style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{isRTL ? 'الورق:' : 'Paper:'}</span>
+              <strong style={{ color: '#38bdf8' }}>{paperSize}</strong>
+              <span style={{ color: 'var(--text-dim)' }}>•</span>
+              <span style={{ color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {orientation === 'landscape' ? (isRTL ? 'عرضي' : 'Landscape') : (isRTL ? 'طولي' : 'Portrait')}
+              </span>
             </div>
 
-            {/* Orientation */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
+            {onOpenPrinters && (
               <button
-                onClick={() => setOrientation('portrait')}
+                type="button"
+                onClick={onOpenPrinters}
                 style={{
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: orientation === 'portrait' ? '2px solid #0ea5e9' : '1px solid var(--border-subtle)',
-                  background: orientation === 'portrait' ? 'rgba(14, 165, 233, 0.25)' : 'var(--bg-card)',
-                  color: orientation === 'portrait' ? '#38bdf8' : 'var(--text-main)',
+                  background: 'rgba(14, 165, 233, 0.12)',
+                  border: '1px solid rgba(14, 165, 233, 0.25)',
+                  color: '#38bdf8',
+                  fontSize: '0.72rem',
                   fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  padding: '3px 8px',
+                  borderRadius: '6px',
+                  flexShrink: 0
                 }}
               >
-                {t('orientationPortrait')}
+                {isRTL ? 'تعديل من إعدادات الطابعة' : 'Printer Settings'}
               </button>
-
-              <button
-                onClick={() => setOrientation('landscape')}
-                style={{
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: orientation === 'landscape' ? '2px solid #0ea5e9' : '1px solid var(--border-subtle)',
-                  background: orientation === 'landscape' ? 'rgba(14, 165, 233, 0.25)' : 'var(--bg-card)',
-                  color: orientation === 'landscape' ? '#38bdf8' : 'var(--text-main)',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer'
-                }}
-              >
-                {t('orientationLandscape')}
-              </button>
-            </div>
-
-            {/* Margins */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('pageMargins')}</span>
-              <div style={{ display: 'flex', gap: '6px' }}>
-                {[
-                  { id: 'tight', label: t('marginTight') },
-                  { id: 'normal', label: t('marginNormal') },
-                  { id: 'wide', label: t('marginWide') }
-                ].map((m) => (
-                  <button
-                    key={m.id}
-                    onClick={() => setMargins(m.id)}
-                    style={{
-                      padding: '4px 8px',
-                      borderRadius: '6px',
-                      fontSize: '0.75rem',
-                      border: 'none',
-                      cursor: 'pointer',
-                      background: margins === m.id ? '#0284c7' : 'var(--bg-secondary)',
-                      color: margins === m.id ? '#ffffff' : 'var(--text-main)'
-                    }}
-                  >
-                    {m.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* 3. ULTRASOUND IMAGE ENHANCEMENT */}
+          {/* 2. ULTRASOUND IMAGE ENHANCEMENT */}
           <div style={{ marginBottom: '22px' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '10px' }}>
               <SunMedium size={18} color="#f59e0b" />

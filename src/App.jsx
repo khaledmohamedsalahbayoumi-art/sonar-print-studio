@@ -279,6 +279,7 @@ function AppContent() {
               selectedImageIds={selectedImageIds}
               patientInfo={patientInfo}
               onBackToHome={() => setCurrentView('home')}
+              onOpenPrinters={() => setCurrentView('printers')}
             />
           )}
           {currentView === 'printers' && (

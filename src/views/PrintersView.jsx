@@ -33,6 +33,12 @@ export function PrintersView({
     setCopies,
     colorMode,
     setColorMode,
+    paperSize,
+    setPaperSize,
+    orientation,
+    setOrientation,
+    margins,
+    setMargins,
     refreshPrinters,
     isDetecting,
     isPrinting
@@ -131,17 +137,18 @@ export function PrintersView({
         gap: '24px',
         alignItems: 'start'
       }}>
-        {/* LEFT COLUMN: Printers List */}
-        <div style={{
-          background: 'var(--bg-secondary)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: '16px',
-          padding: '24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '18px',
-          boxShadow: 'var(--shadow-card)'
-        }}>
+        {/* LEFT COLUMN (Primary in RTL): Printers List & Paper Settings */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <div style={{
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '16px',
+            padding: '24px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '18px',
+            boxShadow: 'var(--shadow-card)'
+          }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Printer size={18} style={{ color: '#0ea5e9' }} />
@@ -322,6 +329,159 @@ export function PrintersView({
                   {isRTL ? 'محدد' : 'Active'}
                 </span>
               )}
+            </div>
+          </div>
+        </div>
+
+          {/* Box 2 in Primary Column: Paper Format & Orientation (Moved from Print Studio) */}
+          <div style={{
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '16px',
+            padding: '24px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            boxShadow: 'var(--shadow-card)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Sliders size={18} color="#0ea5e9" />
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
+                  {t('paperSettings')}
+                </h3>
+              </div>
+              <span style={{
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                color: '#38bdf8',
+                background: 'rgba(14, 165, 233, 0.15)',
+                padding: '3px 9px',
+                borderRadius: '6px'
+              }}>
+                {paperSize} • {orientation === 'landscape' ? (isRTL ? 'عرضي' : 'Landscape') : (isRTL ? 'طولي' : 'Portrait')}
+              </span>
+            </div>
+
+            {/* Paper Size */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => setPaperSize('A4')}
+                style={{
+                  padding: '11px',
+                  borderRadius: '10px',
+                  border: paperSize === 'A4' ? '2px solid #0284c7' : '1px solid var(--border-subtle)',
+                  background: paperSize === 'A4' ? '#0284c7' : 'var(--bg-card)',
+                  color: paperSize === 'A4' ? '#ffffff' : 'var(--text-main)',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                  boxShadow: paperSize === 'A4' ? '0 4px 12px rgba(2, 132, 199, 0.35)' : 'none'
+                }}
+              >
+                {t('paperA4')}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPaperSize('A5')}
+                style={{
+                  padding: '11px',
+                  borderRadius: '10px',
+                  border: paperSize === 'A5' ? '2px solid #0284c7' : '1px solid var(--border-subtle)',
+                  background: paperSize === 'A5' ? '#0284c7' : 'var(--bg-card)',
+                  color: paperSize === 'A5' ? '#ffffff' : 'var(--text-main)',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                  boxShadow: paperSize === 'A5' ? '0 4px 12px rgba(2, 132, 199, 0.35)' : 'none'
+                }}
+              >
+                {t('paperA5')}
+              </button>
+            </div>
+
+            {/* Orientation */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => setOrientation('portrait')}
+                style={{
+                  padding: '11px',
+                  borderRadius: '10px',
+                  border: orientation === 'portrait' ? '2px solid #0ea5e9' : '1px solid var(--border-subtle)',
+                  background: orientation === 'portrait' ? 'rgba(14, 165, 233, 0.25)' : 'var(--bg-card)',
+                  color: orientation === 'portrait' ? '#38bdf8' : 'var(--text-main)',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s'
+                }}
+              >
+                {t('orientationPortrait')}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOrientation('landscape')}
+                style={{
+                  padding: '11px',
+                  borderRadius: '10px',
+                  border: orientation === 'landscape' ? '2px solid #0ea5e9' : '1px solid var(--border-subtle)',
+                  background: orientation === 'landscape' ? 'rgba(14, 165, 233, 0.25)' : 'var(--bg-card)',
+                  color: orientation === 'landscape' ? '#38bdf8' : 'var(--text-main)',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s'
+                }}
+              >
+                {t('orientationLandscape')}
+              </button>
+            </div>
+
+            {/* Margins */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: 'var(--bg-card)',
+              padding: '10px 14px',
+              borderRadius: '10px',
+              border: '1px solid var(--border-subtle)'
+            }}>
+              <span style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+                {t('pageMargins')}
+              </span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {[
+                  { id: 'tight', label: t('marginTight') },
+                  { id: 'normal', label: t('marginNormal') },
+                  { id: 'wide', label: t('marginWide') }
+                ].map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setMargins(m.id)}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: '7px',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      border: 'none',
+                      cursor: 'pointer',
+                      background: margins === m.id ? '#0284c7' : 'var(--bg-secondary)',
+                      color: margins === m.id ? '#ffffff' : 'var(--text-main)',
+                      transition: 'all 0.15s'
+                    }}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -511,6 +671,12 @@ export function PrintersView({
                 <span style={{ color: 'var(--text-muted)' }}>{isRTL ? 'الطابعة المحددة: ' : 'Target Printer: '}</span>
                 <strong style={{ color: '#10b981' }}>{selectedPrinter || (isRTL ? 'الافتراضية للويندوز' : 'System Default')}</strong>
               </div>
+              <div>
+                <span style={{ color: 'var(--text-muted)' }}>{isRTL ? 'مقاس واتجاه الورقة: ' : 'Paper & Layout: '}</span>
+                <strong style={{ color: '#38bdf8' }}>
+                  {paperSize} • {orientation === 'landscape' ? (isRTL ? 'عرضي (Landscape)' : 'Landscape') : (isRTL ? 'طولي (Portrait)' : 'Portrait')}
+                </strong>
+              </div>
             </div>
 
             {/* Direct Print Button */}
@@ -550,3 +716,4 @@ export function PrintersView({
     </div>
   );
 }
+

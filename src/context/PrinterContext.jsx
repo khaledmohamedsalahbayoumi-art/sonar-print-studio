@@ -9,8 +9,32 @@ export function PrinterProvider({ children }) {
   });
   const [copies, setCopies] = useState(1);
   const [colorMode, setColorMode] = useState('color'); // 'color' | 'monochrome'
+  const [paperSize, setPaperSizeState] = useState(() => {
+    return localStorage.getItem('sonar_paper_size') || 'A4';
+  });
+  const [orientation, setOrientationState] = useState(() => {
+    return localStorage.getItem('sonar_orientation') || 'portrait';
+  });
+  const [margins, setMarginsState] = useState(() => {
+    return localStorage.getItem('sonar_margins') || 'normal';
+  });
   const [isDetecting, setIsDetecting] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+
+  const setPaperSize = (val) => {
+    setPaperSizeState(val);
+    localStorage.setItem('sonar_paper_size', val);
+  };
+
+  const setOrientation = (val) => {
+    setOrientationState(val);
+    localStorage.setItem('sonar_orientation', val);
+  };
+
+  const setMargins = (val) => {
+    setMarginsState(val);
+    localStorage.setItem('sonar_margins', val);
+  };
 
   // Fetch connected printers
   const refreshPrinters = useCallback(async () => {
@@ -75,8 +99,8 @@ export function PrinterProvider({ children }) {
           deviceName: targetPrinter,
           copies: numCopies,
           color: isColor,
-          landscape: options.landscape || false,
-          pageSize: options.pageSize || 'A4'
+          landscape: options.landscape !== undefined ? options.landscape : (orientation === 'landscape'),
+          pageSize: options.pageSize || paperSize || 'A4'
         });
         setIsPrinting(false);
         return res;
@@ -91,7 +115,7 @@ export function PrinterProvider({ children }) {
     window.print();
     setIsPrinting(false);
     return { success: true };
-  }, [selectedPrinter, colorMode, copies]);
+  }, [selectedPrinter, colorMode, copies, orientation, paperSize]);
 
   return (
     <PrinterContext.Provider
@@ -103,6 +127,12 @@ export function PrinterProvider({ children }) {
         setCopies,
         colorMode,
         setColorMode,
+        paperSize,
+        setPaperSize,
+        orientation,
+        setOrientation,
+        margins,
+        setMargins,
         isDetecting,
         isPrinting,
         setIsPrinting,
