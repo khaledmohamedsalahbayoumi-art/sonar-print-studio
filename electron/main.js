@@ -98,6 +98,16 @@ function scanFolderForPatients(folderPath) {
     else if (ext === '.bmp') mime = 'image/bmp';
 
     try {
+      let fileTime = Date.now();
+      let fileSize = 0;
+      try {
+        const stats = fs.statSync(filePath);
+        fileSize = stats.size;
+        fileTime = Math.max(stats.mtimeMs || 0, stats.birthtimeMs || 0, stats.ctimeMs || 0);
+      } catch (e) {
+        fileTime = Date.now();
+      }
+
       const fileBuffer = fs.readFileSync(filePath);
       const base64Data = fileBuffer.toString('base64');
       return {
@@ -105,10 +115,11 @@ function scanFolderForPatients(folderPath) {
         name: filename,
         path: filePath,
         url: `data:${mime};base64,${base64Data}`,
-        size: fileBuffer.length,
+        size: fileSize || fileBuffer.length,
         rotation: 0,
         tag: filename.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
-        timestamp: Date.now()
+        timestamp: fileTime,
+        mtimeMs: fileTime
       };
     } catch (err) {
       console.error('Error reading image file:', filePath, err);
@@ -127,6 +138,12 @@ function scanFolderForPatients(folderPath) {
     for (const subDir of subDirs) {
       const subDirPath = path.join(folderPath, subDir.name);
       try {
+        let folderTime = 0;
+        try {
+          const folderStat = fs.statSync(subDirPath);
+          folderTime = Math.max(folderStat.mtimeMs || 0, folderStat.birthtimeMs || 0, folderStat.ctimeMs || 0);
+        } catch (e) {}
+
         const subFiles = fs.readdirSync(subDirPath, { withFileTypes: true });
         const images = [];
         for (const file of subFiles) {
@@ -135,12 +152,26 @@ function scanFolderForPatients(folderPath) {
             if (parsed) images.push(parsed);
           }
         }
+
+        // Sort images inside patient subfolder: newest first (المضاف حديثاً أولاً)
+        images.sort((a, b) => {
+          const diff = (b.timestamp || 0) - (a.timestamp || 0);
+          if (Math.abs(diff) > 50) return diff;
+          return b.name.localeCompare(a.name, undefined, { numeric: true });
+        });
+
+        // Patient timestamp: latest of folder modification/creation or any of its scans
+        const latestImageTime = images.length > 0 ? (images[0].timestamp || 0) : 0;
+        const effectiveTime = Math.max(folderTime, latestImageTime);
+
         patients.push({
           id: 'patient_' + Math.random().toString(36).substring(2, 9),
           folderName: subDir.name,
           patientName: subDir.name.replace(/[-_]/g, ' '),
           path: subDirPath,
-          images
+          images,
+          timestamp: effectiveTime,
+          mtimeMs: effectiveTime
         });
       } catch (err) {
         console.error('Error reading subfolder:', subDirPath, err);
@@ -154,15 +185,51 @@ function scanFolderForPatients(folderPath) {
       if (parsed) rootImages.push(parsed);
     }
 
-    if (rootImages.length > 0 || patients.length === 0) {
-      patients.unshift({
+    if (rootImages.length > 0) {
+      rootImages.sort((a, b) => {
+        const diff = (b.timestamp || 0) - (a.timestamp || 0);
+        if (Math.abs(diff) > 50) return diff;
+        return b.name.localeCompare(a.name, undefined, { numeric: true });
+      });
+
+      let rootFolderTime = 0;
+      try {
+        const rootStat = fs.statSync(folderPath);
+        rootFolderTime = Math.max(rootStat.mtimeMs || 0, rootStat.birthtimeMs || 0, rootStat.ctimeMs || 0);
+      } catch (e) {}
+      const latestRootImgTime = rootImages.length > 0 ? (rootImages[0].timestamp || 0) : 0;
+      const effectiveRootTime = Math.max(rootFolderTime, latestRootImgTime);
+
+      patients.push({
         id: 'patient_root_' + Math.random().toString(36).substring(2, 9),
         folderName: folderName,
         patientName: folderName.replace(/[-_]/g, ' '),
         path: folderPath,
-        images: rootImages
+        images: rootImages,
+        timestamp: effectiveRootTime,
+        mtimeMs: effectiveRootTime
       });
     }
+
+    if (patients.length === 0) {
+      patients.push({
+        id: 'patient_root_' + Math.random().toString(36).substring(2, 9),
+        folderName: folderName,
+        patientName: folderName.replace(/[-_]/g, ' '),
+        path: folderPath,
+        images: [],
+        timestamp: Date.now(),
+        mtimeMs: Date.now()
+      });
+    }
+
+    // Sort patients descending: Most recently added / modified FIRST (المضاف حديثاً بالأعلى)
+    patients.sort((a, b) => {
+      const timeDiff = (b.timestamp || 0) - (a.timestamp || 0);
+      if (Math.abs(timeDiff) > 50) return timeDiff;
+      // If timestamps are identical or very close, sort natural reverse (e.g. patient3 before patient2 before patient1)
+      return b.folderName.localeCompare(a.folderName, undefined, { numeric: true, sensitivity: 'base' });
+    });
 
     return {
       success: true,
@@ -225,6 +292,16 @@ ipcMain.handle('dialog:open-files', async () => {
     else if (ext === '.bmp') mime = 'image/bmp';
 
     try {
+      let fileTime = Date.now();
+      let fileSize = 0;
+      try {
+        const stats = fs.statSync(filePath);
+        fileSize = stats.size;
+        fileTime = Math.max(stats.mtimeMs || 0, stats.birthtimeMs || 0, stats.ctimeMs || 0);
+      } catch (e) {
+        fileTime = Date.now();
+      }
+
       const fileBuffer = fs.readFileSync(filePath);
       const base64Data = fileBuffer.toString('base64');
       const dataUrl = `data:${mime};base64,${base64Data}`;
@@ -233,14 +310,22 @@ ipcMain.handle('dialog:open-files', async () => {
         name: filename,
         path: filePath,
         url: dataUrl,
-        size: fileBuffer.length,
-        timestamp: Date.now()
+        size: fileSize || fileBuffer.length,
+        timestamp: fileTime,
+        mtimeMs: fileTime
       };
     } catch (err) {
       console.error('Error reading file:', filePath, err);
       return null;
     }
   }).filter(Boolean);
+
+  // Sort files descending: newest first
+  filesData.sort((a, b) => {
+    const diff = (b.timestamp || 0) - (a.timestamp || 0);
+    if (Math.abs(diff) > 50) return diff;
+    return b.name.localeCompare(a.name, undefined, { numeric: true });
+  });
 
   return filesData;
 });

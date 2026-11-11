@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   UploadCloud,
   FolderOpen,
@@ -16,7 +16,10 @@ import {
   Layers,
   ArrowLeft,
   ArrowRight,
-  Tag
+  Tag,
+  Clock,
+  ArrowUpDown,
+  ArrowDownAZ
 } from 'lucide-react';
 import { SAMPLE_SONAR_SCANS } from '../utils/sampleImages';
 import { ConfirmModal } from '../components/ConfirmModal';
@@ -40,6 +43,7 @@ export function HomeView({
   const ProceedIcon = isRTL ? ArrowLeft : ArrowRight;
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [imageSortOrder, setImageSortOrder] = useState('newest'); // 'newest' | 'name' | 'oldest'
   const [isDragging, setIsDragging] = useState(false);
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const fileInputRef = useRef(null);
@@ -89,12 +93,15 @@ export function HomeView({
         folderName: patientName,
         patientName: patientName.replace(/[-_]/g, ' '),
         path: '',
-        images: pImages
+        images: pImages,
+        timestamp: 0,
+        mtimeMs: 0
       };
       patients.push(pObj);
 
       patientMap[patientName].forEach((file) => {
         const p = new Promise((resolve) => {
+          const fileTime = file.lastModified || Date.now();
           const reader = new FileReader();
           reader.onload = (ev) => {
             pImages.push({
@@ -103,7 +110,8 @@ export function HomeView({
               url: ev.target.result,
               rotation: 0,
               tag: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
-              timestamp: Date.now()
+              timestamp: fileTime,
+              mtimeMs: fileTime
             });
             resolve();
           };
@@ -119,11 +127,14 @@ export function HomeView({
         folderName: 'General',
         patientName: isRTL ? 'ملف عام' : 'General',
         path: '',
-        images: []
+        images: [],
+        timestamp: 0,
+        mtimeMs: 0
       };
       patients.unshift(rootPatient);
       rootImages.forEach((file) => {
         const p = new Promise((resolve) => {
+          const fileTime = file.lastModified || Date.now();
           const reader = new FileReader();
           reader.onload = (ev) => {
             rootPatient.images.push({
@@ -132,7 +143,8 @@ export function HomeView({
               url: ev.target.result,
               rotation: 0,
               tag: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
-              timestamp: Date.now()
+              timestamp: fileTime,
+              mtimeMs: fileTime
             });
             resolve();
           };
@@ -143,6 +155,25 @@ export function HomeView({
     }
 
     Promise.all(readPromises).then(() => {
+      // Sort images within each patient newest first
+      patients.forEach((p) => {
+        p.images.sort((a, b) => {
+          const diff = (b.timestamp || 0) - (a.timestamp || 0);
+          if (Math.abs(diff) > 50) return diff;
+          return (b.name || '').localeCompare(a.name || '', undefined, { numeric: true });
+        });
+        const latestTime = p.images.length > 0 ? p.images[0].timestamp : 0;
+        p.timestamp = latestTime;
+        p.mtimeMs = latestTime;
+      });
+
+      // Sort patients newest first (المضاف حديثاً بالأعلى)
+      patients.sort((a, b) => {
+        const timeDiff = (b.timestamp || 0) - (a.timestamp || 0);
+        if (Math.abs(timeDiff) > 50) return timeDiff;
+        return b.folderName.localeCompare(a.folderName, undefined, { numeric: true, sensitivity: 'base' });
+      });
+
       if (onFolderLoaded) {
         onFolderLoaded({
           folderName: files[0]?.webkitRelativePath?.split('/')[0] || 'Ultrasound Folder',
@@ -153,11 +184,29 @@ export function HomeView({
     e.target.value = '';
   };
 
-  // Filter images by search query
-  const filteredImages = images.filter((img) =>
-    (img.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (img.tag || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Sort and filter images
+  const sortedAndFilteredImages = useMemo(() => {
+    const list = images.filter((img) =>
+      (img.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (img.tag || '').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (imageSortOrder === 'newest') {
+      return list.sort((a, b) => {
+        const diff = (b.timestamp || 0) - (a.timestamp || 0);
+        if (Math.abs(diff) > 50) return diff;
+        return (b.name || '').localeCompare(a.name || '', undefined, { numeric: true });
+      });
+    } else if (imageSortOrder === 'oldest') {
+      return list.sort((a, b) => {
+        const diff = (a.timestamp || 0) - (b.timestamp || 0);
+        if (Math.abs(diff) > 50) return diff;
+        return (a.name || '').localeCompare(b.name || '', undefined, { numeric: true });
+      });
+    } else {
+      return list.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true }));
+    }
+  }, [images, searchTerm, imageSortOrder]);
 
   // File picker handler: native Electron or HTML file input
   const handleBrowseFiles = async () => {
@@ -189,6 +238,7 @@ export function HomeView({
 
     files.forEach((file) => {
       if (!file.type.startsWith('image/')) return;
+      const fileTime = file.lastModified || Date.now();
       const reader = new FileReader();
       reader.onload = (event) => {
         newItems.push({
@@ -197,7 +247,8 @@ export function HomeView({
           url: event.target.result,
           rotation: 0,
           tag: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
-          timestamp: Date.now()
+          timestamp: fileTime,
+          mtimeMs: fileTime
         });
         processedCount++;
         if (processedCount === files.length) {
@@ -209,11 +260,17 @@ export function HomeView({
   };
 
   const addLoadedImages = (newImages) => {
-    setImages((prev) => [...prev, ...newImages]);
+    // Sort newly loaded images newest first
+    const sortedNew = [...newImages].sort((a, b) => {
+      const diff = (b.timestamp || 0) - (a.timestamp || 0);
+      if (Math.abs(diff) > 50) return diff;
+      return (b.name || '').localeCompare(a.name || '', undefined, { numeric: true });
+    });
+    setImages((prev) => [...sortedNew, ...prev]);
     // Automatically select newly added images
     setSelectedImageIds((prev) => [
-      ...prev,
-      ...newImages.map((img) => img.id)
+      ...sortedNew.map((img) => img.id),
+      ...prev
     ]);
   };
 
@@ -635,7 +692,7 @@ export function HomeView({
         marginBottom: '18px',
         padding: '0 4px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
             {isRTL ? `الصور المحملة (${images.length})` : `Loaded Scans (${images.length})`}
           </h2>
@@ -650,6 +707,49 @@ export function HomeView({
           }}>
             {t('imagesSelected', { count: selectedImageIds.length, total: images.length })}
           </span>
+
+          {images.length > 1 && (
+            <button
+              type="button"
+              onClick={() => {
+                setImageSortOrder((prev) => {
+                  if (prev === 'newest') return 'name';
+                  if (prev === 'name') return 'oldest';
+                  return 'newest';
+                });
+              }}
+              title={isRTL ? 'تغيير ترتيب عرض الصور (الافتراضي: المضاف حديثاً)' : 'Change sort order (default: Recently Added)'}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                background: 'rgba(14, 165, 233, 0.1)',
+                border: '1px solid rgba(14, 165, 233, 0.3)',
+                borderRadius: '8px',
+                padding: '4px 10px',
+                color: '#38bdf8',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(14, 165, 233, 0.2)';
+                e.currentTarget.style.borderColor = '#38bdf8';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(14, 165, 233, 0.1)';
+                e.currentTarget.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+              }}
+            >
+              {imageSortOrder === 'newest' && <Clock size={13} />}
+              {imageSortOrder === 'name' && <ArrowDownAZ size={13} />}
+              {imageSortOrder === 'oldest' && <ArrowUpDown size={13} />}
+              <span>
+                {imageSortOrder === 'newest' ? t('sortNewest') : imageSortOrder === 'name' ? t('sortName') : t('sortOldest')}
+              </span>
+            </button>
+          )}
         </div>
 
         {images.length > 0 && (
@@ -726,7 +826,7 @@ export function HomeView({
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
           gap: '18px'
         }}>
-          {filteredImages.map((img) => {
+          {sortedAndFilteredImages.map((img) => {
             const isSelected = selectedImageIds.includes(img.id);
             return (
               <div

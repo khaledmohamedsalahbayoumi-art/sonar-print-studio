@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Stethoscope,
   Image as ImageIcon,
@@ -18,7 +18,10 @@ import {
   UserCog,
   Sparkles,
   ShieldCheck,
-  Key
+  Key,
+  Clock,
+  ArrowUpDown,
+  ArrowDownAZ
 } from 'lucide-react';
 import { useDoctor } from '../context/DoctorContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -43,6 +46,35 @@ export function Sidebar({
   const { theme, toggleTheme } = useTheme();
   const { isActivated, openActivationModal } = useLicense();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [patientSortOrder, setPatientSortOrder] = useState('newest'); // 'newest' | 'alpha' | 'oldest'
+
+  const sortedPatients = useMemo(() => {
+    if (!folderData?.patients) return [];
+    const list = [...folderData.patients];
+    if (patientSortOrder === 'newest') {
+      return list.sort((a, b) => {
+        const diff = (b.timestamp || 0) - (a.timestamp || 0);
+        if (Math.abs(diff) > 50) return diff;
+        return b.folderName.localeCompare(a.folderName, undefined, { numeric: true });
+      });
+    } else if (patientSortOrder === 'oldest') {
+      return list.sort((a, b) => {
+        const diff = (a.timestamp || 0) - (b.timestamp || 0);
+        if (Math.abs(diff) > 50) return diff;
+        return a.folderName.localeCompare(b.folderName, undefined, { numeric: true });
+      });
+    } else {
+      return list.sort((a, b) => a.folderName.localeCompare(b.folderName, undefined, { numeric: true }));
+    }
+  }, [folderData?.patients, patientSortOrder]);
+
+  const cycleSortOrder = () => {
+    setPatientSortOrder((prev) => {
+      if (prev === 'newest') return 'alpha';
+      if (prev === 'alpha') return 'oldest';
+      return 'newest';
+    });
+  };
 
   const CollapseIcon = isRTL
     ? (isCollapsed ? ChevronLeft : ChevronRight)
@@ -392,10 +424,60 @@ export function Sidebar({
             </div>
           )}
 
+          {/* Patient Sort Order Indicator & Quick Switch */}
+          {folderData && !isCollapsed && sortedPatients.length > 0 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '2px 4px 6px',
+              fontSize: '0.72rem'
+            }}>
+              <button
+                type="button"
+                onClick={cycleSortOrder}
+                title={isRTL ? 'الترتيب التلقائي: المضاف حديثاً (اضغط للتبديل)' : 'Default: Recently Added (click to cycle)'}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  background: 'rgba(14, 165, 233, 0.12)',
+                  border: '1px solid rgba(14, 165, 233, 0.3)',
+                  borderRadius: '6px',
+                  padding: '3px 8px',
+                  color: '#38bdf8',
+                  cursor: 'pointer',
+                  fontSize: '0.71rem',
+                  fontWeight: 700,
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(14, 165, 233, 0.22)';
+                  e.currentTarget.style.borderColor = '#38bdf8';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(14, 165, 233, 0.12)';
+                  e.currentTarget.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+                }}
+              >
+                {patientSortOrder === 'newest' && <Clock size={12} />}
+                {patientSortOrder === 'alpha' && <ArrowDownAZ size={12} />}
+                {patientSortOrder === 'oldest' && <ArrowUpDown size={12} />}
+                <span>
+                  {patientSortOrder === 'newest' ? t('sortNewest') : patientSortOrder === 'alpha' ? t('sortAlpha') : t('sortOldest')}
+                </span>
+              </button>
+
+              <span style={{ fontSize: '0.68rem', color: 'var(--text-dim)', fontWeight: 600 }}>
+                {sortedPatients.length} {isRTL ? 'ملف' : 'files'}
+              </span>
+            </div>
+          )}
+
           {/* Vertical Patient Files List */}
-          {folderData && folderData.patients?.length > 0 ? (
+          {folderData && sortedPatients.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '280px', overflowY: 'auto' }}>
-              {folderData.patients.map((patient) => {
+              {sortedPatients.map((patient) => {
                 const isActive = patient.id === activePatientId;
                 const scanCount = patient.images?.length || 0;
 
