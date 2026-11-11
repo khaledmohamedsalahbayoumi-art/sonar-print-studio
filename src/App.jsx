@@ -7,6 +7,7 @@ import { PrinterProvider, usePrinter } from './context/PrinterContext';
 import { Sidebar } from './components/Sidebar';
 import { HomeView } from './views/HomeView';
 import { PrintStudioView } from './views/PrintStudioView';
+import { PrintersView } from './views/PrintersView';
 import { DoctorSettingsModal } from './components/DoctorSettingsModal';
 import { ActivationModal } from './components/ActivationModal';
 import { Toast } from './components/Toast';
@@ -257,7 +258,7 @@ function AppContent() {
       {/* Main Content Workspace */}
       <div style={{ flex: 1, minWidth: 0, height: '100vh', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
         <main style={{ flex: 1 }}>
-          {currentView === 'home' ? (
+          {currentView === 'home' && (
             <HomeView
               images={images}
               setImages={setImages}
@@ -271,12 +272,21 @@ function AppContent() {
               folderData={folderData}
               activePatientId={activePatientId}
             />
-          ) : (
+          )}
+          {currentView === 'studio' && (
             <PrintStudioView
               images={images}
               selectedImageIds={selectedImageIds}
               patientInfo={patientInfo}
               onBackToHome={() => setCurrentView('home')}
+            />
+          )}
+          {currentView === 'printers' && (
+            <PrintersView
+              onNavigate={(view) => setCurrentView(view)}
+              selectedImagesCount={selectedImageIds.length}
+              patientInfo={patientInfo}
+              onInstantPrint={handleInstantPrint}
             />
           )}
         </main>
