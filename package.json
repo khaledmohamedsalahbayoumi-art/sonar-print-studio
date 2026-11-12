@@ -8,7 +8,7 @@
     "build": "vite build && node scripts/pack-asar.js",
     "build:vite": "vite build",
     "build:win": "vite build && electron-builder --win --x64",
-    "build:mac": "vite build && electron-builder --mac --universal",
+    "build:mac": "vite build && electron-builder --mac",
     "build:all": "vite build && electron-builder --win --mac",
     "pack": "node scripts/pack-asar.js",
     "preview": "vite preview",
@@ -45,7 +45,7 @@
           ]
         }
       ],
-      "icon": "build/icon.png"
+      "icon": "build/icon.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -59,13 +59,15 @@
         {
           "target": "dmg",
           "arch": [
-            "universal"
+            "arm64",
+            "x64"
           ]
         },
         {
           "target": "zip",
           "arch": [
-            "universal"
+            "arm64",
+            "x64"
           ]
         }
       ],
