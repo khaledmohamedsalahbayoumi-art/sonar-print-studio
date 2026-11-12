@@ -10,7 +10,7 @@ const MASTER_SECRET = 'SONAR_PRINT_STUDIO_MED_LICENSE_SECRET_KEY_2026_ELSAKKA_SE
 let cachedMachineId = null;
 
 /**
- * Get a persistent, hardware-locked Machine ID for Windows
+ * Get a persistent, hardware-locked Machine ID for Windows & macOS
  */
 function getMachineId() {
   if (cachedMachineId) return cachedMachineId;
@@ -30,6 +30,21 @@ function getMachineId() {
       }
     } catch (e) {
       // Ignore registry error and fallback
+    }
+  } else if (process.platform === 'darwin') {
+    // 1b. Try macOS IOPlatformUUID (Persistent per Mac hardware)
+    try {
+      const ioregOutput = execSync('ioreg -rd1 -c IOPlatformExpertDevice', {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+        timeout: 2000
+      });
+      const match = ioregOutput.match(/"IOPlatformUUID"\s*=\s*"([A-F0-9\-]+)"/i);
+      if (match && match[1]) {
+        machineGuid = match[1].trim();
+      }
+    } catch (e) {
+      // Ignore ioreg error and fallback
     }
   }
 

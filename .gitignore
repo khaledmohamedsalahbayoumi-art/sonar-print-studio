@@ -12,7 +12,9 @@ dist-ssr/
 
 # Packaged Desktop App (Binaries > 100MB rejected by GitHub)
 SonarStudio-App/
+release/
 *.exe
+*.dmg
 *.dll
 *.pak
 *.bin

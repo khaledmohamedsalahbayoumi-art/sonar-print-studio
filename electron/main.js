@@ -1,7 +1,62 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const licenseManager = require('./licenseManager');
+
+function setupMacMenu() {
+  if (process.platform !== 'darwin') return;
+  const template = [
+    {
+      label: app.name,
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideOthers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'selectAll' }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    },
+    {
+      label: 'Window',
+      submenu: [
+        { role: 'minimize' },
+        { role: 'zoom' },
+        { type: 'separator' },
+        { role: 'front' }
+      ]
+    }
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
 
 let mainWindow;
 let activeFolderWatcher = null;
@@ -53,6 +108,7 @@ function startFolderWatcher(folderPath) {
 }
 
 function createWindow() {
+  const iconPath = path.join(__dirname, '../build/icon.png');
   mainWindow = new BrowserWindow({
     width: 1366,
     height: 850,
@@ -60,6 +116,7 @@ function createWindow() {
     minHeight: 700,
     backgroundColor: '#0f172a',
     title: 'برنامج تجهيز وطباعة صور السونار - Sonar Print Studio',
+    icon: fs.existsSync(iconPath) ? iconPath : undefined,
     show: true,
     autoHideMenuBar: true,
     webPreferences: {
@@ -421,7 +478,10 @@ ipcMain.handle('license:deactivate', async () => {
   return licenseManager.deactivateLicense(app);
 });
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  setupMacMenu();
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

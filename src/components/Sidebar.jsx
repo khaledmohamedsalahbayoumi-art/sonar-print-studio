@@ -363,7 +363,7 @@ export function Sidebar({
                     textOverflow: 'ellipsis',
                     maxWidth: '135px'
                   }}>
-                    {selectedPrinter || (isRTL ? 'طابعة الويندوز الافتراضية' : 'System Default')}
+                    {selectedPrinter || (isRTL ? 'طابعة النظام الافتراضية' : 'System Default')}
                   </span>
                 </div>
               )}

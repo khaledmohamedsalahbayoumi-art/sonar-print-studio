@@ -6,11 +6,77 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/pack-asar.js",
+    "build:vite": "vite build",
+    "build:win": "vite build && electron-builder --win --x64",
+    "build:mac": "vite build && electron-builder --mac --universal",
+    "build:all": "vite build && electron-builder --win --mac",
     "pack": "node scripts/pack-asar.js",
     "preview": "vite preview",
     "electron": "electron .",
     "keygen": "node scripts/generate-license.js",
     "app": "concurrently \"vite\" \"wait-on tcp:5173 && electron .\""
+  },
+  "build": {
+    "appId": "com.elsakka.sonarprintstudio",
+    "productName": "Sonar Print Studio",
+    "copyright": "Copyright © 2026 Sonar Studio",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "category": "public.app-category.medical",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "darkModeSupport": true,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "title": "Sonar Print Studio"
+    }
   },
   "keywords": [
     "ultrasound",
@@ -31,6 +97,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.2",
     "electron": "^34.2.0",
+    "electron-builder": "^26.18.0",
     "vite": "^6.2.0",
     "wait-on": "^8.0.2"
   }

@@ -309,10 +309,10 @@ export function PrintersView({
                 }} />
                 <div>
                   <div style={{ fontSize: '0.92rem', fontWeight: 700, color: !selectedPrinter ? '#38bdf8' : 'var(--text-main)' }}>
-                    {isRTL ? 'الطباعة عبر نافذة الويندوز الافتراضية (System Print Dialog)' : 'System Native Print Dialog'}
+                    {isRTL ? 'الطباعة عبر نافذة النظام للطباعة (System Print Dialog)' : 'System Native Print Dialog'}
                   </div>
                   <div style={{ fontSize: '0.74rem', color: 'var(--text-dim)' }}>
-                    {isRTL ? 'فتح نافذة الويندوز الكلاسيكية لاختيار الطابعة يدوياً عند كل طباعة' : 'Opens classic system dialog upon print'}
+                    {isRTL ? 'فتح نافذة النظام الكلاسيكية لاختيار الطابعة يدوياً عند كل طباعة' : 'Opens classic system dialog upon print'}
                   </div>
                 </div>
               </div>
@@ -669,7 +669,7 @@ export function PrintersView({
               </div>
               <div>
                 <span style={{ color: 'var(--text-muted)' }}>{isRTL ? 'الطابعة المحددة: ' : 'Target Printer: '}</span>
-                <strong style={{ color: '#10b981' }}>{selectedPrinter || (isRTL ? 'الافتراضية للويندوز' : 'System Default')}</strong>
+                <strong style={{ color: '#10b981' }}>{selectedPrinter || (isRTL ? 'طابعة النظام الافتراضية' : 'System Default')}</strong>
               </div>
               <div>
                 <span style={{ color: 'var(--text-muted)' }}>{isRTL ? 'مقاس واتجاه الورقة: ' : 'Paper & Layout: '}</span>
