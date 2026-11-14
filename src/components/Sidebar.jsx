@@ -29,7 +29,9 @@ import {
   Sliders,
   Phone,
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
+  Copy,
+  Check
 } from 'lucide-react';
 import { useDoctor } from '../context/DoctorContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -57,7 +59,37 @@ export function Sidebar({
   const { doctorInfo } = useDoctor();
   const { lang, toggleLang, t, isRTL } = useLanguage();
   const { theme, toggleTheme } = useTheme();
-  const { isActivated, openActivationModal } = useLicense();
+  const { isActivated, openActivationModal, machineId, licenseInfo } = useLicense();
+  const [copiedMachineId, setCopiedMachineId] = useState(false);
+
+  const handleCopyMachineId = (e) => {
+    e?.stopPropagation?.();
+    if (!machineId) return;
+    navigator.clipboard.writeText(machineId);
+    setCopiedMachineId(true);
+    setTimeout(() => setCopiedMachineId(false), 2200);
+  };
+
+  const subscriptionText = useMemo(() => {
+    if (!isActivated) {
+      return isRTL ? 'غير مفعل' : 'Unlicensed';
+    }
+    if (licenseInfo?.isPerpetual) {
+      return isRTL ? 'دائم مدى الحياة 🌟' : 'Lifetime 🌟';
+    }
+    if (typeof licenseInfo?.daysLeft === 'number') {
+      if (licenseInfo.daysLeft <= 0) {
+        return isRTL ? 'انتهى اليوم ⚠️' : 'Expired today ⚠️';
+      }
+      return isRTL ? `متبقي ${licenseInfo.daysLeft} يوم` : `${licenseInfo.daysLeft}d left`;
+    }
+    return isRTL ? 'ترخيص ساري' : 'Active';
+  }, [isActivated, licenseInfo, isRTL]);
+
+  const expirySubtext = useMemo(() => {
+    if (!isActivated || licenseInfo?.isPerpetual || !licenseInfo?.expiryDate) return null;
+    return isRTL ? `حتى تاريخ: ${licenseInfo.expiryDate}` : `Until: ${licenseInfo.expiryDate}`;
+  }, [isActivated, licenseInfo, isRTL]);
   const {
     printers,
     selectedPrinter,
@@ -824,44 +856,6 @@ export function Sidebar({
         flexDirection: 'column',
         gap: '8px'
       }}>
-        {/* Software License Status Badge */}
-        <button
-          type="button"
-          onClick={openActivationModal}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: isCollapsed ? 'center' : 'flex-start',
-            gap: '8px',
-            padding: isCollapsed ? '8px 0' : '7px 10px',
-            borderRadius: '8px',
-            background: isActivated ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
-            border: isActivated ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(239, 68, 68, 0.35)',
-            color: isActivated ? '#10b981' : '#f87171',
-            cursor: 'pointer',
-            transition: 'all 0.15s',
-            width: '100%',
-            fontSize: '0.74rem',
-            fontWeight: 700
-          }}
-          title={isRTL
-            ? (isActivated ? 'الترخيص مفعل - اضغط لعرض التفاصيل' : 'البرنامج غير مفعل - اضغط هنا للتفعيل')
-            : (isActivated ? 'Licensed - Click to view' : 'Unlicensed - Click to activate')}
-        >
-          {isActivated ? (
-            <ShieldCheck size={14} style={{ color: '#10b981', flexShrink: 0 }} />
-          ) : (
-            <Key size={14} style={{ color: '#f87171', flexShrink: 0 }} />
-          )}
-          {!isCollapsed && (
-            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {isActivated
-                ? (isRTL ? 'نسخة أصلية مرخصة 🟢' : 'Genuine License 🟢')
-                : (isRTL ? 'غير مفعل (اضغط للتفعيل) 🔴' : 'Not Activated 🔴')}
-            </span>
-          )}
-        </button>
-
         {/* Doctor & Clinic Profile Button */}
         <button
           type="button"
@@ -965,6 +959,177 @@ export function Sidebar({
             {!isCollapsed && <span>{theme === 'dark' ? t('themeLight') : t('themeDark')}</span>}
           </button>
         </div>
+
+        {/* Machine ID ("IP النسخة") & Subscription Remaining Duration (ف الأسفل خالص) */}
+        {!isCollapsed ? (
+          <div
+            style={{
+              padding: '8px 10px',
+              borderRadius: '8px',
+              background: isActivated
+                ? 'linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.03) 100%)'
+                : 'linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.03) 100%)',
+              border: isActivated ? '1px solid rgba(16, 185, 129, 0.28)' : '1px solid rgba(239, 68, 68, 0.35)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              marginTop: '2px'
+            }}
+          >
+            {/* Status & Subscription Period */}
+            <div
+              onClick={openActivationModal}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+                gap: '4px'
+              }}
+              title={isRTL ? 'الترخيص - اضغط لعرض التفاصيل وتغيير الكود' : 'License - Click to view details'}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                {isActivated ? (
+                  <ShieldCheck size={14} style={{ color: '#10b981', flexShrink: 0 }} />
+                ) : (
+                  <Key size={14} style={{ color: '#f87171', flexShrink: 0 }} />
+                )}
+                <span style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  color: isActivated ? '#10b981' : '#f87171',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {isActivated ? (isRTL ? 'نسخة أصلية' : 'Genuine License') : (isRTL ? 'نسخة غير مفعلة' : 'Unlicensed')}
+                </span>
+              </div>
+
+              <span style={{
+                fontSize: '0.67rem',
+                fontWeight: 700,
+                padding: '2px 6px',
+                borderRadius: '5px',
+                background: isActivated ? 'rgba(16, 185, 129, 0.16)' : 'rgba(239, 68, 68, 0.16)',
+                color: isActivated ? '#34d399' : '#fca5a5',
+                whiteSpace: 'nowrap'
+              }}>
+                {subscriptionText}
+              </span>
+            </div>
+
+            {/* Machine ID ("IP النسخة" / كود الجهاز) with copy button */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'rgba(0, 0, 0, 0.24)',
+                padding: '4px 7px',
+                borderRadius: '6px',
+                border: '1px solid var(--border-subtle)',
+                gap: '6px'
+              }}
+            >
+              <div
+                onClick={handleCopyMachineId}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  flex: 1
+                }}
+                title={isRTL ? 'اضغط لنسخ كود الجهاز' : 'Click to copy Machine ID'}
+              >
+                <span style={{
+                  fontSize: '0.65rem',
+                  color: 'var(--text-dim)',
+                  whiteSpace: 'nowrap',
+                  fontWeight: 600
+                }}>
+                  {isRTL ? 'كود الجهاز:' : 'ID:'}
+                </span>
+                <code style={{
+                  fontFamily: 'Consolas, monospace',
+                  fontSize: '0.70rem',
+                  fontWeight: 700,
+                  color: 'var(--text-main)',
+                  letterSpacing: '0.3px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  direction: 'ltr'
+                }}>
+                  {machineId || 'PRINT-DEMO-2026'}
+                </code>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleCopyMachineId}
+                style={{
+                  background: copiedMachineId ? '#10b981' : 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid ' + (copiedMachineId ? '#10b981' : 'rgba(255, 255, 255, 0.08)'),
+                  borderRadius: '4px',
+                  color: copiedMachineId ? '#ffffff' : 'var(--text-muted)',
+                  padding: '2px 6px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                  fontSize: '0.64rem',
+                  fontWeight: 600,
+                  flexShrink: 0,
+                  transition: 'all 0.15s'
+                }}
+                title={isRTL ? 'نسخ كود الجهاز' : 'Copy ID'}
+              >
+                {copiedMachineId ? <Check size={11} /> : <Copy size={11} />}
+                <span>{copiedMachineId ? (isRTL ? 'تم النسخ' : 'Copied') : (isRTL ? 'نسخ' : 'Copy')}</span>
+              </button>
+            </div>
+
+            {/* Expiry date subtext if limited */}
+            {expirySubtext && (
+              <div style={{
+                fontSize: '0.62rem',
+                color: 'var(--text-dim)',
+                textAlign: 'center',
+                marginTop: '-2px'
+              }}>
+                {expirySubtext}
+              </div>
+            )}
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={openActivationModal}
+            style={{
+              width: '100%',
+              padding: '7px 0',
+              borderRadius: '8px',
+              background: isActivated ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+              border: isActivated ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(239, 68, 68, 0.35)',
+              color: isActivated ? '#10b981' : '#f87171',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px'
+            }}
+            title={`${isRTL ? 'كود الجهاز:' : 'Machine ID:'} ${machineId} | ${subscriptionText}`}
+          >
+            {isActivated ? <ShieldCheck size={16} /> : <Key size={16} />}
+            <span style={{ fontSize: '0.62rem', fontWeight: 700 }}>
+              {isActivated
+                ? (licenseInfo?.isPerpetual ? '∞' : `${licenseInfo?.daysLeft ?? ''}d`)
+                : '!'}
+            </span>
+          </button>
+        )}
       </div>
     </aside>
   );
