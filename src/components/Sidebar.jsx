@@ -33,6 +33,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLicense } from '../context/LicenseContext';
 import { usePrinter } from '../context/PrinterContext';
+import printifyIcon from '../assets/icon.png';
 
 export function Sidebar({
   currentView,
@@ -140,14 +141,21 @@ export function Sidebar({
               width: '40px',
               height: '40px',
               borderRadius: '10px',
-              background: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
+              background: 'rgba(2, 132, 199, 0.08)',
+              border: '1px solid rgba(2, 132, 199, 0.25)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 14px rgba(6, 182, 212, 0.35)',
-              flexShrink: 0
+              boxShadow: '0 0 14px rgba(2, 132, 199, 0.2)',
+              flexShrink: 0,
+              padding: '3px',
+              overflow: 'hidden'
             }}>
-              <Stethoscope size={22} color="#ffffff" />
+              <img
+                src={printifyIcon}
+                alt="Printify"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
             </div>
 
             {!isCollapsed && (
