@@ -443,7 +443,7 @@ export function ActivationModal() {
               </div>
 
               <a
-                href={`https://wa.me/201553332921?text=${encodeURIComponent(
+                href={`https://wa.me/201036623265?text=${encodeURIComponent(
                   `السلام عليكم، أود تفعيل برنامج Printify.\nكود جهازي هو: ${machineId || ''}`
                 )}`}
                 target="_blank"
@@ -476,7 +476,7 @@ export function ActivationModal() {
                 }}
                 title={isRTL ? 'اضغط لفتح محادثة واتساب فورية وإرسال كود جهازك' : 'Click to send your machine code via WhatsApp'}
               >
-                <span>01553332921</span>
+                <span>+20 10 36623265</span>
                 <ExternalLink size={14} />
               </a>
             </div>

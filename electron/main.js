@@ -67,7 +67,7 @@ function stopFolderWatcher() {
   if (activeFolderWatcher) {
     try {
       activeFolderWatcher.close();
-    } catch (e) {}
+    } catch (e) { }
     activeFolderWatcher = null;
   }
   if (watcherDebounceTimer) {
@@ -206,7 +206,7 @@ function scanFolderForPatients(folderPath) {
         try {
           const folderStat = fs.statSync(subDirPath);
           folderTime = Math.max(folderStat.mtimeMs || 0, folderStat.birthtimeMs || 0, folderStat.ctimeMs || 0);
-        } catch (e) {}
+        } catch (e) { }
 
         const subFiles = fs.readdirSync(subDirPath, { withFileTypes: true });
         const images = [];
@@ -260,7 +260,7 @@ function scanFolderForPatients(folderPath) {
       try {
         const rootStat = fs.statSync(folderPath);
         rootFolderTime = Math.max(rootStat.mtimeMs || 0, rootStat.birthtimeMs || 0, rootStat.ctimeMs || 0);
-      } catch (e) {}
+      } catch (e) { }
       const latestRootImgTime = rootImages.length > 0 ? (rootImages[0].timestamp || 0) : 0;
       const effectiveRootTime = Math.max(rootFolderTime, latestRootImgTime);
 

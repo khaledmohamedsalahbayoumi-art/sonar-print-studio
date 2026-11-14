@@ -26,7 +26,8 @@ import {
   Minus,
   Plus,
   Zap,
-  Sliders
+  Sliders,
+  Phone
 } from 'lucide-react';
 import { useDoctor } from '../context/DoctorContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -172,18 +173,43 @@ export function Sidebar({
                 }}>
                   {t('appTitle')}
                 </h1>
-                <span style={{
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  color: '#10b981',
-                  fontSize: '0.68rem',
-                  fontWeight: 700,
-                  padding: '1px 6px',
-                  borderRadius: '10px',
-                  display: 'inline-block',
-                  marginTop: '2px'
-                }}>
-                  {t('desktopBadge')}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                  <span style={{
+                    background: 'rgba(16, 185, 129, 0.15)',
+                    color: '#10b981',
+                    fontSize: '0.68rem',
+                    fontWeight: 700,
+                    padding: '1px 6px',
+                    borderRadius: '10px',
+                    display: 'inline-block'
+                  }}>
+                    {t('desktopBadge')}
+                  </span>
+                </div>
+                <a
+                  href="https://wa.me/201036623265"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    marginTop: '4px',
+                    fontSize: '0.73rem',
+                    fontWeight: 700,
+                    color: 'var(--text-muted)',
+                    textDecoration: 'none',
+                    direction: 'ltr',
+                    fontFamily: 'monospace',
+                    transition: 'color 0.15s'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = '#38bdf8'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
+                  title="الدعم الفني والواتساب: +20 10 36623265"
+                >
+                  <Phone size={11} style={{ color: '#22c55e', flexShrink: 0 }} />
+                  <span>+20 10 36623265</span>
+                </a>
               </div>
             )}
           </div>
