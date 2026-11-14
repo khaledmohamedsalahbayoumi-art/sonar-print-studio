@@ -164,30 +164,30 @@ export function Sidebar({
       }}
     >
       {/* TOP SECTION: App Branding & Navigation */}
-      <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         
         {/* Branding Header */}
         <div style={{
-          padding: isCollapsed ? '16px 12px' : '16px 16px 14px',
+          padding: isCollapsed ? '10px 8px' : '10px 12px 8px',
           borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: isCollapsed ? 'center' : 'space-between',
-          gap: '10px'
+          gap: '8px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
             <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
               background: 'rgba(2, 132, 199, 0.08)',
               border: '1px solid rgba(2, 132, 199, 0.25)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 14px rgba(2, 132, 199, 0.2)',
+              boxShadow: '0 0 10px rgba(2, 132, 199, 0.18)',
               flexShrink: 0,
-              padding: '3px',
+              padding: '2px',
               overflow: 'hidden'
             }}>
               <img
@@ -199,26 +199,26 @@ export function Sidebar({
 
             {!isCollapsed && (
               <div style={{ overflow: 'hidden' }}>
-                <h1 style={{
-                  fontSize: '1rem',
-                  fontWeight: 800,
-                  color: 'var(--text-main)',
-                  letterSpacing: '-0.3px',
-                  margin: 0,
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden'
-                }}>
-                  {t('appTitle')}
-                </h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <h1 style={{
+                    fontSize: '0.92rem',
+                    fontWeight: 800,
+                    color: 'var(--text-main)',
+                    letterSpacing: '-0.3px',
+                    margin: 0,
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden'
+                  }}>
+                    {t('appTitle')}
+                  </h1>
                   <span style={{
                     background: 'rgba(16, 185, 129, 0.15)',
                     color: '#10b981',
-                    fontSize: '0.68rem',
+                    fontSize: '0.62rem',
                     fontWeight: 700,
-                    padding: '1px 6px',
-                    borderRadius: '10px',
+                    padding: '1px 5px',
+                    borderRadius: '8px',
                     display: 'inline-block'
                   }}>
                     {t('desktopBadge')}
@@ -232,8 +232,8 @@ export function Sidebar({
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
-                    marginTop: '4px',
-                    fontSize: '0.73rem',
+                    marginTop: '2px',
+                    fontSize: '0.68rem',
                     fontWeight: 700,
                     color: 'var(--text-muted)',
                     textDecoration: 'none',
@@ -245,7 +245,7 @@ export function Sidebar({
                   onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
                   title="الدعم الفني والواتساب: +20 10 36623265"
                 >
-                  <Phone size={11} style={{ color: '#22c55e', flexShrink: 0 }} />
+                  <Phone size={10} style={{ color: '#22c55e', flexShrink: 0 }} />
                   <span>+20 10 36623265</span>
                 </a>
               </div>
@@ -258,8 +258,8 @@ export function Sidebar({
             onClick={() => setIsCollapsed(!isCollapsed)}
             title={isCollapsed ? (isRTL ? "توسيع القائمة" : "Expand Sidebar") : (isRTL ? "طي القائمة" : "Collapse Sidebar")}
             style={{
-              width: '26px',
-              height: '26px',
+              width: '24px',
+              height: '24px',
               borderRadius: '6px',
               background: 'var(--bg-card)',
               border: '1px solid var(--border-subtle)',
@@ -280,7 +280,7 @@ export function Sidebar({
               e.currentTarget.style.borderColor = 'var(--border-subtle)';
             }}
           >
-            <CollapseIcon size={16} />
+            <CollapseIcon size={14} />
           </button>
         </div>
 
@@ -291,8 +291,8 @@ export function Sidebar({
               type="button"
               onClick={() => setIsCollapsed(false)}
               style={{
-                width: '28px',
-                height: '28px',
+                width: '26px',
+                height: '26px',
                 borderRadius: '6px',
                 background: 'var(--bg-card)',
                 border: '1px solid var(--border-subtle)',
@@ -303,13 +303,13 @@ export function Sidebar({
                 cursor: 'pointer'
               }}
             >
-              <CollapseIcon size={16} />
+              <CollapseIcon size={14} />
             </button>
           </div>
         )}
 
         {/* Navigation Tabs (Vertical in Sidebar) */}
-        <div style={{ padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div style={{ padding: '8px 8px 6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {canGoBack && (
             <button
               type="button"
@@ -318,34 +318,34 @@ export function Sidebar({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: isCollapsed ? 'center' : 'flex-start',
-                gap: '8px',
-                padding: isCollapsed ? '10px 0' : '9px 12px',
-                borderRadius: '10px',
-                fontSize: '0.84rem',
+                gap: '6px',
+                padding: isCollapsed ? '6px 0' : '5px 10px',
+                borderRadius: '8px',
+                fontSize: '0.76rem',
                 fontWeight: 700,
                 border: '1px solid rgba(2, 132, 199, 0.45)',
-                background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.2) 0%, rgba(6, 182, 212, 0.15) 100%)',
+                background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.18) 0%, rgba(6, 182, 212, 0.12) 100%)',
                 color: '#38bdf8',
                 cursor: 'pointer',
                 transition: 'all 0.15s',
-                marginBottom: '4px',
-                boxShadow: '0 2px 8px rgba(2, 132, 199, 0.2)'
+                marginBottom: '2px',
+                boxShadow: '0 2px 6px rgba(2, 132, 199, 0.15)'
               }}
               title={isRTL ? 'الرجوع للصفحة السابقة' : 'Back to Previous Page'}
             >
-              <BackIcon size={17} style={{ flexShrink: 0 }} />
+              <BackIcon size={14} style={{ flexShrink: 0 }} />
               {!isCollapsed && <span>{isRTL ? '← رجوع للصفحة السابقة' : '← Back'}</span>}
             </button>
           )}
 
           {!isCollapsed && (
             <div style={{
-              fontSize: '0.7rem',
+              fontSize: '0.66rem',
               fontWeight: 700,
               color: 'var(--text-dim)',
               textTransform: 'uppercase',
-              letterSpacing: '0.6px',
-              padding: '0 6px 4px'
+              letterSpacing: '0.5px',
+              padding: '0 4px 2px'
             }}>
               {isRTL ? 'التنقل الرئيسي' : 'Navigation'}
             </div>
@@ -359,22 +359,22 @@ export function Sidebar({
               display: 'flex',
               alignItems: 'center',
               justifyContent: isCollapsed ? 'center' : 'flex-start',
-              gap: '10px',
-              padding: isCollapsed ? '10px 0' : '10px 14px',
-              borderRadius: '10px',
-              fontSize: '0.88rem',
+              gap: '8px',
+              padding: isCollapsed ? '7px 0' : '6px 10px',
+              borderRadius: '8px',
+              fontSize: '0.80rem',
               fontWeight: 600,
               border: currentView === 'home' ? '1px solid #0284c7' : '1px solid transparent',
               cursor: 'pointer',
               transition: 'all 0.15s',
               background: currentView === 'home' ? 'var(--bg-card)' : 'transparent',
               color: currentView === 'home' ? '#38bdf8' : 'var(--text-muted)',
-              boxShadow: currentView === 'home' ? '0 2px 10px rgba(0,0,0,0.2)' : 'none',
+              boxShadow: currentView === 'home' ? '0 2px 8px rgba(0,0,0,0.18)' : 'none',
               width: '100%'
             }}
             title={t('navImages')}
           >
-            <ImageIcon size={19} style={{ color: currentView === 'home' ? '#0ea5e9' : 'var(--text-muted)', flexShrink: 0 }} />
+            <ImageIcon size={16} style={{ color: currentView === 'home' ? '#0ea5e9' : 'var(--text-muted)', flexShrink: 0 }} />
             {!isCollapsed && <span>{t('navImages')}</span>}
           </button>
 
@@ -386,24 +386,24 @@ export function Sidebar({
               display: 'flex',
               alignItems: 'center',
               justifyContent: isCollapsed ? 'center' : 'space-between',
-              gap: '10px',
-              padding: isCollapsed ? '10px 0' : '10px 14px',
-              borderRadius: '10px',
-              fontSize: '0.88rem',
+              gap: '8px',
+              padding: isCollapsed ? '7px 0' : '6px 10px',
+              borderRadius: '8px',
+              fontSize: '0.80rem',
               fontWeight: 600,
               border: currentView === 'studio' ? '1px solid #0284c7' : '1px solid transparent',
               cursor: 'pointer',
               transition: 'all 0.15s',
               background: currentView === 'studio' ? '#0284c7' : 'transparent',
               color: currentView === 'studio' ? '#ffffff' : 'var(--text-muted)',
-              boxShadow: currentView === 'studio' ? '0 4px 14px rgba(2, 132, 199, 0.4)' : 'none',
+              boxShadow: currentView === 'studio' ? '0 3px 10px rgba(2, 132, 199, 0.35)' : 'none',
               width: '100%',
               position: 'relative'
             }}
             title={t('navStudio')}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Printer size={19} style={{ color: currentView === 'studio' ? '#ffffff' : 'var(--text-muted)', flexShrink: 0 }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Printer size={16} style={{ color: currentView === 'studio' ? '#ffffff' : 'var(--text-muted)', flexShrink: 0 }} />
               {!isCollapsed && <span>{t('navStudio')}</span>}
             </div>
 
@@ -411,20 +411,20 @@ export function Sidebar({
               <span style={{
                 background: currentView === 'studio' ? '#ffffff' : '#0284c7',
                 color: currentView === 'studio' ? '#0369a1' : '#ffffff',
-                fontSize: '0.72rem',
+                fontSize: '0.68rem',
                 fontWeight: 800,
-                padding: '1px 6px',
-                borderRadius: '10px',
+                padding: '1px 5px',
+                borderRadius: '8px',
                 position: isCollapsed ? 'absolute' : 'static',
-                top: isCollapsed ? '4px' : 'auto',
-                right: isCollapsed ? '8px' : 'auto'
+                top: isCollapsed ? '3px' : 'auto',
+                right: isCollapsed ? '6px' : 'auto'
               }}>
                 {selectedImagesCount}
               </span>
             )}
           </button>
 
-          {/* 3. Printers & Settings Page Navigation Button - DIRECTLY UNDER PRINT STUDIO */}
+          {/* 3. Printers & Settings Page Navigation Button */}
           <button
             type="button"
             onClick={() => setCurrentView('printers')}
@@ -432,36 +432,36 @@ export function Sidebar({
               display: 'flex',
               alignItems: 'center',
               justifyContent: isCollapsed ? 'center' : 'space-between',
-              gap: '10px',
-              padding: isCollapsed ? '10px 0' : '10px 14px',
-              borderRadius: '10px',
-              fontSize: '0.88rem',
+              gap: '8px',
+              padding: isCollapsed ? '7px 0' : '6px 10px',
+              borderRadius: '8px',
+              fontSize: '0.80rem',
               fontWeight: 600,
               border: currentView === 'printers' ? '1px solid #0284c7' : '1px solid transparent',
               cursor: 'pointer',
               transition: 'all 0.15s',
-              background: currentView === 'printers' ? 'rgba(2, 132, 199, 0.25)' : 'transparent',
+              background: currentView === 'printers' ? 'rgba(2, 132, 199, 0.22)' : 'transparent',
               color: currentView === 'printers' ? '#38bdf8' : 'var(--text-muted)',
-              boxShadow: currentView === 'printers' ? '0 2px 10px rgba(2, 132, 199, 0.3)' : 'none',
+              boxShadow: currentView === 'printers' ? '0 2px 8px rgba(2, 132, 199, 0.25)' : 'none',
               width: '100%',
               position: 'relative'
             }}
             title={isRTL ? 'اختيار وإعدادات الطابعة' : 'Printers & Settings'}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, overflow: 'hidden' }}>
-              <Sliders size={18} style={{ color: currentView === 'printers' ? '#38bdf8' : 'var(--text-muted)', flexShrink: 0 }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, overflow: 'hidden' }}>
+              <Sliders size={16} style={{ color: currentView === 'printers' ? '#38bdf8' : 'var(--text-muted)', flexShrink: 0 }} />
               {!isCollapsed && (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', overflow: 'hidden', textAlign: isRTL ? 'right' : 'left' }}>
-                  <span style={{ fontSize: '0.84rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
                     {isRTL ? 'إعدادات الطابعة' : 'Printer Settings'}
                   </span>
                   <span style={{
-                    fontSize: '0.68rem',
+                    fontSize: '0.64rem',
                     color: currentView === 'printers' ? '#7dd3fc' : 'var(--text-dim)',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    maxWidth: '135px'
+                    maxWidth: '130px'
                   }}>
                     {selectedPrinter || (isRTL ? 'طابعة النظام الافتراضية' : 'System Default')}
                   </span>
@@ -473,10 +473,10 @@ export function Sidebar({
               <span style={{
                 background: currentView === 'printers' ? '#0284c7' : 'rgba(100, 116, 139, 0.25)',
                 color: currentView === 'printers' ? '#ffffff' : 'var(--text-dim)',
-                fontSize: '0.7rem',
+                fontSize: '0.66rem',
                 fontWeight: 700,
-                padding: '2px 7px',
-                borderRadius: '8px',
+                padding: '1px 6px',
+                borderRadius: '6px',
                 flexShrink: 0
               }}>
                 {printers.length}
@@ -494,10 +494,10 @@ export function Sidebar({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px',
-                padding: '8px 12px',
+                gap: '6px',
+                padding: '6px 10px',
                 borderRadius: '8px',
-                fontSize: '0.8rem',
+                fontSize: '0.76rem',
                 fontWeight: 700,
                 border: selectedImagesCount > 0 ? '1px solid rgba(14, 165, 233, 0.4)' : '1px solid var(--border-subtle)',
                 background: selectedImagesCount > 0 ? 'linear-gradient(135deg, rgba(2, 132, 199, 0.22) 0%, rgba(14, 165, 233, 0.12) 100%)' : 'rgba(255, 255, 255, 0.02)',
@@ -505,19 +505,19 @@ export function Sidebar({
                 cursor: selectedImagesCount > 0 && !isPrinting ? 'pointer' : 'not-allowed',
                 width: '100%',
                 transition: 'all 0.15s',
-                marginTop: '2px',
-                boxShadow: selectedImagesCount > 0 ? '0 2px 8px rgba(2, 132, 199, 0.25)' : 'none'
+                marginTop: '1px',
+                boxShadow: selectedImagesCount > 0 ? '0 2px 6px rgba(2, 132, 199, 0.2)' : 'none'
               }}
               title={isRTL ? `طباعة فورية على: ${selectedPrinter || 'الطابعة الافتراضية'}` : `Instant Print on ${selectedPrinter || 'Default'}`}
             >
               {isPrinting ? (
                 <>
-                  <RotateCw size={13} style={{ animation: 'spin 1s linear infinite' }} />
+                  <RotateCw size={12} style={{ animation: 'spin 1s linear infinite' }} />
                   <span>{isRTL ? 'جاري إرسال الطباعة...' : 'Printing...'}</span>
                 </>
               ) : (
                 <>
-                  <Zap size={13} color="#f59e0b" />
+                  <Zap size={12} color="#f59e0b" />
                   <span>{isRTL ? 'طباعة فورية ⚡' : 'Instant Print ⚡'}</span>
                 </>
               )}
@@ -531,330 +531,358 @@ export function Sidebar({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '8px 0',
+                padding: '6px 0',
                 borderRadius: '8px',
                 border: '1px solid #0284c7',
                 background: 'rgba(2, 132, 199, 0.2)',
                 color: '#38bdf8',
                 cursor: selectedImagesCount > 0 && !isPrinting ? 'pointer' : 'not-allowed',
                 width: '100%',
-                marginTop: '4px'
+                marginTop: '2px'
               }}
               title={isRTL ? `طباعة فورية على: ${selectedPrinter || 'الطابعة الافتراضية'}` : `Print to: ${selectedPrinter}`}
             >
-              <Zap size={15} color="#f59e0b" />
-            </button>
-          )}
-        </div>
-
-        {/* PATIENT FILES SECTION */}
-        <div style={{
-          padding: '10px 10px 14px',
-          borderTop: '1px solid var(--border-subtle)',
-          flex: 1,
-          overflowY: 'auto'
-        }}>
-          {!isCollapsed && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '8px',
-              padding: '0 4px'
-            }}>
-              <span style={{
-                fontSize: '0.7rem',
-                fontWeight: 700,
-                color: 'var(--text-dim)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.6px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}>
-                <User size={13} style={{ color: '#06b6d4' }} />
-                <span>{isRTL ? 'ملفات المرضى' : 'Patient Files'}</span>
-              </span>
-
-              {folderData && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '0.66rem',
-                      fontWeight: 700,
-                      color: '#10b981',
-                      background: 'rgba(16, 185, 129, 0.12)',
-                      padding: '1px 6px',
-                      borderRadius: '10px',
-                      border: '1px solid rgba(16, 185, 129, 0.25)'
-                    }}
-                    title={isRTL ? "مزامنة وريفريش تلقائي لأي مجلد أو صورة جديدة" : "Live Auto-Sync Active"}
-                  >
-                    <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#10b981' }} />
-                    <span>{isRTL ? 'تلقائي' : 'Live'}</span>
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={onReloadFolder}
-                    disabled={isReloadingFolder}
-                    title={t('refreshFolder')}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'var(--text-muted)',
-                      cursor: isReloadingFolder ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '2px'
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
-                  >
-                    <RotateCw size={13} style={{ animation: isReloadingFolder ? 'spin 1s linear infinite' : 'none' }} />
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Active Folder Title Pill */}
-          {folderData && !isCollapsed && (
-            <div style={{
-              padding: '6px 10px',
-              marginBottom: '8px',
-              background: 'var(--bg-primary)',
-              borderRadius: '8px',
-              border: '1px solid var(--border-subtle)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontSize: '0.76rem'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
-                <Folder size={14} style={{ color: '#06b6d4', flexShrink: 0 }} />
-                <span style={{
-                  fontWeight: 700,
-                  color: 'var(--text-main)',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  {folderData.folderName}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={onCloseFolder}
-                title={t('closeFolder')}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-dim)',
-                  cursor: 'pointer',
-                  padding: 0
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-dim)')}
-              >
-                <X size={13} />
-              </button>
-            </div>
-          )}
-
-          {/* Patient Sort Order Indicator & Quick Switch */}
-          {folderData && !isCollapsed && sortedPatients.length > 0 && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '2px 4px 6px',
-              fontSize: '0.72rem'
-            }}>
-              <button
-                type="button"
-                onClick={cycleSortOrder}
-                title={isRTL ? 'الترتيب التلقائي: المضاف حديثاً (اضغط للتبديل)' : 'Default: Recently Added (click to cycle)'}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  background: 'rgba(14, 165, 233, 0.12)',
-                  border: '1px solid rgba(14, 165, 233, 0.3)',
-                  borderRadius: '6px',
-                  padding: '3px 8px',
-                  color: '#38bdf8',
-                  cursor: 'pointer',
-                  fontSize: '0.71rem',
-                  fontWeight: 700,
-                  transition: 'all 0.15s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(14, 165, 233, 0.22)';
-                  e.currentTarget.style.borderColor = '#38bdf8';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(14, 165, 233, 0.12)';
-                  e.currentTarget.style.borderColor = 'rgba(14, 165, 233, 0.3)';
-                }}
-              >
-                {patientSortOrder === 'newest' && <Clock size={12} />}
-                {patientSortOrder === 'alpha' && <ArrowDownAZ size={12} />}
-                {patientSortOrder === 'oldest' && <ArrowUpDown size={12} />}
-                <span>
-                  {patientSortOrder === 'newest' ? t('sortNewest') : patientSortOrder === 'alpha' ? t('sortAlpha') : t('sortOldest')}
-                </span>
-              </button>
-
-              <span style={{ fontSize: '0.68rem', color: 'var(--text-dim)', fontWeight: 600 }}>
-                {sortedPatients.length} {isRTL ? 'ملف' : 'files'}
-              </span>
-            </div>
-          )}
-
-          {/* Vertical Patient Files List */}
-          {folderData && sortedPatients.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '280px', overflowY: 'auto' }}>
-              {sortedPatients.map((patient) => {
-                const isActive = patient.id === activePatientId;
-                const scanCount = patient.images?.length || 0;
-
-                return (
-                  <button
-                    key={patient.id}
-                    type="button"
-                    onClick={() => onSelectPatient(patient)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: isCollapsed ? 'center' : 'space-between',
-                      gap: '8px',
-                      padding: isCollapsed ? '8px 0' : '7px 10px',
-                      borderRadius: '8px',
-                      border: isActive ? '1px solid #0284c7' : '1px solid transparent',
-                      background: isActive ? 'var(--bg-accent-soft)' : 'var(--bg-card)',
-                      color: isActive ? '#38bdf8' : 'var(--text-main)',
-                      fontSize: '0.8rem',
-                      fontWeight: isActive ? 700 : 500,
-                      cursor: 'pointer',
-                      textAlign: isRTL ? 'right' : 'left',
-                      transition: 'all 0.15s',
-                      width: '100%',
-                      boxShadow: isActive ? '0 0 10px rgba(14, 165, 233, 0.2)' : 'none'
-                    }}
-                    title={`${patient.patientName} (${scanCount} ${isRTL ? 'صور' : 'scans'})`}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
-                      <User size={14} style={{ color: isActive ? '#0284c7' : 'var(--text-dim)', flexShrink: 0 }} />
-                      {!isCollapsed && (
-                        <span style={{
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis'
-                        }}>
-                          {patient.patientName}
-                        </span>
-                      )}
-                    </div>
-
-                    {!isCollapsed && (
-                      <span style={{
-                        fontSize: '0.68rem',
-                        padding: '1px 5px',
-                        borderRadius: '8px',
-                        fontWeight: 700,
-                        background: scanCount > 0 ? (isActive ? '#0284c7' : 'rgba(14, 165, 233, 0.15)') : 'rgba(100, 116, 139, 0.15)',
-                        color: scanCount > 0 ? (isActive ? '#ffffff' : '#38bdf8') : 'var(--text-dim)',
-                        flexShrink: 0
-                      }}>
-                        {scanCount}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          ) : (
-            /* Button to Import Folder if none is loaded */
-            <button
-              type="button"
-              onClick={onOpenFolder}
-              style={{
-                width: '100%',
-                padding: isCollapsed ? '10px 0' : '10px 12px',
-                borderRadius: '8px',
-                border: '1px dashed var(--border-subtle)',
-                background: 'var(--bg-card)',
-                color: 'var(--text-muted)',
-                fontSize: '0.78rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: isCollapsed ? 'center' : 'flex-start',
-                gap: '8px',
-                transition: 'all 0.15s'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#0284c7';
-                e.currentTarget.style.color = '#38bdf8';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border-subtle)';
-                e.currentTarget.style.color = 'var(--text-muted)';
-              }}
-              title={t('importFolderBtn')}
-            >
-              <FolderPlus size={16} style={{ color: '#06b6d4', flexShrink: 0 }} />
-              {!isCollapsed && <span>{isRTL ? 'استدعاء مجلد مرضى' : 'Import Patients Folder'}</span>}
-            </button>
-          )}
-
-          {/* Quick folder action if folder loaded */}
-          {folderData && !isCollapsed && (
-            <button
-              type="button"
-              onClick={onOpenFolder}
-              style={{
-                width: '100%',
-                marginTop: '8px',
-                padding: '6px 10px',
-                borderRadius: '6px',
-                border: '1px solid var(--border-subtle)',
-                background: 'transparent',
-                color: 'var(--text-dim)',
-                fontSize: '0.74rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#38bdf8';
-                e.currentTarget.style.borderColor = '#0284c7';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--text-dim)';
-                e.currentTarget.style.borderColor = 'var(--border-subtle)';
-              }}
-            >
-              <FolderPlus size={13} />
-              <span>{isRTL ? 'استدعاء فولدر آخر' : 'Open Another Folder'}</span>
+              <Zap size={14} color="#f59e0b" />
             </button>
           )}
         </div>
       </div>
 
-      {/* BOTTOM SECTION: Doctor Settings, Theme & Language */}
+      {/* MIDDLE SECTION: Patient Files & Folder Import (Expands with flex: 1 to give maximum room) */}
       <div style={{
-        padding: '12px 10px',
+        padding: '8px 8px 10px',
+        borderTop: '1px solid var(--border-subtle)',
+        flex: 1,
+        minHeight: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden'
+      }}>
+        {!isCollapsed && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '6px',
+            padding: '0 3px'
+          }}>
+            <span style={{
+              fontSize: '0.68rem',
+              fontWeight: 700,
+              color: 'var(--text-dim)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              <User size={12} style={{ color: '#06b6d4' }} />
+              <span>{isRTL ? 'ملفات المرضى' : 'Patient Files'}</span>
+            </span>
+
+            {folderData && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '0.64rem',
+                    fontWeight: 700,
+                    color: '#10b981',
+                    background: 'rgba(16, 185, 129, 0.12)',
+                    padding: '1px 5px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(16, 185, 129, 0.25)'
+                  }}
+                  title={isRTL ? "مزامنة وريفريش تلقائي لأي مجلد أو صورة جديدة" : "Live Auto-Sync Active"}
+                >
+                  <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#10b981' }} />
+                  <span>{isRTL ? 'تلقائي' : 'Live'}</span>
+                </span>
+
+                <button
+                  type="button"
+                  onClick={onReloadFolder}
+                  disabled={isReloadingFolder}
+                  title={t('refreshFolder')}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: isReloadingFolder ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '2px'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                >
+                  <RotateCw size={12} style={{ animation: isReloadingFolder ? 'spin 1s linear infinite' : 'none' }} />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Active Folder Title Pill */}
+        {folderData && !isCollapsed && (
+          <div style={{
+            padding: '5px 8px',
+            marginBottom: '6px',
+            background: 'var(--bg-primary)',
+            borderRadius: '6px',
+            border: '1px solid var(--border-subtle)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '0.74rem',
+            flexShrink: 0
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', overflow: 'hidden' }}>
+              <Folder size={13} style={{ color: '#06b6d4', flexShrink: 0 }} />
+              <span style={{
+                fontWeight: 700,
+                color: 'var(--text-main)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}>
+                {folderData.folderName}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={onCloseFolder}
+              title={t('closeFolder')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-dim)',
+                cursor: 'pointer',
+                padding: 0
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-dim)')}
+            >
+              <X size={12} />
+            </button>
+          </div>
+        )}
+
+        {/* Patient Sort Order Indicator & Quick Switch */}
+        {folderData && !isCollapsed && sortedPatients.length > 0 && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 2px 5px',
+            fontSize: '0.70rem',
+            flexShrink: 0
+          }}>
+            <button
+              type="button"
+              onClick={cycleSortOrder}
+              title={isRTL ? 'الترتيب التلقائي: المضاف حديثاً (اضغط للتبديل)' : 'Default: Recently Added (click to cycle)'}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px',
+                background: 'rgba(14, 165, 233, 0.12)',
+                border: '1px solid rgba(14, 165, 233, 0.3)',
+                borderRadius: '5px',
+                padding: '2px 6px',
+                color: '#38bdf8',
+                cursor: 'pointer',
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                transition: 'all 0.15s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(14, 165, 233, 0.22)';
+                e.currentTarget.style.borderColor = '#38bdf8';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(14, 165, 233, 0.12)';
+                e.currentTarget.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+              }}
+            >
+              {patientSortOrder === 'newest' && <Clock size={11} />}
+              {patientSortOrder === 'alpha' && <ArrowDownAZ size={11} />}
+              {patientSortOrder === 'oldest' && <ArrowUpDown size={11} />}
+              <span>
+                {patientSortOrder === 'newest' ? t('sortNewest') : patientSortOrder === 'alpha' ? t('sortAlpha') : t('sortOldest')}
+              </span>
+            </button>
+
+            <span style={{ fontSize: '0.66rem', color: 'var(--text-dim)', fontWeight: 600 }}>
+              {sortedPatients.length} {isRTL ? 'ملف' : 'files'}
+            </span>
+          </div>
+        )}
+
+        {/* Vertical Patient Files List: Takes remaining height with flex: 1 and scrolls smoothly */}
+        {folderData && sortedPatients.length > 0 ? (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '3px',
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            paddingRight: isRTL ? 0 : '2px',
+            paddingLeft: isRTL ? '2px' : 0
+          }}>
+            {sortedPatients.map((patient) => {
+              const isActive = patient.id === activePatientId;
+              const scanCount = patient.images?.length || 0;
+
+              return (
+                <button
+                  key={patient.id}
+                  type="button"
+                  onClick={() => onSelectPatient(patient)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: isCollapsed ? 'center' : 'space-between',
+                    gap: '6px',
+                    padding: isCollapsed ? '6px 0' : '6px 8px',
+                    borderRadius: '6px',
+                    border: isActive ? '1px solid #0284c7' : '1px solid transparent',
+                    background: isActive ? 'var(--bg-accent-soft)' : 'var(--bg-card)',
+                    color: isActive ? '#38bdf8' : 'var(--text-main)',
+                    fontSize: '0.78rem',
+                    fontWeight: isActive ? 700 : 500,
+                    cursor: 'pointer',
+                    textAlign: isRTL ? 'right' : 'left',
+                    transition: 'all 0.15s',
+                    width: '100%',
+                    boxShadow: isActive ? '0 0 8px rgba(14, 165, 233, 0.2)' : 'none',
+                    flexShrink: 0
+                  }}
+                  title={`${patient.patientName} (${scanCount} ${isRTL ? 'صور' : 'scans'})`}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', overflow: 'hidden' }}>
+                    <User size={13} style={{ color: isActive ? '#0284c7' : 'var(--text-dim)', flexShrink: 0 }} />
+                    {!isCollapsed && (
+                      <span style={{
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
+                        {patient.patientName}
+                      </span>
+                    )}
+                  </div>
+
+                  {!isCollapsed && (
+                    <span style={{
+                      fontSize: '0.65rem',
+                      padding: '1px 5px',
+                      borderRadius: '6px',
+                      fontWeight: 700,
+                      background: scanCount > 0 ? (isActive ? '#0284c7' : 'rgba(14, 165, 233, 0.15)') : 'rgba(100, 116, 139, 0.15)',
+                      color: scanCount > 0 ? (isActive ? '#ffffff' : '#38bdf8') : 'var(--text-dim)',
+                      flexShrink: 0
+                    }}>
+                      {scanCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          /* Button to Import Folder if none is loaded - Spacious & Prominent */
+          <button
+            type="button"
+            onClick={onOpenFolder}
+            style={{
+              flex: 1,
+              minHeight: '120px',
+              width: '100%',
+              padding: isCollapsed ? '10px 0' : '16px 10px',
+              borderRadius: '8px',
+              border: '2px dashed rgba(2, 132, 199, 0.4)',
+              background: 'linear-gradient(180deg, rgba(2, 132, 199, 0.08) 0%, rgba(2, 132, 199, 0.02) 100%)',
+              color: '#38bdf8',
+              fontSize: '0.80rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'all 0.15s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#0284c7';
+              e.currentTarget.style.background = 'rgba(2, 132, 199, 0.14)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(2, 132, 199, 0.4)';
+              e.currentTarget.style.background = 'linear-gradient(180deg, rgba(2, 132, 199, 0.08) 0%, rgba(2, 132, 199, 0.02) 100%)';
+            }}
+            title={t('importFolderBtn')}
+          >
+            <FolderPlus size={isCollapsed ? 18 : 26} style={{ color: '#06b6d4' }} />
+            {!isCollapsed && (
+              <>
+                <span style={{ fontWeight: 800 }}>{isRTL ? 'استدعاء مجلد مرضى' : 'Import Patient Folder'}</span>
+                <span style={{ fontSize: '0.67rem', color: 'var(--text-dim)', fontWeight: 500 }}>
+                  {isRTL ? 'اضغط لاختيار مجلد السونار' : 'Select ultrasound folder'}
+                </span>
+              </>
+            )}
+          </button>
+        )}
+
+        {/* Quick folder action if folder loaded */}
+        {folderData && !isCollapsed && (
+          <button
+            type="button"
+            onClick={onOpenFolder}
+            style={{
+              width: '100%',
+              marginTop: '6px',
+              padding: '5px 8px',
+              borderRadius: '6px',
+              border: '1px solid var(--border-subtle)',
+              background: 'transparent',
+              color: 'var(--text-dim)',
+              fontSize: '0.72rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '5px',
+              flexShrink: 0
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#38bdf8';
+              e.currentTarget.style.borderColor = '#0284c7';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-dim)';
+              e.currentTarget.style.borderColor = 'var(--border-subtle)';
+            }}
+          >
+            <FolderPlus size={12} />
+            <span>{isRTL ? 'استدعاء فولدر آخر' : 'Open Another Folder'}</span>
+          </button>
+        )}
+      </div>
+
+      {/* BOTTOM SECTION: Doctor Settings, Theme, Language & License */}
+      <div style={{
+        padding: '8px 8px 10px',
         borderTop: '1px solid var(--border-subtle)',
         display: 'flex',
         flexDirection: 'column',
-        gap: '8px'
+        gap: '6px',
+        flexShrink: 0
       }}>
         {/* Doctor & Clinic Profile Button */}
         <button
@@ -862,17 +890,17 @@ export function Sidebar({
           onClick={onOpenDoctorSettings}
           style={{
             width: '100%',
-            padding: isCollapsed ? '8px 0' : '8px 10px',
-            borderRadius: '8px',
+            padding: isCollapsed ? '6px 0' : '6px 8px',
+            borderRadius: '7px',
             background: 'var(--bg-card)',
             border: '1px solid var(--border-subtle)',
             color: 'var(--text-main)',
-            fontSize: '0.78rem',
+            fontSize: '0.76rem',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: isCollapsed ? 'center' : 'flex-start',
-            gap: '8px',
+            gap: '6px',
             transition: 'all 0.15s'
           }}
           onMouseEnter={(e) => {
@@ -885,12 +913,12 @@ export function Sidebar({
           }}
           title={t('doctorProfile')}
         >
-          <UserCog size={16} style={{ color: '#0ea5e9', flexShrink: 0 }} />
+          <UserCog size={15} style={{ color: '#0ea5e9', flexShrink: 0 }} />
           {!isCollapsed && (
             <div style={{ textAlign: isRTL ? 'right' : 'left', overflow: 'hidden' }}>
               <div style={{
                 fontWeight: 700,
-                fontSize: '0.8rem',
+                fontSize: '0.78rem',
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',
                 overflow: 'hidden'
@@ -905,29 +933,29 @@ export function Sidebar({
         <div style={{
           display: 'grid',
           gridTemplateColumns: isCollapsed ? '1fr' : '1fr 1fr',
-          gap: '6px'
+          gap: '5px'
         }}>
           {/* Language Switch */}
           <button
             type="button"
             onClick={toggleLang}
             style={{
-              padding: '6px 8px',
+              padding: '5px 6px',
               borderRadius: '6px',
               background: 'var(--bg-card)',
               border: '1px solid var(--border-subtle)',
               color: 'var(--text-muted)',
-              fontSize: '0.74rem',
+              fontSize: '0.70rem',
               fontWeight: 600,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '5px'
+              gap: '4px'
             }}
             title={isRTL ? "Switch to English" : "التبديل إلى العربية"}
           >
-            <Globe size={13} style={{ color: '#06b6d4' }} />
+            <Globe size={12} style={{ color: '#06b6d4' }} />
             {!isCollapsed && <span>{t('langToggle')}</span>}
           </button>
 
@@ -936,25 +964,25 @@ export function Sidebar({
             type="button"
             onClick={toggleTheme}
             style={{
-              padding: '6px 8px',
+              padding: '5px 6px',
               borderRadius: '6px',
               background: 'var(--bg-card)',
               border: '1px solid var(--border-subtle)',
               color: 'var(--text-muted)',
-              fontSize: '0.74rem',
+              fontSize: '0.70rem',
               fontWeight: 600,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '5px'
+              gap: '4px'
             }}
             title={theme === 'dark' ? t('themeLight') : t('themeDark')}
           >
             {theme === 'dark' ? (
-              <Sun size={13} style={{ color: '#f59e0b' }} />
+              <Sun size={12} style={{ color: '#f59e0b' }} />
             ) : (
-              <Moon size={13} style={{ color: '#0ea5e9' }} />
+              <Moon size={12} style={{ color: '#0ea5e9' }} />
             )}
             {!isCollapsed && <span>{theme === 'dark' ? t('themeLight') : t('themeDark')}</span>}
           </button>
@@ -964,16 +992,15 @@ export function Sidebar({
         {!isCollapsed ? (
           <div
             style={{
-              padding: '8px 10px',
-              borderRadius: '8px',
+              padding: '6px 8px',
+              borderRadius: '7px',
               background: isActivated
                 ? 'linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.03) 100%)'
                 : 'linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.03) 100%)',
               border: isActivated ? '1px solid rgba(16, 185, 129, 0.28)' : '1px solid rgba(239, 68, 68, 0.35)',
               display: 'flex',
               flexDirection: 'column',
-              gap: '6px',
-              marginTop: '2px'
+              gap: '4px'
             }}
           >
             {/* Status & Subscription Period */}
@@ -988,27 +1015,27 @@ export function Sidebar({
               }}
               title={isRTL ? 'الترخيص - اضغط لعرض التفاصيل وتغيير الكود' : 'License - Click to view details'}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 {isActivated ? (
-                  <ShieldCheck size={14} style={{ color: '#10b981', flexShrink: 0 }} />
+                  <ShieldCheck size={13} style={{ color: '#10b981', flexShrink: 0 }} />
                 ) : (
-                  <Key size={14} style={{ color: '#f87171', flexShrink: 0 }} />
+                  <Key size={13} style={{ color: '#f87171', flexShrink: 0 }} />
                 )}
                 <span style={{
-                  fontSize: '0.72rem',
+                  fontSize: '0.70rem',
                   fontWeight: 700,
                   color: isActivated ? '#10b981' : '#f87171',
                   whiteSpace: 'nowrap'
                 }}>
-                  {isActivated ? (isRTL ? 'نسخة أصلية' : 'Genuine License') : (isRTL ? 'نسخة غير مفعلة' : 'Unlicensed')}
+                  {isActivated ? (isRTL ? 'نسخة أصلية' : 'Genuine') : (isRTL ? 'غير مفعل' : 'Unlicensed')}
                 </span>
               </div>
 
               <span style={{
-                fontSize: '0.67rem',
+                fontSize: '0.65rem',
                 fontWeight: 700,
-                padding: '2px 6px',
-                borderRadius: '5px',
+                padding: '1px 5px',
+                borderRadius: '4px',
                 background: isActivated ? 'rgba(16, 185, 129, 0.16)' : 'rgba(239, 68, 68, 0.16)',
                 color: isActivated ? '#34d399' : '#fca5a5',
                 whiteSpace: 'nowrap'
@@ -1024,10 +1051,10 @@ export function Sidebar({
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 background: 'rgba(0, 0, 0, 0.24)',
-                padding: '4px 7px',
-                borderRadius: '6px',
+                padding: '3px 6px',
+                borderRadius: '5px',
                 border: '1px solid var(--border-subtle)',
-                gap: '6px'
+                gap: '4px'
               }}
             >
               <div
@@ -1035,7 +1062,7 @@ export function Sidebar({
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '5px',
+                  gap: '4px',
                   overflow: 'hidden',
                   cursor: 'pointer',
                   flex: 1
@@ -1043,7 +1070,7 @@ export function Sidebar({
                 title={isRTL ? 'اضغط لنسخ كود الجهاز' : 'Click to copy Machine ID'}
               >
                 <span style={{
-                  fontSize: '0.65rem',
+                  fontSize: '0.62rem',
                   color: 'var(--text-dim)',
                   whiteSpace: 'nowrap',
                   fontWeight: 600
@@ -1052,7 +1079,7 @@ export function Sidebar({
                 </span>
                 <code style={{
                   fontFamily: 'Consolas, monospace',
-                  fontSize: '0.70rem',
+                  fontSize: '0.68rem',
                   fontWeight: 700,
                   color: 'var(--text-main)',
                   letterSpacing: '0.3px',
@@ -1073,19 +1100,19 @@ export function Sidebar({
                   border: '1px solid ' + (copiedMachineId ? '#10b981' : 'rgba(255, 255, 255, 0.08)'),
                   borderRadius: '4px',
                   color: copiedMachineId ? '#ffffff' : 'var(--text-muted)',
-                  padding: '2px 6px',
+                  padding: '2px 5px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '3px',
-                  fontSize: '0.64rem',
+                  gap: '2px',
+                  fontSize: '0.62rem',
                   fontWeight: 600,
                   flexShrink: 0,
                   transition: 'all 0.15s'
                 }}
                 title={isRTL ? 'نسخ كود الجهاز' : 'Copy ID'}
               >
-                {copiedMachineId ? <Check size={11} /> : <Copy size={11} />}
+                {copiedMachineId ? <Check size={10} /> : <Copy size={10} />}
                 <span>{copiedMachineId ? (isRTL ? 'تم النسخ' : 'Copied') : (isRTL ? 'نسخ' : 'Copy')}</span>
               </button>
             </div>
@@ -1093,10 +1120,10 @@ export function Sidebar({
             {/* Expiry date subtext if limited */}
             {expirySubtext && (
               <div style={{
-                fontSize: '0.62rem',
+                fontSize: '0.60rem',
                 color: 'var(--text-dim)',
                 textAlign: 'center',
-                marginTop: '-2px'
+                marginTop: '-1px'
               }}>
                 {expirySubtext}
               </div>
@@ -1108,8 +1135,8 @@ export function Sidebar({
             onClick={openActivationModal}
             style={{
               width: '100%',
-              padding: '7px 0',
-              borderRadius: '8px',
+              padding: '6px 0',
+              borderRadius: '7px',
               background: isActivated ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
               border: isActivated ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(239, 68, 68, 0.35)',
               color: isActivated ? '#10b981' : '#f87171',
@@ -1122,8 +1149,8 @@ export function Sidebar({
             }}
             title={`${isRTL ? 'كود الجهاز:' : 'Machine ID:'} ${machineId} | ${subscriptionText}`}
           >
-            {isActivated ? <ShieldCheck size={16} /> : <Key size={16} />}
-            <span style={{ fontSize: '0.62rem', fontWeight: 700 }}>
+            {isActivated ? <ShieldCheck size={15} /> : <Key size={15} />}
+            <span style={{ fontSize: '0.60rem', fontWeight: 700 }}>
               {isActivated
                 ? (licenseInfo?.isPerpetual ? '∞' : `${licenseInfo?.daysLeft ?? ''}d`)
                 : '!'}
