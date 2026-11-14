@@ -20,6 +20,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 export function PrintersView({
   onNavigate,
+  onGoBack,
   selectedImagesCount = 0,
   patientInfo,
   onInstantPrint
@@ -97,6 +98,29 @@ export function PrintersView({
 
         {/* Action Buttons */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {onGoBack && (
+            <button
+              type="button"
+              onClick={onGoBack}
+              className="btn btn-secondary"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '9px 18px',
+                fontSize: '0.88rem',
+                fontWeight: 700,
+                background: 'rgba(2, 132, 199, 0.15)',
+                border: '1px solid rgba(2, 132, 199, 0.4)',
+                color: '#38bdf8'
+              }}
+              title={isRTL ? 'الرجوع للصفحة السابقة' : 'Go Back'}
+            >
+              <BackIcon size={17} />
+              <span>{isRTL ? 'رجوع للصفحة السابقة' : 'Back'}</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={refreshPrinters}

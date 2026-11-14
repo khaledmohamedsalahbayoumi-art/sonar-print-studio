@@ -27,7 +27,9 @@ import {
   Plus,
   Zap,
   Sliders,
-  Phone
+  Phone,
+  ArrowRight,
+  ArrowLeft
 } from 'lucide-react';
 import { useDoctor } from '../context/DoctorContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -48,7 +50,9 @@ export function Sidebar({
   onCloseFolder,
   isReloadingFolder = false,
   onOpenDoctorSettings,
-  onInstantPrint
+  onInstantPrint,
+  onGoBack,
+  canGoBack = false
 }) {
   const { doctorInfo } = useDoctor();
   const { lang, toggleLang, t, isRTL } = useLanguage();
@@ -100,6 +104,8 @@ export function Sidebar({
   const CollapseIcon = isRTL
     ? (isCollapsed ? ChevronLeft : ChevronRight)
     : (isCollapsed ? ChevronRight : ChevronLeft);
+
+  const BackIcon = isRTL ? ArrowRight : ArrowLeft;
 
   const sidebarWidth = isCollapsed ? '72px' : '260px';
 
@@ -272,6 +278,34 @@ export function Sidebar({
 
         {/* Navigation Tabs (Vertical in Sidebar) */}
         <div style={{ padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          {canGoBack && (
+            <button
+              type="button"
+              onClick={onGoBack}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: isCollapsed ? 'center' : 'flex-start',
+                gap: '8px',
+                padding: isCollapsed ? '10px 0' : '9px 12px',
+                borderRadius: '10px',
+                fontSize: '0.84rem',
+                fontWeight: 700,
+                border: '1px solid rgba(2, 132, 199, 0.45)',
+                background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.2) 0%, rgba(6, 182, 212, 0.15) 100%)',
+                color: '#38bdf8',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                marginBottom: '4px',
+                boxShadow: '0 2px 8px rgba(2, 132, 199, 0.2)'
+              }}
+              title={isRTL ? 'الرجوع للصفحة السابقة' : 'Back to Previous Page'}
+            >
+              <BackIcon size={17} style={{ flexShrink: 0 }} />
+              {!isCollapsed && <span>{isRTL ? '← رجوع للصفحة السابقة' : '← Back'}</span>}
+            </button>
+          )}
+
           {!isCollapsed && (
             <div style={{
               fontSize: '0.7rem',

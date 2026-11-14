@@ -32,6 +32,7 @@ export function PrintStudioView({
   selectedImageIds,
   patientInfo,
   onBackToHome,
+  onGoBack,
   onOpenPrinters
 }) {
   const { doctorInfo, updateDoctorInfo } = useDoctor();
@@ -271,22 +272,35 @@ export function PrintStudioView({
         
         {/* Studio Top Action Bar */}
         <div style={{
-          padding: '16px 20px',
+          padding: '14px 18px',
           borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          gap: '12px'
         }}>
           <button
-            onClick={onBackToHome}
+            type="button"
+            onClick={onGoBack || onBackToHome}
             className="btn btn-secondary"
-            style={{ padding: '6px 12px', fontSize: '0.85rem' }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 14px',
+              fontSize: '0.86rem',
+              fontWeight: 700,
+              background: 'rgba(2, 132, 199, 0.12)',
+              border: '1px solid rgba(2, 132, 199, 0.35)',
+              color: '#38bdf8'
+            }}
+            title={isRTL ? 'الرجوع للصفحة السابقة' : 'Back to Previous Page'}
           >
-            <BackIcon size={16} />
-            <span>{t('backToImages')}</span>
+            <BackIcon size={17} />
+            <span>{isRTL ? 'رجوع للصفحة السابقة' : t('backToImages')}</span>
           </button>
 
-          <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#38bdf8' }}>
+          <span style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-main)' }}>
             {t('printPreparation')}
           </span>
         </div>
@@ -838,7 +852,7 @@ export function PrintStudioView({
         position: 'relative'
       }}>
         
-        {/* Floating Zoom Controls Bar */}
+        {/* Floating Zoom & Back Controls Bar */}
         <div className="no-print" style={{
           position: 'sticky',
           top: '0',
@@ -848,12 +862,37 @@ export function PrintStudioView({
           backdropFilter: 'blur(10px)',
           border: '1px solid var(--border-subtle)',
           borderRadius: '30px',
-          padding: '6px 18px',
+          padding: '6px 16px',
           display: 'flex',
           alignItems: 'center',
-          gap: '16px',
+          gap: '14px',
           boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
         }}>
+          <button
+            type="button"
+            onClick={onGoBack || onBackToHome}
+            style={{
+              background: 'rgba(2, 132, 199, 0.12)',
+              border: '1px solid rgba(2, 132, 199, 0.3)',
+              borderRadius: '20px',
+              color: '#38bdf8',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              padding: '4px 12px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s'
+            }}
+            title={isRTL ? 'الرجوع للصفحة السابقة' : 'Back to Previous Page'}
+          >
+            <BackIcon size={14} />
+            <span>{isRTL ? 'رجوع' : 'Back'}</span>
+          </button>
+
+          <div style={{ width: '1px', height: '16px', backgroundColor: 'var(--border-subtle)' }} />
+
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>
             {t('precisePreview')}
           </span>

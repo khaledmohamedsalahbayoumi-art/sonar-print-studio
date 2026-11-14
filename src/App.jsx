@@ -37,9 +37,51 @@ const PATIENT_PRESETS = {
 function AppContent() {
   const { lang, t, isRTL } = useLanguage();
   const { selectedPrinter, executeDirectPrint, isPrinting } = usePrinter();
-  const [currentView, setCurrentView] = useState('home'); // 'home' | 'studio'
+  const [currentView, setCurrentView] = useState('home'); // 'home' | 'studio' | 'printers'
+  const [viewHistory, setViewHistory] = useState(['home']);
   const [isDoctorSettingsOpen, setIsDoctorSettingsOpen] = useState(false);
   const [toastInfo, setToastInfo] = useState(null);
+
+  const navigateTo = (newView) => {
+    if (newView === currentView) return;
+    setViewHistory((prev) => [...prev, newView]);
+    setCurrentView(newView);
+  };
+
+  const handleGoBack = () => {
+    if (viewHistory.length > 1) {
+      setViewHistory((prev) => {
+        const next = [...prev];
+        next.pop();
+        const target = next[next.length - 1] || 'home';
+        setCurrentView(target);
+        return next;
+      });
+    } else {
+      setCurrentView('home');
+      setViewHistory(['home']);
+    }
+  };
+
+  // Keyboard navigation: Escape or Alt+Arrow to go back
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) {
+        return;
+      }
+      if (
+        (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) ||
+        (e.key === 'Escape' && !isDoctorSettingsOpen)
+      ) {
+        if (currentView !== 'home') {
+          e.preventDefault();
+          handleGoBack();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentView, viewHistory, isDoctorSettingsOpen]);
 
   // Ultrasound images state (preloaded with sample scans for current language)
   const [images, setImages] = useState(() => getSampleSonarScans(lang));
@@ -242,7 +284,7 @@ function AppContent() {
       {/* Sidebar Navigation & Patient Files */}
       <Sidebar
         currentView={currentView}
-        setCurrentView={setCurrentView}
+        setCurrentView={navigateTo}
         selectedImagesCount={selectedImageIds.length}
         folderData={folderData}
         activePatientId={activePatientId}
@@ -253,6 +295,8 @@ function AppContent() {
         isReloadingFolder={isReloadingFolder}
         onOpenDoctorSettings={() => setIsDoctorSettingsOpen(true)}
         onInstantPrint={handleInstantPrint}
+        onGoBack={handleGoBack}
+        canGoBack={currentView !== 'home'}
       />
 
       {/* Main Content Workspace */}
@@ -266,7 +310,7 @@ function AppContent() {
               setSelectedImageIds={setSelectedImageIds}
               patientInfo={patientInfo}
               setPatientInfo={handlePatientInfoChange}
-              onProceedToPrint={() => setCurrentView('studio')}
+              onProceedToPrint={() => navigateTo('studio')}
               onOpenFolder={handleOpenFolder}
               onFolderLoaded={handleFolderLoaded}
               folderData={folderData}
@@ -278,13 +322,15 @@ function AppContent() {
               images={images}
               selectedImageIds={selectedImageIds}
               patientInfo={patientInfo}
-              onBackToHome={() => setCurrentView('home')}
-              onOpenPrinters={() => setCurrentView('printers')}
+              onBackToHome={handleGoBack}
+              onGoBack={handleGoBack}
+              onOpenPrinters={() => navigateTo('printers')}
             />
           )}
           {currentView === 'printers' && (
             <PrintersView
-              onNavigate={(view) => setCurrentView(view)}
+              onNavigate={navigateTo}
+              onGoBack={handleGoBack}
               selectedImagesCount={selectedImageIds.length}
               patientInfo={patientInfo}
               onInstantPrint={handleInstantPrint}
