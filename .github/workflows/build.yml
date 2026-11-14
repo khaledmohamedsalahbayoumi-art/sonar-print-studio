@@ -47,7 +47,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: Sonar-Print-Studio-Windows
+          name: Printify-Windows
           path: |
             release/*.exe
           if-no-files-found: error
@@ -56,7 +56,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: Sonar-Print-Studio-macOS
+          name: Printify-macOS
           path: |
             release/*.dmg
             release/*-mac.zip

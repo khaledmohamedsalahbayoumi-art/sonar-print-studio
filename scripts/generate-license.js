@@ -1,10 +1,10 @@
 /**
- * CLI License Key Generator for Sonar Print Studio
+ * CLI License Key Generator for Printify
  * Usage:
  *   node scripts/generate-license.js <MACHINE_ID> [TYPE] [DAYS]
  * Example:
- *   node scripts/generate-license.js SONAR-1185-3802-996B perpetual
- *   node scripts/generate-license.js SONAR-1185-3802-996B year 365
+ *   node scripts/generate-license.js PRINT-1185-3802-996B perpetual
+ *   node scripts/generate-license.js PRINT-1185-3802-996B year 365
  */
 
 const { generateActivationKey, getMachineId } = require('../electron/licenseManager');
@@ -35,7 +35,7 @@ const type = isPerp ? 'PERPETUAL' : 'TIME_LIMITED';
 const key = generateActivationKey(machineId, type, days);
 
 console.log('\n======================================================');
-console.log('   SONAR PRINT STUDIO - LICENSE KEY GENERATOR');
+console.log('   PRINTIFY - LICENSE KEY GENERATOR');
 console.log('======================================================');
 console.log('  Machine ID:     ' + machineId.toUpperCase());
 console.log('  License Type:   ' + (isPerp ? 'دائم مدى الحياة (Perpetual)' : `محدد المدة (${days} يوم)`));

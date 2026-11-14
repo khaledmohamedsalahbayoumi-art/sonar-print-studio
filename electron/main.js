@@ -115,7 +115,7 @@ function createWindow() {
     minWidth: 1050,
     minHeight: 700,
     backgroundColor: '#0f172a',
-    title: 'برنامج تجهيز وطباعة صور السونار - Sonar Print Studio',
+    title: 'Printify - برنامج تجهيز وطباعة صور السونار والتقارير الطبية',
     icon: fs.existsSync(iconPath) ? iconPath : undefined,
     show: true,
     autoHideMenuBar: true,

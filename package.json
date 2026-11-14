@@ -1,7 +1,7 @@
 {
-  "name": "sonar-print-studio",
+  "name": "printify",
   "version": "1.0.0",
-  "description": "برنامج تجهيز وتنظيم وطباعة صور السونار والتقارير الطبية",
+  "description": "Printify - برنامج تجهيز وتنظيم وطباعة صور السونار والتقارير الطبية",
   "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
@@ -17,9 +17,9 @@
     "app": "concurrently \"vite\" \"wait-on tcp:5173 && electron .\""
   },
   "build": {
-    "appId": "com.elsakka.sonarprintstudio",
-    "productName": "Sonar Print Studio",
-    "copyright": "Copyright © 2026 Sonar Studio",
+    "appId": "com.elsakka.printify",
+    "productName": "Printify",
+    "copyright": "Copyright © 2026 Printify",
     "directories": {
       "output": "release",
       "buildResources": "build"
@@ -77,7 +77,7 @@
       "gatekeeperAssess": false
     },
     "dmg": {
-      "title": "Sonar Print Studio"
+      "title": "Printify"
     }
   },
   "keywords": [
@@ -86,7 +86,7 @@
     "medical-printing",
     "electron"
   ],
-  "author": "Sonar Studio",
+  "author": "Printify",
   "license": "MIT",
   "dependencies": {
     "lucide-react": "^1.16.0",

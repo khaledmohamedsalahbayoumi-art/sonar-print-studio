@@ -190,7 +190,7 @@ export function ActivationModal() {
           <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0 }}>
             {isActivated
               ? (isRTL ? 'هذه النسخة أصلية ومرخصة لجهازك الطبي بنجاح' : 'This software is licensed and activated for this machine')
-              : (isRTL ? 'يرجى تفعيل نسختك للبدء في استخدام استوديو طباعة السونار' : 'Please activate your license to start using Sonar Print Studio')}
+              : (isRTL ? 'يرجى تفعيل نسختك للبدء في استخدام برنتيفاي (Printify)' : 'Please activate your license to start using Printify')}
           </p>
         </div>
 
@@ -448,7 +448,7 @@ export function ActivationModal() {
 
               <a
                 href={`https://wa.me/201553332921?text=${encodeURIComponent(
-                  `السلام عليكم، أود تفعيل برنامج Sonar Print Studio.\nكود جهازي هو: ${machineId || ''}`
+                  `السلام عليكم، أود تفعيل برنامج Printify.\nكود جهازي هو: ${machineId || ''}`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"

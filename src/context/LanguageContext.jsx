@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const translations = {
   ar: {
     // Header
-    appTitle: 'Sonar Print Studio',
+    appTitle: 'Printify',
     appSubtitle: 'تجهيز وتنظيم وطباعة صور السونار والتقارير الطبية',
     desktopBadge: 'برنامج ديسكتوب',
     navImages: 'اختيار الصور والبحث',
@@ -167,7 +167,7 @@ const translations = {
   },
   en: {
     // Header
-    appTitle: 'Sonar Print Studio',
+    appTitle: 'Printify',
     appSubtitle: 'Ultrasound image preparation, layout & medical report printing',
     desktopBadge: 'Desktop App',
     navImages: 'Image Selection & Search',

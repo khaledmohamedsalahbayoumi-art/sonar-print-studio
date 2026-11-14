@@ -58,8 +58,8 @@ function getMachineId() {
   const rawSeed = `${machineGuid}|${cpuModel}|${hostname}|${username}|${totalMem}|${os.arch()}`;
   const hash = crypto.createHash('sha256').update(rawSeed).digest('hex').toUpperCase();
 
-  // Format: SONAR-XXXX-XXXX-XXXX
-  cachedMachineId = `SONAR-${hash.substring(0, 4)}-${hash.substring(4, 8)}-${hash.substring(8, 12)}`;
+  // Format: PRINT-XXXX-XXXX-XXXX
+  cachedMachineId = `PRINT-${hash.substring(0, 4)}-${hash.substring(4, 8)}-${hash.substring(8, 12)}`;
   return cachedMachineId;
 }
 
@@ -109,7 +109,26 @@ function verifyActivationKey(machineId, key) {
   const dataToSign = `${normMachine}#${typeFlag}#${expiryHex}`;
   const expectedSig = crypto.createHmac('sha256', MASTER_SECRET).update(dataToSign).digest('hex').toUpperCase();
 
-  if (sigPart !== expectedSig.substring(0, 11)) {
+  let matches = (sigPart === expectedSig.substring(0, 11));
+
+  // Backward compatibility: If current machineId is PRINT-..., check legacy SONAR-... counterpart
+  if (!matches && normMachine.startsWith('PRINT-')) {
+    const legacyMachine = 'SONAR-' + normMachine.substring(6);
+    const legacyDataToSign = `${legacyMachine}#${typeFlag}#${expiryHex}`;
+    const legacySig = crypto.createHmac('sha256', MASTER_SECRET).update(legacyDataToSign).digest('hex').toUpperCase();
+    if (sigPart === legacySig.substring(0, 11)) {
+      matches = true;
+    }
+  } else if (!matches && normMachine.startsWith('SONAR-')) {
+    const modernMachine = 'PRINT-' + normMachine.substring(6);
+    const modernDataToSign = `${modernMachine}#${typeFlag}#${expiryHex}`;
+    const modernSig = crypto.createHmac('sha256', MASTER_SECRET).update(modernDataToSign).digest('hex').toUpperCase();
+    if (sigPart === modernSig.substring(0, 11)) {
+      matches = true;
+    }
+  }
+
+  if (!matches) {
     return { valid: false, error: 'كود التفعيل غير مطابق لهذا الجهاز' };
   }
 
@@ -144,6 +163,17 @@ function getPossibleLicensePaths(app) {
   try {
     if (app && typeof app.getPath === 'function') {
       paths.push(path.join(app.getPath('userData'), 'license.dat'));
+    }
+  } catch (e) {}
+
+  // Also check printify and legacy sonar-print-studio folders so existing activations persist seamlessly
+  try {
+    if (process.platform === 'win32' && process.env.APPDATA) {
+      paths.push(path.join(process.env.APPDATA, 'printify', 'license.dat'));
+      paths.push(path.join(process.env.APPDATA, 'sonar-print-studio', 'license.dat'));
+    } else if (process.platform === 'darwin' && process.env.HOME) {
+      paths.push(path.join(process.env.HOME, 'Library', 'Application Support', 'printify', 'license.dat'));
+      paths.push(path.join(process.env.HOME, 'Library', 'Application Support', 'sonar-print-studio', 'license.dat'));
     }
   } catch (e) {}
 
