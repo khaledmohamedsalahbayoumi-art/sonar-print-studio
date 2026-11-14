@@ -337,7 +337,36 @@ export function HomeView({
   };
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 20px 80px', direction: isRTL ? 'rtl' : 'ltr' }}>
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 20px 80px', direction: isRTL ? 'rtl' : 'ltr', position: 'relative' }}
+    >
+      {/* Full-window drag overlay when user drags images */}
+      {isDragging && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(2, 132, 199, 0.3)',
+          backdropFilter: 'blur(8px)',
+          border: '3px dashed #38bdf8',
+          zIndex: 9999,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'none'
+        }}>
+          <UploadCloud size={64} color="#38bdf8" />
+          <h2 style={{ color: '#ffffff', fontWeight: 800, marginTop: '16px' }}>
+            {t('dragDropTitle')}
+          </h2>
+          <p style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '0.95rem' }}>
+            {t('dragDropSubtitle')}
+          </p>
+        </div>
+      )}
       
       {/* Hidden File Input Fallback */}
       <input
@@ -520,168 +549,6 @@ export function HomeView({
         </div>
       </div>
 
-      {/* Central Search & Drag-Drop Hero Section */}
-      <div style={{
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: '24px',
-        padding: '36px 24px',
-        textAlign: 'center',
-        marginBottom: '28px',
-        boxShadow: 'var(--shadow-card)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        {/* Glow ambient circle */}
-        <div style={{
-          position: 'absolute',
-          top: '-60px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '300px',
-          height: '180px',
-          background: 'radial-gradient(ellipse at center, rgba(14, 165, 233, 0.18) 0%, transparent 70%)',
-          pointerEvents: 'none'
-        }} />
-
-        {/* Central Search Input */}
-        <div style={{
-          maxWidth: '560px',
-          margin: '0 auto 24px',
-          position: 'relative'
-        }}>
-          <div style={{
-            position: 'absolute',
-            right: isRTL ? '16px' : 'auto',
-            left: isRTL ? 'auto' : '16px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            color: 'var(--text-muted)',
-            display: 'flex',
-            alignItems: 'center',
-            pointerEvents: 'none'
-          }}>
-            <Search size={20} />
-          </div>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={t('searchPlaceholder')}
-            style={{
-              width: '100%',
-              padding: isRTL ? '14px 48px 14px 18px' : '14px 18px 14px 48px',
-              backgroundColor: 'var(--bg-card)',
-              border: '2px solid var(--border-subtle)',
-              borderRadius: '16px',
-              color: 'var(--text-main)',
-              fontSize: '1rem',
-              outline: 'none',
-              boxShadow: 'var(--shadow-card)',
-              transition: 'border-color 0.2s'
-            }}
-            onFocus={(e) => (e.target.style.borderColor = '#0284c7')}
-            onBlur={(e) => (e.target.style.borderColor = 'var(--border-subtle)')}
-          />
-        </div>
-
-        {/* Drag & Drop Zone */}
-        <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onClick={handleBrowseFiles}
-          style={{
-            maxWidth: '680px',
-            margin: '0 auto',
-            padding: '36px 20px',
-            border: isDragging ? '2px dashed #38bdf8' : '2px dashed var(--border-subtle)',
-            backgroundColor: isDragging ? 'rgba(14, 165, 233, 0.08)' : 'var(--bg-primary)',
-            borderRadius: '20px',
-            cursor: 'pointer',
-            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-            transform: isDragging ? 'scale(1.01)' : 'scale(1)'
-          }}
-          onMouseEnter={(e) => {
-            if (!isDragging) e.currentTarget.style.borderColor = '#0ea5e9';
-          }}
-          onMouseLeave={(e) => {
-            if (!isDragging) e.currentTarget.style.borderColor = 'var(--border-subtle)';
-          }}
-        >
-          <div style={{
-            width: '64px',
-            height: '64px',
-            borderRadius: '18px',
-            background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%)',
-            border: '1px solid rgba(14, 165, 233, 0.4)',
-            color: '#38bdf8',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 16px'
-          }}>
-            <UploadCloud size={34} />
-          </div>
-
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '8px' }}>
-            {t('dragDropTitle')}
-          </h3>
-          <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: '0 auto 18px', maxWidth: '420px' }}>
-            {t('dragDropSubtitle')}
-          </p>
-
-          <div style={{ display: 'inline-flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
-            {/* Primary Action: Import Entire Patients Folder */}
-            <button
-              type="button"
-              className="btn btn-primary"
-              style={{
-                padding: '12px 24px',
-                fontSize: '1rem',
-                background: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
-                boxShadow: '0 4px 16px rgba(6, 182, 212, 0.35)'
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenFolderClick();
-              }}
-            >
-              <Folder size={20} />
-              <span>{t('importFolderBtn')}</span>
-            </button>
-
-            {/* Browse Individual Scans */}
-            <button
-              type="button"
-              className="btn btn-secondary"
-              style={{ padding: '12px 20px', fontSize: '0.95rem' }}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleBrowseFiles();
-              }}
-            >
-              <FolderOpen size={19} />
-              <span>{t('browseFiles')}</span>
-            </button>
-
-            {/* Load Mock Samples */}
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleLoadSamples();
-              }}
-              title={t('loadSamples')}
-            >
-              <Sparkles size={18} color="#f59e0b" />
-              <span>{t('loadSamples')}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Gallery Section Header & Batch Actions */}
       <div style={{
         display: 'flex',
@@ -707,6 +574,40 @@ export function HomeView({
           }}>
             {t('imagesSelected', { count: selectedImageIds.length, total: images.length })}
           </span>
+
+          {/* Quick Compact Search */}
+          <div style={{ position: 'relative', minWidth: '220px' }}>
+            <Search
+              size={15}
+              style={{
+                position: 'absolute',
+                right: isRTL ? '10px' : 'auto',
+                left: isRTL ? 'auto' : '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--text-muted)'
+              }}
+            />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={isRTL ? 'ابحث في صور السونار...' : 'Search scans...'}
+              style={{
+                width: '100%',
+                padding: isRTL ? '7px 32px 7px 12px' : '7px 12px 7px 32px',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '10px',
+                color: 'var(--text-main)',
+                fontSize: '0.84rem',
+                outline: 'none',
+                transition: 'border-color 0.2s'
+              }}
+              onFocus={(e) => (e.target.style.borderColor = '#0284c7')}
+              onBlur={(e) => (e.target.style.borderColor = 'var(--border-subtle)')}
+            />
+          </div>
 
           {images.length > 1 && (
             <button
@@ -752,41 +653,54 @@ export function HomeView({
           )}
         </div>
 
-        {images.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <button
-              onClick={handleSelectAll}
-              className="btn btn-secondary"
-              style={{ fontSize: '0.85rem', padding: '8px 14px' }}
-            >
-              {selectedImageIds.length === images.length ? t('deselectAll') : t('selectAll')}
-            </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            type="button"
+            onClick={handleBrowseFiles}
+            className="btn btn-secondary"
+            style={{ fontSize: '0.85rem', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
+            title={t('browseFiles')}
+          >
+            <FolderOpen size={16} />
+            <span>{t('browseFiles')}</span>
+          </button>
 
-            <button
-              onClick={() => setIsClearModalOpen(true)}
-              className="btn btn-secondary"
-              style={{ fontSize: '0.85rem', padding: '8px 14px', color: '#f43f5e' }}
-            >
-              <Trash2 size={16} />
-              <span>{t('clearAll')}</span>
-            </button>
+          {images.length > 0 && (
+            <>
+              <button
+                onClick={handleSelectAll}
+                className="btn btn-secondary"
+                style={{ fontSize: '0.85rem', padding: '8px 14px' }}
+              >
+                {selectedImageIds.length === images.length ? t('deselectAll') : t('selectAll')}
+              </button>
 
-            <button
-              onClick={onProceedToPrint}
-              disabled={selectedImageIds.length === 0}
-              className="btn btn-success"
-              style={{
-                fontSize: '0.95rem',
-                padding: '10px 22px',
-                opacity: selectedImageIds.length === 0 ? 0.5 : 1,
-                cursor: selectedImageIds.length === 0 ? 'not-allowed' : 'pointer'
-              }}
-            >
-              <span>{t('proceedToPrint')}</span>
-              <ProceedIcon size={18} />
-            </button>
-          </div>
-        )}
+              <button
+                onClick={() => setIsClearModalOpen(true)}
+                className="btn btn-secondary"
+                style={{ fontSize: '0.85rem', padding: '8px 14px', color: '#f43f5e' }}
+              >
+                <Trash2 size={16} />
+                <span>{t('clearAll')}</span>
+              </button>
+
+              <button
+                onClick={onProceedToPrint}
+                disabled={selectedImageIds.length === 0}
+                className="btn btn-success"
+                style={{
+                  fontSize: '0.95rem',
+                  padding: '10px 22px',
+                  opacity: selectedImageIds.length === 0 ? 0.5 : 1,
+                  cursor: selectedImageIds.length === 0 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                <span>{t('proceedToPrint')}</span>
+                <ProceedIcon size={18} />
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Image Cards Grid */}
@@ -817,6 +731,26 @@ export function HomeView({
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '6px' }}>
                 {t('noImagesSubtitle')}
               </p>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '16px' }}>
+                <button
+                  type="button"
+                  onClick={handleBrowseFiles}
+                  className="btn btn-primary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 22px' }}
+                >
+                  <FolderOpen size={18} />
+                  <span>{t('browseFiles')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLoadSamples}
+                  className="btn btn-secondary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px' }}
+                >
+                  <Sparkles size={16} color="#f59e0b" />
+                  <span>{t('loadSamples')}</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
