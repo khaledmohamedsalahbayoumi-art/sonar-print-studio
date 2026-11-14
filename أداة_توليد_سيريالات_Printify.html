@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مولد سيريال تفعيل برنامج Printify</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Embedded CryptoJS for offline HMAC-SHA256 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --accent: #22c55e;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Alexandria', sans-serif; }
+    body {
+      background: radial-gradient(circle at 50% 20%, #1e293b 0%, #090d16 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+    .header { text-align: center; margin-bottom: 28px; }
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: white;
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.4);
+    }
+    h1 { font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 6px; }
+    p.sub { font-size: 0.85rem; color: var(--text-muted); }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #e5e7eb; }
+    input[type="text"], select {
+      width: 100%;
+      background: #0f172a;
+      border: 1.5px solid #334155;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s;
+      direction: ltr;
+      text-align: center;
+      font-family: 'Outfit', monospace;
+      font-weight: 600;
+    }
+    input[type="text"]:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.25);
+    }
+    select { direction: rtl; text-align: right; font-family: 'Alexandria', sans-serif; }
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn:hover {
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4);
+      transform: translateY(-1px);
+    }
+    .btn:active { transform: translateY(0); }
+    .result-box {
+      margin-top: 24px;
+      background: #090e17;
+      border: 1.5px dashed #38bdf8;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      display: none;
+    }
+    .key-display {
+      font-family: 'Outfit', monospace;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: 2px;
+      background: rgba(2, 132, 199, 0.12);
+      padding: 12px;
+      border-radius: 10px;
+      margin: 12px 0;
+      word-break: break-all;
+      user-select: all;
+    }
+    .copy-btn {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid #334155;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: #334155; }
+    .footer-note {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <img src="build/icon.png" alt="Printify" style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 4px 15px rgba(2, 132, 199, 0.4));" />
+    <h1>Printify - مولد التفعيل</h1>
+    <p class="sub">خاص بالإدارة لإنشاء أكواد تفعيل أصلية لعملاء البرنامج</p>
+  </div>
+
+  <div class="form-group">
+    <label>كود جهاز العميل (Machine ID):</label>
+    <input type="text" id="machineInput" placeholder="PRINT-XXXX-XXXX-XXXX" autocomplete="off" />
+  </div>
+
+  <div class="form-group">
+    <label>نوع الترخيص:</label>
+    <select id="licenseType">
+      <option value="perpetual">ترخيص دائم مدى الحياة (Perpetual)</option>
+      <option value="365">ترخيص سنوي (1 سنة - 365 يوم)</option>
+      <option value="180">ترخيص 6 أشهر (180 يوم)</option>
+      <option value="30">ترخيص تجريبي (30 يوم)</option>
+    </select>
+  </div>
+
+  <button class="btn" onclick="generateKey()">توليد كود التفعيل 🔑</button>
+
+  <div class="result-box" id="resultBox">
+    <span style="font-size: 0.82rem; color: #9ca3af;">كود التفعيل المرخص:</span>
+    <div class="key-display" id="keyOutput"></div>
+    <button class="copy-btn" id="copyBtn" onclick="copyKey()">نسخ الكود 📋</button>
+  </div>
+
+  <div class="footer-note">
+    🔒 النظام مشفر بتقنية HMAC-SHA256 • متوافق مع كافة أنظمة Windows و macOS
+  </div>
+</div>
+
+<script>
+  const MASTER_SECRET = 'SONAR_PRINT_STUDIO_MED_LICENSE_SECRET_KEY_2026_ELSAKKA_SECURE';
+
+  function generateKey() {
+    const rawInput = document.getElementById('machineInput').value.trim();
+    if (!rawInput) {
+      alert('يرجى إدخال كود جهاز العميل أولاً!');
+      return;
+    }
+
+    const normMachine = rawInput.toUpperCase();
+    const typeChoice = document.getElementById('licenseType').value;
+    const isPerpetual = (typeChoice === 'perpetual');
+    const typeFlag = isPerpetual ? 'P' : 'T';
+
+    const baseEpoch = new Date('2026-01-01').getTime();
+    const now = Date.now();
+    let expiryDays = 0xFFFF; // 65535
+    if (!isPerpetual) {
+      const days = parseInt(typeChoice, 10);
+      expiryDays = Math.min(0xFFFE, Math.floor((now + days * 24 * 60 * 60 * 1000 - baseEpoch) / (24 * 60 * 60 * 1000)));
+    }
+    const expiryHex = expiryDays.toString(16).toUpperCase().padStart(4, '0');
+
+    const dataToSign = `${normMachine}#${typeFlag}#${expiryHex}`;
+    const hash = CryptoJS.HmacSHA256(dataToSign, MASTER_SECRET);
+    const signature = hash.toString(CryptoJS.enc.Hex).toUpperCase();
+
+    const rawKey = typeFlag + expiryHex + signature.substring(0, 11);
+    const formattedKey = `${rawKey.substring(0, 4)}-${rawKey.substring(4, 8)}-${rawKey.substring(8, 12)}-${rawKey.substring(12, 16)}`;
+
+    document.getElementById('keyOutput').innerText = formattedKey;
+    document.getElementById('resultBox').style.display = 'block';
+  }
+
+  function copyKey() {
+    const key = document.getElementById('keyOutput').innerText;
+    navigator.clipboard.writeText(key).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.innerText = 'تم النسخ بنجاح! ✅';
+      setTimeout(() => { btn.innerText = 'نسخ الكود 📋'; }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>

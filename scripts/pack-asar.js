@@ -81,6 +81,7 @@ function copyDirSync(src, dest) {
 console.log('Syncing dist, electron, and package.json to app directory...');
 copyDirSync(path.join(rootDir, 'dist'), path.join(appDir, 'dist'));
 copyDirSync(path.join(rootDir, 'electron'), path.join(appDir, 'electron'));
+copyDirSync(path.join(rootDir, 'build'), path.join(appDir, 'build'));
 fs.copyFileSync(path.join(rootDir, 'package.json'), path.join(appDir, 'package.json'));
 
 // 2. Build asar

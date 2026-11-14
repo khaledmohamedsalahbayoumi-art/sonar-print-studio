@@ -108,7 +108,14 @@ function startFolderWatcher(folderPath) {
 }
 
 function createWindow() {
-  const iconPath = path.join(__dirname, '../build/icon.png');
+  const possibleIcons = [
+    path.join(__dirname, '../build/icon.png'),
+    path.join(__dirname, '../build/icon.ico'),
+    path.join(__dirname, '../dist/icon.png'),
+    path.join(process.resourcesPath || '', 'app/build/icon.png'),
+    path.join(process.resourcesPath || '', 'build/icon.png')
+  ];
+  const iconPath = possibleIcons.find(p => fs.existsSync(p));
   mainWindow = new BrowserWindow({
     width: 1366,
     height: 850,
@@ -116,7 +123,7 @@ function createWindow() {
     minHeight: 700,
     backgroundColor: '#0f172a',
     title: 'Printify - برنامج تجهيز وطباعة صور السونار والتقارير الطبية',
-    icon: fs.existsSync(iconPath) ? iconPath : undefined,
+    icon: iconPath,
     show: true,
     autoHideMenuBar: true,
     webPreferences: {

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useLicense } from '../context/LicenseContext';
 import { useLanguage } from '../context/LanguageContext';
+import printifyIcon from '../assets/icon.png';
 
 export function ActivationModal() {
   const {
@@ -160,25 +161,20 @@ export function ActivationModal() {
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <div
             style={{
-              width: '68px',
-              height: '68px',
-              borderRadius: '20px',
-              background: isActivated
-                ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.2) 100%)'
-                : 'linear-gradient(135deg, rgba(2, 132, 199, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%)',
-              border: isActivated ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(14, 165, 233, 0.4)',
+              width: '74px',
+              height: '74px',
+              borderRadius: '22px',
+              background: 'rgba(2, 132, 199, 0.1)',
+              border: isActivated ? '1.5px solid rgba(16, 185, 129, 0.4)' : '1.5px solid rgba(14, 165, 233, 0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 16px',
-              boxShadow: isActivated ? '0 0 20px rgba(16, 185, 129, 0.3)' : '0 0 20px rgba(6, 182, 212, 0.3)'
+              boxShadow: isActivated ? '0 0 25px rgba(16, 185, 129, 0.25)' : '0 0 25px rgba(6, 182, 212, 0.25)',
+              padding: '8px'
             }}
           >
-            {isActivated ? (
-              <ShieldCheck size={36} color="#10b981" />
-            ) : (
-              <Key size={34} color="#38bdf8" />
-            )}
+            <img src={printifyIcon} alt="Printify" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
 
           <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 6px' }}>

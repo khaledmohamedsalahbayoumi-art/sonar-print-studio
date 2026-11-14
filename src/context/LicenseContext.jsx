@@ -26,11 +26,11 @@ export function LicenseProvider({ children }) {
         }
       } else {
         // Browser fallback (for preview/development in Vite)
-        const storedMachine = localStorage.getItem('sonar_browser_machine_id') || 'SONAR-DEMO-2026-TEST';
-        localStorage.setItem('sonar_browser_machine_id', storedMachine);
+        const storedMachine = localStorage.getItem('printify_browser_machine_id') || localStorage.getItem('sonar_browser_machine_id') || 'PRINT-DEMO-2026-TEST';
+        localStorage.setItem('printify_browser_machine_id', storedMachine);
         setMachineId(storedMachine);
 
-        const isBrowserActive = localStorage.getItem('sonar_browser_is_activated') === 'true';
+        const isBrowserActive = localStorage.getItem('printify_browser_is_activated') === 'true' || localStorage.getItem('sonar_browser_is_activated') === 'true';
         setIsActivated(isBrowserActive);
         setLicenseInfo({
           isActivated: isBrowserActive,
@@ -76,6 +76,7 @@ export function LicenseProvider({ children }) {
       } else {
         // Browser fallback: accept any 16-char code or sample
         if (activationKey.replace(/[^A-Za-z0-9]/g, '').length === 16) {
+          localStorage.setItem('printify_browser_is_activated', 'true');
           localStorage.setItem('sonar_browser_is_activated', 'true');
           setIsActivated(true);
           setIsActivationModalOpen(false);
@@ -93,6 +94,7 @@ export function LicenseProvider({ children }) {
     if (window.electronAPI && typeof window.electronAPI.deactivateLicense === 'function') {
       await window.electronAPI.deactivateLicense();
     } else {
+      localStorage.removeItem('printify_browser_is_activated');
       localStorage.removeItem('sonar_browser_is_activated');
     }
     setIsActivated(false);

@@ -3,6 +3,7 @@ import { useDoctor } from '../context/DoctorContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { Stethoscope, UserCog, Printer, Image as ImageIcon, Sun, Moon, Globe, Folder, User, ChevronDown } from 'lucide-react';
+import printifyIcon from '../assets/icon.png';
 
 export function Header({
   currentView,
@@ -40,14 +41,21 @@ export function Header({
           width: '44px',
           height: '44px',
           borderRadius: '12px',
-          background: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
+          background: 'rgba(2, 132, 199, 0.08)',
+          border: '1px solid rgba(2, 132, 199, 0.25)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 0 16px rgba(6, 182, 212, 0.35)',
-          flexShrink: 0
+          boxShadow: '0 0 16px rgba(2, 132, 199, 0.2)',
+          flexShrink: 0,
+          padding: '4px',
+          overflow: 'hidden'
         }}>
-          <Stethoscope size={24} color="#ffffff" />
+          <img
+            src={printifyIcon}
+            alt="Printify"
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
