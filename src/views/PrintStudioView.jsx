@@ -727,52 +727,6 @@ export function PrintStudioView({
                   </div>
                 </div>
               )}
-
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                {t('chooseImageForSlot')}
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', maxHeight: '160px', overflowY: 'auto' }}>
-                {images.map((img) => (
-                  <div
-                    key={img.id}
-                    draggable={true}
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData('text/plain', img.id);
-                      e.dataTransfer.setData('application/json', JSON.stringify({ id: img.id }));
-                    }}
-                    onClick={() => handleAssignImageToSlot(img)}
-                    style={{
-                      height: '60px',
-                      background: '#000000',
-                      borderRadius: '6px',
-                      overflow: 'hidden',
-                      cursor: 'grab',
-                      border: '1px solid var(--border-subtle)'
-                    }}
-                    title={`${img.name}`}
-                  >
-                    <img src={img.url} alt={img.name} style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }} />
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <button
-                  onClick={() => handleClearSlot(activeSlotIndex)}
-                  style={{
-                    background: '#ef4444',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '4px 10px',
-                    fontSize: '0.72rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {t('clearSlotBtn')}
-                </button>
-              </div>
             </div>
           )}
 
