@@ -975,38 +975,7 @@ export function HomeView({
         </div>
       )}
 
-      {/* Floating Action Bar at the bottom when images are selected */}
-      {selectedImageIds.length > 0 && (
-        <div style={{
-          position: 'fixed',
-          bottom: '24px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'var(--bg-secondary)',
-          backdropFilter: 'blur(16px)',
-          border: '1px solid #0284c7',
-          padding: '12px 28px',
-          borderRadius: '50px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(14, 165, 233, 0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '20px',
-          zIndex: 30
-        }} className="fade-in">
-          <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-main)' }}>
-            {t('imagesSelected', { count: selectedImageIds.length, total: images.length })}
-          </div>
 
-          <button
-            onClick={onProceedToPrint}
-            className="btn btn-primary"
-            style={{ padding: '10px 26px', borderRadius: '30px', fontSize: '1rem' }}
-          >
-            <span>{t('proceedToPrint')}</span>
-            <ProceedIcon size={18} />
-          </button>
-        </div>
-      )}
 
       {/* In-app custom confirmation dialog */}
       <ConfirmModal
